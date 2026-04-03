@@ -1,0 +1,425 @@
+@if($mode === 'create' || $mode === 'edit')
+@extends('layouts.admin')
+{{-- ═══ CREATE / EDIT MODE ═══ --}}
+
+@section('title', $mode === 'create' ? 'Add Product Detail Option' : 'Edit Product Detail Option')
+
+@section('styles')
+<style>
+    .page-header-wrap { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .page-header-wrap h1 { font-size:22px; font-weight:800; color:var(--text); }
+    .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; white-space:nowrap; }
+    .btn-back:hover { background:#334155; }
+
+    .content-panel { background:white; border:1px solid var(--border); border-radius:12px; padding:32px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+
+    .form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px 24px; margin-bottom:28px; }
+
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-label { font-size:13px; font-weight:600; color:var(--text); }
+    .form-label span { color:var(--danger); margin-left:2px; }
+
+    .form-input, .form-select {
+        width:100%; padding:9px 13px;
+        border:1.5px solid var(--border); border-radius:8px;
+        font-family:inherit; font-size:13.5px; color:var(--text);
+        outline:none; transition:border-color .2s, box-shadow .2s; background:white;
+    }
+    .form-input:focus, .form-select:focus {
+        border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1);
+    }
+    .form-input::placeholder { color:#CBD5E1; }
+    .form-select { appearance:none; background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; cursor:pointer; }
+
+    /* Data type radio row */
+    .data-type-wrap { display:flex; align-items:center; flex-wrap:nowrap; gap:24px; padding:20px 0; border-top:1px solid var(--border); margin-bottom:8px; }
+    .data-type-label { font-size:13px; font-weight:600; color:var(--text); margin-right:8px; white-space:nowrap; }
+    .radio-option { display:flex; align-items:center; gap:8px; cursor:pointer; white-space:nowrap; }
+    .radio-option input[type="radio"] { width:18px; height:18px; accent-color:var(--primary); cursor:pointer; }
+    .radio-option span { font-size:14px; color:var(--text); font-weight:500; }
+
+    .form-actions { display:flex; justify-content:flex-end; padding-top:20px; border-top:1px solid var(--border); margin-top:20px; clear:both; }
+    .btn-save { display:inline-flex; align-items:center; gap:8px; padding:10px 28px; background:#10B981; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s, box-shadow .2s; }
+    .btn-save:hover { background:#059669; box-shadow:0 4px 14px rgba(16,185,129,.35); }
+
+    .multi-select-wrap { position:relative; width:100%; }
+.multi-select-trigger {
+    width:100%; padding:9px 13px;
+    border:1.5px solid var(--border); border-radius:8px;
+    font-family:inherit; font-size:13.5px; color:var(--text);
+    background:white; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between;
+    user-select:none;
+}
+.multi-select-trigger:hover { border-color:var(--primary); }
+.multi-select-options {
+    display:none;
+    position:absolute; top:calc(100% + 4px); left:0; right:0;
+    background:white; border:1.5px solid var(--border); border-radius:8px;
+    box-shadow:0 4px 16px rgba(0,0,0,.1);
+    max-height:200px; overflow-y:auto; z-index:100;
+    padding:6px;
+}
+.multi-select-options.open { display:block; }
+.multi-select-item {
+    display:flex; align-items:center; gap:10px;
+    padding:8px 10px; border-radius:6px;
+    font-size:13.5px; color:var(--text);
+    cursor:pointer; transition:background .1s;
+}
+.multi-select-item:hover { background:#F0F9FF; }
+.multi-select-item input[type="checkbox"] {
+    width:16px; height:16px; accent-color:var(--primary); cursor:pointer;
+}
+    .alert-error { padding:12px 16px; background:#FEE2E2; color:#991B1B; border:1px solid #FECACA; border-radius:8px; font-size:13.5px; margin-bottom:20px; }
+</style>
+@endsection
+
+@section('content')
+
+
+
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">{{ $mode === 'create' ? 'Add Product Detail Option' : 'Edit Product Detail Option' }}</h1>
+    <a href="{{ route('admin.products.detail-options.index') }}" class="btn-back">← Back</a>
+</div>
+
+<div class="content-panel">
+
+    @if($errors->any())
+        <div class="alert-error">{{ $errors->first() }}</div>
+    @endif
+
+    <form
+        method="POST"
+        action="{{ $mode === 'create'
+            ? route('admin.products.detail-options.store')
+            : route('admin.products.detail-options.update', $record->id) }}"
+        id="optionForm"
+    >
+        @csrf
+        @if($mode === 'edit') @method('PUT') @endif
+
+        {{-- Top 3-column grid --}}
+        <div class="form-grid">
+
+            {{-- Option Name --}}
+            <div class="form-group">
+                <label class="form-label">Option Name: <span>*</span></label>
+                <input
+                    type="text"
+                    name="option_name"
+                    class="form-input"
+                    placeholder="e.g. Serial Number"
+                    value="{{ old('option_name', $record->option_name ?? '') }}"
+                    required
+                />
+            </div>
+
+            {{-- Main Menu --}}
+            <div class="form-group">
+                <label class="form-label">Main Menu:</label>
+                <select name="main_menu_id" class="form-select">
+                    <option value=""> Select Main Menu </option>
+                    @foreach($mainMenus as $menu)
+                        <option value="{{ $menu->id }}"
+                            {{ old('main_menu_id', $record->main_menu_id ?? '') == $menu->id ? 'selected' : '' }}>
+                            {{ $menu->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Sub Menu --}}
+            <div class="form-group">
+                <label class="form-label">Sub Menu:</label>
+                <select name="sub_menu_id" class="form-select">
+                    <option value=""> Select Sub Menu </option>
+                    @foreach($subMenus as $menu)
+                        <option value="{{ $menu->id }}"
+                            {{ old('sub_menu_id', $record->sub_menu_id ?? '') == $menu->id ? 'selected' : '' }}>
+                            {{ $menu->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Unit --}}
+<div class="form-group">
+    <label class="form-label">Unit:</label>
+    <div class="multi-select-wrap" id="unitDropdown">
+        <div class="multi-select-trigger" onclick="toggleMultiSelect()">
+            <span id="unitTriggerText"> Select Units </span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="multi-select-options" id="unitOptions">
+            @foreach($units as $unit)
+                <label class="multi-select-item">
+                    <input type="checkbox" name="unit_ids[]" value="{{ (string)$unit->id }}"
+    {{ in_array((string)$unit->id, array_map('strval', old('unit_ids', $record->unit_ids ?? []))) ? 'checked' : '' }}
+                        onchange="updateTriggerText()"/>
+                    {{ $unit->unit_name }}
+                </label>
+            @endforeach
+        </div>
+    </div>
+</div>
+
+        {{-- Data Type Radio Row --}}
+        <div class="data-type-wrap">
+            <span class="data-type-label">Data Type:</span>
+
+            @foreach(['integer' => 'Integer', 'float' => 'Float', 'small_text' => 'Small Text', 'long_text' => 'Long Text'] as $value => $label)
+                <label class="radio-option">
+                    <input
+                        type="radio"
+                        name="data_type"
+                        value="{{ $value }}"
+                        {{ old('data_type', $record->data_type ?? 'small_text') === $value ? 'checked' : '' }}
+                    />
+                    <span>{{ $label }}</span>
+                </label>
+            @endforeach
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Save
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+function toggleMultiSelect() {
+    document.getElementById('unitOptions').classList.toggle('open');
+}
+function updateTriggerText() {
+    const checked = document.querySelectorAll('#unitOptions input:checked');
+    const trigger = document.getElementById('unitTriggerText');
+    if (checked.length === 0) {
+        trigger.textContent = 'Select Units';
+    } else {
+        trigger.textContent = Array.from(checked).map(c => c.closest('label').textContent.trim()).join(', ');
+    }
+}
+document.addEventListener('click', function(e) {
+    if (!document.getElementById('unitDropdown').contains(e.target)) {
+        document.getElementById('unitOptions').classList.remove('open');
+    }
+});
+document.addEventListener('DOMContentLoaded', updateTriggerText);
+</script>
+
+
+@endsection
+
+
+
+@else
+
+{{-- ═══ INDEX MODE ═══ --}}
+
+@section('title', 'Product Detail Options')
+
+@section('styles')
+<style>
+    .page-title { font-size:22px; font-weight:800; color:var(--text); }
+    .page-title span { color:var(--primary); }
+
+    .content-panel { background:white; border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+    .table-toolbar { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--border); gap:12px; flex-wrap:wrap; background:#FAFBFD; }
+    .search-group { display:flex; align-items:center; gap:8px; }
+    .search-group label { font-size:13.5px; color:var(--text); font-weight:600; }
+    .search-input-wrap { position:relative; }
+    .search-input-wrap svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#CBD5E1; pointer-events:none; }
+    .search-input { padding:8px 12px 8px 34px; border:1.5px solid var(--border); border-radius:7px; font-family:inherit; font-size:13px; outline:none; width:230px; color:var(--text); transition:border-color .2s; background:white; }
+    .search-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1); }
+    .search-input::placeholder { color:#CBD5E1; }
+    .entries-group { display:flex; align-items:center; gap:7px; font-size:13.5px; color:var(--muted); font-weight:500; }
+    .entries-select { padding:7px 26px 7px 10px; border:1.5px solid var(--border); border-radius:7px; font-family:inherit; font-size:13px; font-weight:600; color:var(--text); background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 7px center; -webkit-appearance:none; appearance:none; outline:none; cursor:pointer; }
+    .entries-select:hover,.entries-select:focus { border-color:var(--primary); }
+
+    .data-table { width:100%; border-collapse:collapse; }
+    .data-table thead { background:#F0F9FF; }
+    .data-table th { padding:11px 16px; text-align:left; font-size:12px; font-weight:700; color:var(--primary-d); text-transform:uppercase; letter-spacing:.5px; border-bottom:2px solid #BAE6FD; white-space:nowrap; }
+    .data-table th.center,.data-table td.center { text-align:center; }
+    .data-table td { padding:13px 16px; font-size:13.5px; color:var(--text); border-bottom:1px solid #F1F5F9; vertical-align:middle; }
+    .data-table tr:last-child td { border-bottom:none; }
+    .data-table tbody tr:nth-child(odd) td { background:white; }
+    .data-table tbody tr:nth-child(even) td { background:#FAFBFD; }
+    .data-table tbody tr:hover td { background:#E0F2FE !important; }
+
+    /* Data type badge */
+    .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:5px; font-size:12px; font-weight:600; white-space:nowrap; }
+    .badge-integer   { background:#EFF6FF; color:#1D4ED8; }
+    .badge-float     { background:#F0FDF4; color:#15803D; }
+    .badge-small_text { background:#FFF7ED; color:#C2410C; }
+    .badge-long_text  { background:#FAF5FF; color:#7E22CE; }
+
+    .action-btns { display:flex; align-items:center; justify-content:center; gap:8px; }
+    .action-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1.5px solid transparent; background:none; border-radius:7px; transition:all .15s; text-decoration:none; }
+    .action-icon svg { width:15px; height:15px; }
+    .action-icon.edit   { color:#D97706; border-color:#FDE68A; background:#FFFBEB; }
+    .action-icon.delete { color:#DC2626; border-color:#FECACA; background:#FEF2F2; }
+    .action-icon:hover  { transform:translateY(-2px) scale(1.08); box-shadow:0 3px 8px rgba(0,0,0,.12); }
+    .action-icon.edit:hover   { background:#FEF3C7; border-color:#F59E0B; }
+    .action-icon.delete:hover { background:#FEE2E2; border-color:#EF4444; }
+
+    .table-footer { padding:12px 20px; font-size:13px; color:var(--muted); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#FAFBFD; }
+    .pagination { display:flex; gap:3px; list-style:none; }
+    .pagination li a,.pagination li span { display:flex; align-items:center; justify-content:center; min-width:32px; height:32px; padding:0 8px; border-radius:6px; border:1.5px solid var(--border); font-size:13px; font-weight:500; text-decoration:none; color:var(--text); background:white; transition:all .15s; }
+    .pagination li.active span { background:var(--primary-d); border-color:var(--primary-d); color:white; }
+    .pagination li a:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-l); }
+
+    .empty-state { text-align:center; padding:52px 20px; color:var(--muted); }
+    .empty-state svg { width:42px; height:42px; margin:0 auto 12px; opacity:.2; display:block; }
+    .empty-state p { font-size:14px; font-weight:500; }
+
+    .alert-success { padding:12px 16px; background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; border-radius:8px; font-size:13.5px; font-weight:500; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
+</style>
+@endsection
+
+@section('content')
+
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+    <h1 class="page-title">
+        <span>Products</span> - Product Detail Options
+    </h1>
+    <a href="{{ route('admin.products.detail-options.create') }}"
+       style="display:inline-flex; align-items:center; gap:7px; padding:10px 20px;
+              background:var(--primary); color:white; border-radius:8px; font-size:14px;
+              font-weight:600; text-decoration:none; white-space:nowrap;"
+       onmouseover="this.style.background='var(--primary-d)'"
+       onmouseout="this.style.background='var(--primary)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add +
+    </a>
+</div>
+
+@if(session('success'))
+    <div class="alert-success">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        {{ session('success') }}
+    </div>
+@endif
+
+<div class="content-panel">
+
+    <div class="table-toolbar">
+        <form method="GET" action="{{ route('admin.products.detail-options.index') }}" class="search-group">
+            <label>Search:</label>
+            <div class="search-input-wrap">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" name="search" value="{{ request('search') }}"
+                       placeholder="Search By Option..." class="search-input"/>
+            </div>
+        </form>
+
+        <form method="GET" action="{{ route('admin.products.detail-options.index') }}" class="entries-group">
+            Show
+            <select name="entries" class="entries-select" onchange="this.form.submit()">
+                @foreach([10,25,50,100] as $n)
+                    <option value="{{ $n }}" {{ request('entries',10) == $n ? 'selected':'' }}>{{ $n }}</option>
+                @endforeach
+            </select>
+            entries
+            @if(request('search'))
+                <input type="hidden" name="search" value="{{ request('search') }}">
+            @endif
+        </form>
+    </div>
+
+    <table class="data-table">
+    <thead>
+        <tr>
+            <th class="center" style="width:60px;">S.No</th>
+<th class="center">Option Name</th>
+<th class="center" style="width:160px;">Data Type</th>
+<th class="center" style="width:90px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($options as $index => $option)
+        <tr>
+            <td class="center" style="font-weight:700; color:var(--muted); font-size:13px;">
+                {{ $options->firstItem() + $index }}
+            </td>
+            <td class="center" style="font-weight:500;">{{ $option->option_name }}</td>
+<td class="center">
+    <span class="badge badge-{{ $option->data_type }}">
+                    {{ match($option->data_type) {
+                        'integer'    => 'Integer',
+                        'float'      => 'Float',
+                        'small_text' => 'Small Text',
+                        'long_text'  => 'Long Text',
+                        default      => $option->data_type
+                    } }}
+                </span>
+            </td>
+            <td>
+                <div class="action-btns">
+                    <a href="{{ route('admin.products.detail-options.edit', $option->id) }}"
+                       class="action-icon edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                    </a>
+                    <button class="action-icon delete" title="Delete"
+                        onclick="if(confirm('Delete this option?')) document.getElementById('del-{{ $option->id }}').submit();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                            <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                        </svg>
+                    </button>
+                    <form id="del-{{ $option->id }}" method="POST"
+                          action="{{ route('admin.products.detail-options.destroy', $option->id) }}"
+                          style="display:none;">
+                        @csrf @method('DELETE')
+                    </form>
+                </div>
+            </td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="4">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <p>No product detail options yet. Click <strong>Add +</strong> to create one.</p>
+                </div>
+            </td>
+        </tr>
+        @endforelse
+    </tbody>
+</table>
+
+
+    <div class="table-footer">
+        <span>{{ $options->firstItem() ?? 0 }}–{{ $options->lastItem() ?? 0 }} of {{ $options->total() }} entries</span>
+        {{ $options->appends(request()->query())->links() }}
+    </div>
+
+</div>
+
+@endsection
+
+@endif
+
+

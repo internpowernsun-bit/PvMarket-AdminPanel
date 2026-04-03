@@ -1,0 +1,269 @@
+{{-- views/admin/setup/sliders/sliders.blade.php --}}
+{{-- Single file handles: index | create | edit --}}
+
+{{-- ═══════════════════════════════════════
+     MODE: INDEX
+════════════════════════════════════════ --}}
+@if($mode === 'index')
+
+<x-admin.index-page
+    title="Sliders"
+    create-route="{{ route('admin.setup.sliders.create') }}"
+    search-route="{{ route('admin.setup.sliders.index') }}"
+    search-placeholder="Search By Slider Name..."
+    :total="$records->total()"
+    :first-item="$records->firstItem() ?? 0"
+    :last-item="$records->lastItem() ?? 0"
+    :paginator="$records"
+    :show-drag-handle="true"
+>
+    <x-slot name="columns">
+        <th class="center">Slider Image</th>
+        <th>Slider</th>
+        <th>Redirect Link</th>
+        <th class="center" style="width:130px;">Action</th>
+    </x-slot>
+
+    <x-slot name="rows">
+        @forelse ($records as $index => $slider)
+        <tr data-id="{{ $slider->id }}" draggable="true">
+            {{-- Drag handle --}}
+            <td class="center">
+                <div class="drag-handle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9"  cy="5"  r="1" fill="currentColor"/>
+                        <circle cx="9"  cy="12" r="1" fill="currentColor"/>
+                        <circle cx="9"  cy="19" r="1" fill="currentColor"/>
+                        <circle cx="15" cy="5"  r="1" fill="currentColor"/>
+                        <circle cx="15" cy="12" r="1" fill="currentColor"/>
+                        <circle cx="15" cy="19" r="1" fill="currentColor"/>
+                    </svg>
+                </div>
+            </td>
+            {{-- S.No --}}
+            <td class="center" style="font-weight:700; color:var(--muted); font-size:13px;">
+                {{ $records->firstItem() + $index }}
+            </td>
+            {{-- Image --}}
+            <td class="center">
+                @if($slider->image)
+                    <div class="thumb">
+                        <img src="{{ asset('storage/' . $slider->image) }}" alt="{{ $slider->name }}"/>
+                    </div>
+                @else
+                    <div class="thumb-placeholder">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                    </div>
+                @endif
+            </td>
+            {{-- Name --}}
+            <td style="font-weight:600;">{{ $slider->name }}</td>
+            {{-- Link --}}
+            <td>
+                @if($slider->redirect_link)
+                    <a href="{{ $slider->redirect_link }}" target="_blank" class="redirect-link">Link</a>
+                @else
+                    <span style="color:#CBD5E1;">—</span>
+                @endif
+            </td>
+            {{-- Actions --}}
+            <td>
+                <div class="action-btns">
+                    <a href="{{ route('admin.setup.sliders.edit', $slider->id) }}"
+                       class="action-icon edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                    </a>
+                    <button class="action-icon toggle" title="Toggle status"
+                        onclick="document.getElementById('tog-{{ $slider->id }}').submit();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="5" width="22" height="14" rx="7" ry="7"/>
+                            <circle cx="{{ ($slider->is_active ?? true) ? '16' : '8' }}" cy="12" r="3" fill="currentColor"/>
+                        </svg>
+                    </button>
+                    <form id="tog-{{ $slider->id }}" method="POST"
+                          action="{{ route('admin.setup.sliders.toggle', $slider->id) }}"
+                          style="display:none;">
+                        @csrf @method('PATCH')
+                    </form>
+                    <button class="action-icon delete" title="Delete"
+                        onclick="if(confirm('Delete this slider?')) document.getElementById('del-{{ $slider->id }}').submit();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                            <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                        </svg>
+                    </button>
+                    <form id="del-{{ $slider->id }}" method="POST"
+                          action="{{ route('admin.setup.sliders.destroy', $slider->id) }}"
+                          style="display:none;">
+                        @csrf @method('DELETE')
+                    </form>
+                </div>
+            </td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="6">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <p>No sliders yet. Click <strong>Add +</strong> to create one.</p>
+                </div>
+            </td>
+        </tr>
+        @endforelse
+    </x-slot>
+
+</x-admin.index-page>
+
+@push('scripts')
+<script>
+    {{-- Save drag-and-drop reorder via AJAX --}}
+    document.addEventListener('rowsReordered', e => {
+        fetch("{{ route('admin.setup.sliders.reorder') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type':  'application/json',
+                'X-CSRF-TOKEN':  document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ order: e.detail.ids })
+        });
+    });
+</script>
+@endpush
+
+
+{{-- ═══════════════════════════════════════
+     MODE: CREATE  (multi-row table form)
+════════════════════════════════════════ --}}
+@elseif($mode === 'create')
+
+<x-admin.table-form-page
+    title="Add Sliders"
+    :back-route="route('admin.setup.sliders.index')"
+    :action="route('admin.setup.sliders.store')"
+>
+    <x-slot name="columns">
+        <th style="min-width:160px;">Slider Name</th>
+        <th style="min-width:200px;">Slider Image</th>
+        <th style="min-width:160px;">Alt Tag</th>
+        <th style="min-width:200px;">Redirect Link</th>
+    </x-slot>
+
+    <x-slot name="row">
+        <td>
+            <input
+                type="text"
+                name="sliders[{INDEX}][name]"
+                placeholder="e.g. Jinko Solar"
+                required
+            />
+        </td>
+        <td>
+            <input
+                type="file"
+                name="sliders[{INDEX}][image]"
+                accept="image/*"
+            />
+        </td>
+        <td>
+            <input
+                type="text"
+                name="sliders[{INDEX}][alt_tag]"
+                placeholder="e.g. Jinko"
+            />
+        </td>
+        <td>
+            <input
+                type="url"
+                name="sliders[{INDEX}][redirect_link]"
+                placeholder="https://example.com"
+            />
+        </td>
+    </x-slot>
+
+</x-admin.table-form-page>
+
+
+{{-- ═══════════════════════════════════════
+     MODE: EDIT  (single record form)
+════════════════════════════════════════ --}}
+@elseif($mode === 'edit')
+
+<x-admin.form-page
+    title="Edit Slider"
+    :back-route="route('admin.setup.sliders.index')"
+    :action="route('admin.setup.sliders.update', $record->id)"
+    method="PUT"
+>
+    <div class="form-grid">
+
+        {{-- Slider Name --}}
+        <div class="form-group">
+            <label class="form-label">Slider Name <span>*</span></label>
+            <input
+                type="text"
+                name="name"
+                class="form-input"
+                placeholder="e.g. Jinko Solar"
+                value="{{ old('name', $record->name) }}"
+                required
+            />
+        </div>
+
+        {{-- Image --}}
+        <div class="form-group">
+            <label class="form-label">Slider Image</label>
+            @if($record->image)
+                <div style="margin-bottom:8px;">
+                    <img
+                        src="{{ asset('storage/' . $record->image) }}"
+                        style="height:50px; border-radius:6px; border:1px solid var(--border);"
+                        alt="{{ $record->name }}"
+                    />
+                </div>
+            @endif
+            <div class="form-file-wrap">
+                <input type="file" name="image" accept="image/*"/>
+            </div>
+            <span class="form-hint">Leave blank to keep current image</span>
+        </div>
+
+        {{-- Alt Tag --}}
+        <div class="form-group">
+            <label class="form-label">Alt Tag</label>
+            <input
+                type="text"
+                name="alt_tag"
+                class="form-input"
+                placeholder="e.g. Jinko Solar Banner"
+                value="{{ old('alt_tag', $record->alt_tag) }}"
+            />
+        </div>
+
+        {{-- Redirect Link --}}
+        <div class="form-group">
+            <label class="form-label">Redirect Link</label>
+            <input
+                type="url"
+                name="redirect_link"
+                class="form-input"
+                placeholder="https://example.com"
+                value="{{ old('redirect_link', $record->redirect_link) }}"
+            />
+        </div>
+
+    </div>
+</x-admin.form-page>
+
+@endif

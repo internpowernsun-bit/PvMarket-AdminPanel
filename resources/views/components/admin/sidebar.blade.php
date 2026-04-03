@@ -1,0 +1,324 @@
+<aside class="sidebar">
+
+    <a href="{{ route('admin.dashboard') }}" class="sidebar-logo">
+        <img
+            src="{{ asset('assets/images/logos/Pv Market Logo-01.png') }}"
+            alt="Powernsun"
+            style="height: 40px; width: auto; object-fit: contain; max-width: 250px; transform: scale(1.4);"
+        />
+    </a>
+
+    {{-- Navigation --}}
+    <nav class="sidebar-nav">
+
+        {{-- Setup --}}
+        <div class="nav-item has-children {{ request()->routeIs('admin.setup.*') ? 'active open' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            Setting
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.setup.*') ? 'open' : '' }}">
+            <a href="{{ route('admin.setup.main-menus.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.main-menus.*') ? 'active' : '' }}">
+               Main Menu
+            </a>
+            <a href="{{ route('admin.setup.sub-menus.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.sub-menus.*') ? 'active' : '' }}">
+               Sub Menu
+            </a>
+            <a href="{{ route('admin.setup.brands.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.brands.*') ? 'active' : '' }}">
+               Brands
+            </a>
+            <a href="{{ route('admin.setup.units.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.units.*') ? 'active' : '' }}">
+               Units
+            </a>
+            <a href="{{ route('admin.setup.sliders.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.sliders.*') ? 'active' : '' }}">
+               Sliders
+            </a>
+            <a href="{{ route('admin.setup.advertisements.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.advertisements.*') ? 'active' : '' }}">
+               Advertisements
+            </a>
+            <a href="{{ route('admin.setup.charges.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.charges.*') ? 'active' : '' }}">
+               Charges Setup
+            </a>
+            <a href="{{ route('admin.setup.sub-admins.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.sub-admins.*') ? 'active' : '' }}">
+               Sub Admins
+            </a>
+            <a href="{{ route('admin.setup.countries.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.countries.*') ? 'active' : '' }}">
+               Countries
+            </a>
+            <a href="{{ route('admin.setup.coupons.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.coupons.*') ? 'active' : '' }}">
+               Coupons Management
+            </a>
+            <a href="{{ route('admin.setup.incoterms.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.incoterms.*') ? 'active' : '' }}">
+               Incoterms
+            </a>
+            <!--<a href="#" class="nav-sub-item">Home Sections</a>-->
+        </div>
+
+        {{-- Page Templates --}}
+        <!--
+        <div class="nav-item has-children {{ request()->routeIs('admin.templates.*') ? 'active open' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            Page Templates
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.templates.*') ? 'open' : '' }}">
+            <a href="#" class="nav-sub-item">Static Pages</a>
+            <a href="#" class="nav-sub-item">Static Page Meta</a>
+        </div>-->
+
+        {{-- Knowledge Hub --}}
+        <div class="nav-item has-children {{ request()->routeIs('admin.knowledge-hub.*') ? 'active open' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            Knowledge Hub
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.knowledge-hub.*') ? 'open' : '' }}">
+            <a href="{{ route('admin.knowledge-hub.news.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.knowledge-hub.news.*') ? 'active' : '' }}">
+               News
+            </a>
+            <a href="{{ route('admin.knowledge-hub.events.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.knowledge-hub.events.*') ? 'active' : '' }}">
+               Events
+            </a>
+            <a href="{{ route('admin.knowledge-hub.blogs.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.knowledge-hub.blogs.*') ? 'active' : '' }}">
+               Blogs
+            </a>
+            <!--
+            <a href="#" class="nav-sub-item">Blog Comments</a>-->
+            <a href="{{ route('admin.knowledge-hub.price-promotions.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.knowledge-hub.price-promotions.*') ? 'active' : '' }}">
+               Price Promotions
+            </a>
+            <a href="{{ route('admin.knowledge-hub.pv-spot-price.index') }}"
+   class="nav-sub-item {{ request()->routeIs('admin.knowledge-hub.pv-spot-price.*') ? 'active' : '' }}">
+   PV Spot Price
+</a>
+        </div>
+
+        {{-- Courses/Profile Setup --}}
+        <!--
+        <div class="nav-item has-children {{ request()->routeIs('admin.courses.*') ? 'active open' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+            Courses/Profile Setup
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.courses.*') ? 'open' : '' }}">
+            <a href="#" class="nav-sub-item">Course Categories</a>
+            <a href="#" class="nav-sub-item">Courses</a>
+            <a href="#" class="nav-sub-item">Course Coupons</a>
+            <a href="#" class="nav-sub-item">Profiles</a>
+        </div>
+
+        {{-- Meta Data --}}
+        <div class="nav-item has-children {{ request()->routeIs('admin.metadata.*') ? 'active open' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 9h18M9 21V9"/>
+            </svg>
+            Meta Data
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.metadata.*') ? 'open' : '' }}">
+            <a href="#" class="nav-sub-item">Home Meta</a>
+            <a href="#" class="nav-sub-item">Common Meta Scripts</a>
+            <a href="#" class="nav-sub-item">Non-Index URLs</a>
+            <a href="#" class="nav-sub-item">SEO Meta</a>
+        </div>
+
+        {{-- Charges History --}}
+        <div class="nav-item has-children {{ request()->routeIs('admin.charges.*') ? 'active open' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+            Charges History
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.charges.*') ? 'open' : '' }}">
+            <a href="#" class="nav-sub-item">Offers</a>
+            <a href="#" class="nav-sub-item">Warehouses</a>
+        </div>
+
+        {{-- Solar Projects --}}
+        
+        <div class="nav-item has-children {{ request()->routeIs('admin.projects.*') ? 'active open' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
+            Solar Projects
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.projects.*') ? 'open' : '' }}">
+            <a href="#" class="nav-sub-item">All Projects</a>
+            <a href="#" class="nav-sub-item">Add Project</a>
+        </div>-->
+
+
+        {{-- User Management --}}
+        <a href="{{ route('admin.users.index') }}"
+           class="nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            User Management
+        </a>
+
+        {{-- Schedules --}}
+        <a href="{{ route('admin.schedules.index') }}"
+           class="nav-item {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Schedules
+        </a>
+
+        {{-- Sales --}}
+        <!--
+        <a href="#" class="nav-item {{ request()->routeIs('admin.sales.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            Sales
+        </a>
+
+        {{-- Lead Generations --}}
+        <div class="nav-item has-children {{ request()->routeIs('admin.leads.*') ? 'active open' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Lead Generations
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.leads.*') ? 'open' : '' }}">
+            <a href="#" class="nav-sub-item">Leads</a>
+            <a href="#" class="nav-sub-item">LoggedIn User Leads</a>
+        </div>
+
+        {{-- Discount Center --}}
+        <div class="nav-item has-children {{ request()->routeIs('admin.discount.*') ? 'active open' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+            Discount Center
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.discount.*') ? 'open' : '' }}">
+            <a href="#" class="nav-sub-item">Clearance Sales Offers</a>
+            <a href="#" class="nav-sub-item">Top Discount Product Offers</a>
+        </div>
+
+        {{-- Bid/Fair Price Requests --}}
+        <a href="#" class="nav-item {{ request()->routeIs('admin.bids.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+            Bid/Fair Price Requests
+        </a>
+
+        {{-- Sell on PVMarket Requests --}}
+        <a href="#" class="nav-item {{ request()->routeIs('admin.sell.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            Sell on PVMarket Requests
+        </a>-->
+
+        {{-- ══ Products  ══ --}}
+<div class="nav-item has-children {{ request()->routeIs('admin.products.*') ? 'active open' : '' }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+    </svg>
+    Products
+    <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+</div>
+<div class="nav-sub {{ request()->routeIs('admin.products.*') ? 'open' : '' }}">
+    <a href="{{ route('admin.products.index') }}"
+       class="nav-sub-item {{ request()->routeIs('admin.products.index') || request()->routeIs('admin.products.create') || request()->routeIs('admin.products.edit') || request()->routeIs('admin.products.show') ? 'active' : '' }}">
+       Products
+    </a>
+    <a href="{{ route('admin.products.detail-options.index') }}"
+       class="nav-sub-item {{ request()->routeIs('admin.products.detail-options.*') ? 'active' : '' }}">
+       Product Details Options
+    </a>
+</div>
+
+        {{-- Export --}}
+        <!--
+        <a href="#" class="nav-item {{ request()->routeIs('admin.export.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="18" x2="12" y2="12"/>
+                <line x1="9" y1="15" x2="12" y2="18"/>
+                <line x1="15" y1="15" x2="12" y2="18"/>
+            </svg>
+            Export
+        </a>
+
+        {{-- Miscellaneous Export --}}
+        <a href="#" class="nav-item {{ request()->routeIs('admin.misc-export.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="8" y1="13" x2="16" y2="13"/>
+                <line x1="8" y1="17" x2="16" y2="17"/>
+            </svg>
+            Miscellaneous Export
+        </a>-->
+
+    </nav>
+
+    {{-- Logout — fixed at bottom --}}
+    <div class="sidebar-footer">
+        <form method="POST" action="{{ route('admin.logout') }}">
+            @csrf
+            <button type="submit" class="nav-item" style="color: var(--danger);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--danger);">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Logout
+            </button>
+        </form>
+    </div>
+
+</aside>
