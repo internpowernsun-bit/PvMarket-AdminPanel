@@ -119,7 +119,7 @@
             {{-- Main Menu --}}
             <div class="form-group">
                 <label class="form-label">Main Menu:</label>
-                <select name="main_menu_id" class="form-select">
+                <select name="main_menu_id" id="detailMainMenuSelect" class="form-select" onchange="handleDetailMainMenuChange(this.value)">
                     <option value=""> Select Main Menu </option>
                     @foreach($mainMenus as $menu)
                         <option value="{{ $menu->id }}"
@@ -133,7 +133,7 @@
             {{-- Sub Menu --}}
             <div class="form-group">
                 <label class="form-label">Sub Menu:</label>
-                <select name="sub_menu_id" class="form-select">
+                <select name="sub_menu_id" id="detailSubMenuSelect" class="form-select">
                     <option value=""> Select Sub Menu </option>
                     @foreach($subMenus as $menu)
                         <option value="{{ $menu->id }}"
@@ -215,6 +215,44 @@ document.addEventListener('click', function(e) {
     }
 });
 document.addEventListener('DOMContentLoaded', updateTriggerText);
+</script>
+
+<script>
+function handleDetailMainMenuChange(mainMenuId) {
+    if (!mainMenuId) return;
+
+    const subSelect = document.getElementById('detailSubMenuSelect');
+    subSelect.innerHTML = '<option value="">Loading...</option>';
+
+    fetch('{{ route("admin.products.sub-menus-by-main") }}?main_menu_id=' + mainMenuId, {
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    })
+    .then(r => r.json())
+    .then(data => {
+        subSelect.innerHTML = '<option value=""> Select Sub Menu </option>';
+        data.subMenus.forEach(sm => {
+            const id = sm.id || sm._id;
+            subSelect.innerHTML += `<option value="${id}">${sm.name}</option>`;
+        });
+
+        // Re-select the previously saved sub_menu_id in edit mode (if it matches)
+        const savedSubMenuId = '{{ old('sub_menu_id', $record->sub_menu_id ?? '') }}';
+        if (savedSubMenuId) {
+            subSelect.value = savedSubMenuId;
+        }
+    })
+    .catch(() => {
+        subSelect.innerHTML = '<option value=""> Select Sub Menu </option>';
+    });
+}
+
+// On page load in edit mode: if a main menu is already selected, filter sub menus
+document.addEventListener('DOMContentLoaded', function () {
+    const mainSelect = document.getElementById('detailMainMenuSelect');
+    if (mainSelect && mainSelect.value) {
+        handleDetailMainMenuChange(mainSelect.value);
+    }
+});
 </script>
 
 
