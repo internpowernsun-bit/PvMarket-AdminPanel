@@ -1,64 +1,47 @@
 @if($mode === 'create' || $mode === 'edit')
 @extends('layouts.admin')
-{{-- ═══ CREATE / EDIT MODE ═══ --}}
 
 @section('title', $mode === 'create' ? 'Add Product' : 'Edit Product')
 
 @section('styles')
 <style>
-    .page-header-wrap { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
-    .page-header-wrap h1 { font-size:22px; font-weight:800; color:var(--text); }
-    .page-header-wrap h1 span { color:var(--primary-d); }
     .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; }
     .btn-back:hover { background:#334155; }
-
+    .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    background: var(--text);
+    color: white;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .15s;
+    white-space: nowrap;
+    border: 1.5px solid var(--text);
+}
     .content-panel { background:white; border:1px solid var(--border); border-radius:12px; padding:28px; box-shadow:0 1px 4px rgba(0,0,0,.04); margin-bottom:20px; }
-
     .form-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px 24px; margin-bottom:20px; }
     .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px 24px; margin-bottom:20px; }
-
     .form-group { display:flex; flex-direction:column; gap:6px; }
     .form-label { font-size:13px; font-weight:600; color:var(--text); }
     .form-label span { color:var(--danger); margin-left:2px; }
-
-    .form-input, .form-select {
-        width:100%; padding:9px 13px;
-        border:1.5px solid var(--border); border-radius:8px;
-        font-family:inherit; font-size:13.5px; color:var(--text);
-        outline:none; transition:border-color .2s, box-shadow .2s; background:white;
-    }
+    .form-input, .form-select { width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; color:var(--text); outline:none; transition:border-color .2s, box-shadow .2s; background:white; }
     .form-input:focus, .form-select:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1); }
     .form-input::placeholder { color:#CBD5E1; }
     .form-select { appearance:none; background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; cursor:pointer; }
-
+    
     .form-file-wrap { border:1.5px solid var(--border); border-radius:8px; overflow:hidden; display:flex; align-items:center; background:white; }
     .form-file-wrap input[type="file"] { flex:1; padding:8px 12px; border:none; outline:none; font-family:inherit; font-size:13px; background:transparent; cursor:pointer; }
     .form-file-wrap input[type="file"]::-webkit-file-upload-button { padding:6px 14px; background:var(--light); border:none; border-right:1px solid var(--border); font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; margin-right:8px; }
-
-    /* Section headers */
-    .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: 24px 0 16px;
-        cursor: pointer;
-    }
-
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin:24px 0 16px; cursor:pointer; }
     .section-title { font-size:18px; font-weight:800; color:var(--primary-d); }
-
-    .section-toggle {
-        width: 24px; height: 24px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 18px; color: var(--muted); font-weight: 300;
-        transition: transform .2s;
-    }
-
-    /* Popular product */
+    .section-toggle { width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--muted); font-weight:300; }
     .checkbox-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
     .checkbox-row input[type="checkbox"] { width:18px; height:18px; accent-color:var(--primary); cursor:pointer; }
     .checkbox-row label { font-size:14px; font-weight:500; color:var(--text); cursor:pointer; }
-
-    /* Toggle switch */
     .toggle-wrap { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
     .toggle-switch { position:relative; width:44px; height:24px; }
     .toggle-switch input { opacity:0; width:0; height:0; }
@@ -67,48 +50,31 @@
     .toggle-switch input:checked + .toggle-slider { background:var(--primary); }
     .toggle-switch input:checked + .toggle-slider::before { transform:translateX(20px); }
     .toggle-label { font-size:14px; font-weight:500; color:var(--text); }
-
-    /* Product details table */
     .details-table { width:100%; border-collapse:collapse; margin-top:12px; }
     .details-table thead { background:#F0F9FF; }
-    .details-table th { padding:10px 14px; font-size:12px; font-weight:700; color:var(--primary-d); text-transform:uppercase; letter-spacing:.5px; border-bottom:2px solid #BAE6FD; }
+    .details-table th { padding:10px 14px; font-size:12px; font-weight:700; color:var(--primary-d); text-transform:uppercase; letter-spacing:.5px; border-bottom:2px solid #BAE6FD; text-align:left; }
     .details-table th.center { text-align:center; }
     .details-table td { padding:10px 14px; border-bottom:1px solid #F1F5F9; vertical-align:middle; }
     .details-table tr:last-child td { border-bottom:none; }
-    .details-table td.sno { color:var(--muted); font-weight:700; font-size:13px; text-align:center; }
-
-    .details-table input[type="text"],
-    .details-table input[type="number"],
-    .details-table select {
-        width:100%; padding:8px 12px;
-        border:1.5px solid var(--border); border-radius:7px;
-        font-family:inherit; font-size:13px; color:var(--text);
-        outline:none; transition:border-color .2s; background:white;
-    }
-
-    .details-table select {
-        appearance:none;
-        background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 10px center;
-        cursor:pointer;
-    }
-
+    .details-table td.sno { color:var(--muted); font-weight:700; font-size:13px; text-align:center; width:60px; }
+    .details-table input[type="text"], .details-table input[type="number"], .details-table select { width:100%; padding:8px 12px; border:1.5px solid var(--border); border-radius:7px; font-family:inherit; font-size:13px; color:var(--text); outline:none; transition:border-color .2s; background:white; }
+    .details-table select { appearance:none; background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 10px center; cursor:pointer; }
     .details-table input:focus, .details-table select:focus { border-color:var(--primary); }
     .details-table input::placeholder { color:#CBD5E1; }
-   .details-table .option-name-cell { font-weight:600; font-size:13.5px; color:var(--text); text-align:left; padding-left:14px; }
-
-    /* Quill wrapper */
+    .details-table .option-name-cell { font-weight:600; font-size:13.5px; color:var(--text); }
     .quill-wrapper { border:1.5px solid #CBD5E1; border-radius:8px; overflow:hidden; background:white; }
     .quill-wrapper:focus-within { border-color:#0EA5E9; box-shadow:0 0 0 3px rgba(14,165,233,.1); }
-
-    /* Save */
     .form-actions { display:flex; justify-content:flex-end; padding-top:20px; border-top:1px solid var(--border); margin-top:20px; }
     .btn-save { display:inline-flex; align-items:center; gap:8px; padding:10px 28px; background:#10B981; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s, box-shadow .2s; }
     .btn-save:hover { background:#059669; box-shadow:0 4px 14px rgba(16,185,129,.35); }
-
     .img-preview { height:50px; border-radius:6px; border:1px solid var(--border); object-fit:contain; display:block; margin-bottom:8px; }
     .form-hint { font-size:11px; color:var(--muted); margin-top:3px; }
     .alert-error { padding:12px 16px; background:#FEE2E2; color:#991B1B; border:1px solid #FECACA; border-radius:8px; font-size:13.5px; margin-bottom:20px; }
     .divider { border:none; border-top:1px solid var(--border); margin:20px 0; }
+
+    /* Details loading state */
+    .details-loading { text-align:center; padding:32px; color:var(--muted); font-size:14px; }
+    .details-empty { text-align:center; padding:32px; color:var(--muted); font-size:14px; background:#FAFBFD; border-radius:8px; border:1.5px dashed var(--border); }
 </style>
 @endsection
 
@@ -123,19 +89,15 @@
     .ql-toolbar.ql-snow .ql-formats { margin-right:10px; }
     .ql-toolbar button { width:28px !important; height:28px !important; padding:3px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; }
     .ql-toolbar button svg, .ql-toolbar .ql-picker svg { width:16px !important; height:16px !important; }
-    .ql-toolbar .ql-picker { font-size:13px; }
-    .ql-snow .ql-stroke { stroke:#475569; }
-    .ql-snow .ql-fill  { fill:#475569; }
-    .ql-snow .ql-picker { color:#475569; }
+    .ql-snow .ql-stroke { stroke:#475569; } .ql-snow .ql-fill { fill:#475569; } .ql-snow .ql-picker { color:#475569; }
     .ql-toolbar button:hover .ql-stroke, .ql-toolbar button.ql-active .ql-stroke { stroke:#0EA5E9; }
     .ql-toolbar button:hover .ql-fill,   .ql-toolbar button.ql-active .ql-fill   { fill:#0EA5E9; }
 </style>
 
-
-
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">{{ $mode === 'create' ? 'Add' : 'Edit' }} Product 
-        </h1>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">
+        {{ $mode === 'create' ? 'Add' : 'Edit' }} Product
+    </h1>
     <a href="{{ route('admin.products.index') }}" class="btn-back">← Back</a>
 </div>
 
@@ -147,9 +109,7 @@
 
     <form
         method="POST"
-        action="{{ $mode === 'create'
-            ? route('admin.products.store')
-            : route('admin.products.update', $record->id) }}"
+        action="{{ $mode === 'create' ? route('admin.products.store') : route('admin.products.update', $record->id) }}"
         enctype="multipart/form-data"
         id="productForm"
     >
@@ -187,7 +147,41 @@
             </div>
         </div>
 
-        {{-- ── Row 2: Product Image / Alt Tag ── --}}
+        {{-- ── Row 2: Main Menu / Sub Menu (MANDATORY) ── --}}
+        <div class="form-grid-2" style="margin-bottom:20px;">
+            <div class="form-group">
+                <label class="form-label">Main Menu <span>*</span></label>
+                <select name="main_menu_id" id="mainMenuSelect" class="form-select" required
+                        onchange="handleMainMenuChange(this.value)">
+                    <option value="" disabled {{ old('main_menu_id', $record->main_menu_id ?? '') == '' ? 'selected' : '' }}>
+                        Select Main Menu
+                    </option>
+                    @foreach($mainMenus as $menu)
+                        <option value="{{ $menu->id }}"
+                            {{ old('main_menu_id', $record->main_menu_id ?? '') == $menu->id ? 'selected' : '' }}>
+                            {{ $menu->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Sub Menu <span>*</span></label>
+                <select name="sub_menu_id" id="subMenuSelect" class="form-select" required
+                        onchange="handleSubMenuChange(this.value)">
+                    <option value="" disabled {{ old('sub_menu_id', $record->sub_menu_id ?? '') == '' ? 'selected' : '' }}>
+                        Select Sub Menu
+                    </option>
+                    @foreach($subMenus as $menu)
+                        <option value="{{ $menu->id }}"
+                            {{ old('sub_menu_id', $record->sub_menu_id ?? '') == $menu->id ? 'selected' : '' }}>
+                            {{ $menu->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        {{-- ── Row 3: Product Image / Alt Tag ── --}}
         <div class="form-grid-2">
             <div class="form-group">
                 <label class="form-label">Product Image:</label>
@@ -209,7 +203,7 @@
             </div>
         </div>
 
-        {{-- ── Row 3: 1 Pallet / 1 Container ── --}}
+        {{-- ── Row 4: 1 Pallet / 1 Container ── --}}
         <div class="form-grid-2">
             <div class="form-group">
                 <label class="form-label">
@@ -235,9 +229,7 @@
         <div class="form-group" style="margin-bottom:20px;">
             <label class="form-label">Product Description</label>
             <textarea name="description" id="descriptionInput" style="display:none;">{{ old('description', $record->description ?? '') }}</textarea>
-            <div class="quill-wrapper">
-                <div id="quillEditor"></div>
-            </div>
+            <div class="quill-wrapper"><div id="quillEditor"></div></div>
         </div>
 
         <hr class="divider">
@@ -253,7 +245,6 @@
                        {{ old('is_popular', $record->is_popular ?? false) ? 'checked' : '' }}/>
                 <label for="isPopular">Popular Product</label>
             </div>
-            
         </div>
 
         <hr class="divider">
@@ -276,74 +267,71 @@
 
         <hr class="divider">
 
-        {{-- ── Product Details ── --}}
+        {{-- ── Product Details (dynamically loaded by sub menu) ── --}}
         <div class="section-header" onclick="toggleSection('details')">
             <div class="section-title">Product Details</div>
             <div class="section-toggle" id="toggle-details">−</div>
         </div>
         <div id="section-details">
-            <table class="details-table">
-                <thead>
-                    <tr>
-        <th style="width:60px; text-align:center;">S.No</th>
-<th style="width:35%;">Option Details</th>
-<th style="width:180px;">Unit</th>
-<th style="width:180px;">Value</th>
-<th style="width:120px; text-align:center;">Show in Badge</th>
-    </tr>
-                </thead>
-                <tbody>
-                    @php
-                        $existingDetails = $record->product_details ?? [];
-                        $optionsList = $options ?? collect();
-                    @endphp
-
-                    @foreach($optionsList as $i => $option)
-@php
-    $saved = collect($existingDetails)->firstWhere('option_id', (string)$option->id) ?? [];
-    $rawUnitIds = $option->unit_ids ?? [];
-    // Also handle old single unit_id field
-    if (empty($rawUnitIds) && !empty($option->unit_id)) {
-        $rawUnitIds = [$option->unit_id];
-    }
-    $optionUnitIds = collect($rawUnitIds)->map(fn($id) => (string)$id)->toArray();
-    $optionUnits = $units->filter(fn($u) => in_array((string)$u->id, $optionUnitIds))->values();
-@endphp
-<tr>
-    <td class="sno">{{ $i + 1 }}.</td>
-    <td class="option-name-cell">
-        {{ $option->option_name }}
-        <input type="hidden" name="product_details[{{ $i }}][option_id]"   value="{{ $option->id }}"/>
-        <input type="hidden" name="product_details[{{ $i }}][option_name]" value="{{ $option->option_name }}"/>
-    </td>
-    <td>
-        <select name="product_details[{{ $i }}][unit_id]">
-            <option value="">Select Unit</option>
-            @foreach($optionUnits as $unit)
-                <option value="{{ $unit->id }}"
-                    {{ ($saved['unit_id'] ?? '') == $unit->id ? 'selected' : '' }}>
-                    {{ $unit->unit_name }}
-                </option>
-            @endforeach
-        </select>
-    </td>
-    <td>
-        <input type="text"
-               name="product_details[{{ $i }}][value]"
-               placeholder="Enter value"
-               value="{{ $saved['value'] ?? '' }}"/>
-    </td>
-    <td style="text-align:center;">
-        <input type="checkbox"
-               name="product_details[{{ $i }}][show_in_badge]"
-               value="1"
-               {{ !empty($saved['show_in_badge']) ? 'checked' : '' }}
-               style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;"/>
-    </td>
-</tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <div id="productDetailsWrapper">
+                @if(isset($record) && $record->sub_menu_id && $options->isNotEmpty())
+                    {{-- Edit mode: render existing options with saved values --}}
+                    @php $existingDetails = $record->product_details ?? []; @endphp
+                    <table class="details-table">
+                        <thead>
+                            <tr>
+                                <th class="center">S.No</th>
+                                <th>Option Details</th>
+                                <th style="width:200px;">Unit</th>
+                                <th style="width:200px;">Value</th>
+                                <th class="center" style="width:120px;">Show in Badge</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($options as $i => $option)
+                            @php
+                                $saved = collect($existingDetails)->firstWhere('option_id', (string)$option->id) ?? [];
+                                $rawUnitIds = $option->unit_ids ?? ($option->unit_id ? [$option->unit_id] : []);
+                                $optionUnitIds = collect($rawUnitIds)->map(fn($id) => (string)$id)->toArray();
+                                $optionUnits = isset($units) ? $units->filter(fn($u) => in_array((string)$u->id, $optionUnitIds))->values() : collect();
+                            @endphp
+                            <tr>
+                                <td class="sno">{{ $i + 1 }}.</td>
+                                <td class="option-name-cell">
+                                    {{ $option->option_name }}
+                                    <input type="hidden" name="product_details[{{ $i }}][option_id]"   value="{{ $option->id }}"/>
+                                    <input type="hidden" name="product_details[{{ $i }}][option_name]" value="{{ $option->option_name }}"/>
+                                </td>
+                                <td>
+                                    <select name="product_details[{{ $i }}][unit_id]">
+                                        <option value="">Select Unit</option>
+                                        @foreach($optionUnits as $unit)
+                                            <option value="{{ $unit->id }}"
+                                                {{ ($saved['unit_id'] ?? '') == $unit->id ? 'selected' : '' }}>
+                                                {{ $unit->unit_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" name="product_details[{{ $i }}][value]"
+                                           placeholder="Enter value" value="{{ $saved['value'] ?? '' }}"/>
+                                </td>
+                                <td class="center">
+                                    <input type="checkbox" name="product_details[{{ $i }}][show_in_badge]" value="1"
+                                           {{ !empty($saved['show_in_badge']) ? 'checked' : '' }}
+                                           style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;"/>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <div class="details-empty" id="detailsEmptyMsg">
+                        ← Please select a <strong>Sub Menu</strong> above to load product detail options.
+                    </div>
+                @endif
+            </div>
         </div>
 
         <hr class="divider">
@@ -358,30 +346,30 @@
                 <div class="form-group">
                     <label class="form-label">Height(mm):</label>
                     <input type="number" name="height" class="form-input" step="0.01"
-                           placeholder="e.g. 2278"
-                           value="{{ old('height', $record->height ?? '') }}"/>
+                           placeholder="e.g. 2278" value="{{ old('height', $record->height ?? '') }}"/>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Width(mm):</label>
                     <input type="number" name="width" class="form-input" step="0.01"
-                           placeholder="e.g. 1134"
-                           value="{{ old('width', $record->width ?? '') }}"/>
+                           placeholder="e.g. 1134" value="{{ old('width', $record->width ?? '') }}"/>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Depth(mm):</label>
                     <input type="number" name="depth" class="form-input" step="0.01"
-                           placeholder="e.g. 35"
-                           value="{{ old('depth', $record->depth ?? '') }}"/>
+                           placeholder="e.g. 35" value="{{ old('depth', $record->depth ?? '') }}"/>
                 </div>
             </div>
             <div class="form-grid-2">
                 <div class="form-group">
                     <label class="form-label">Weight(KG):</label>
                     <input type="number" name="weight" class="form-input" step="0.01"
-                           placeholder="e.g. 32.5"
-                           value="{{ old('weight', $record->weight ?? '') }}"/>
+                           placeholder="e.g. 32.5" value="{{ old('weight', $record->weight ?? '') }}"/>
                 </div>
-                
+                <div class="form-group">
+                    <label class="form-label">Length(mm):</label>
+                    <input type="number" name="length" class="form-input" step="0.01"
+                           placeholder="e.g. 1134" value="{{ old('length', $record->length ?? '') }}"/>
+                </div>
             </div>
         </div>
 
@@ -418,12 +406,8 @@
             ]
         }
     });
-
     var existing = document.getElementById('descriptionInput').value;
-    if (existing && existing.trim()) {
-        quill.clipboard.dangerouslyPasteHTML(existing);
-    }
-
+    if (existing && existing.trim()) quill.clipboard.dangerouslyPasteHTML(existing);
     document.getElementById('productForm').addEventListener('submit', function () {
         var html = quill.root.innerHTML;
         document.getElementById('descriptionInput').value = (html === '<p><br></p>') ? '' : html;
@@ -437,6 +421,121 @@ function toggleSection(name) {
     section.style.display = isHidden ? 'block' : 'none';
     toggle.textContent    = isHidden ? '−' : '+';
 }
+
+// ── Handle Main Menu change: filter sub menus ──
+function handleMainMenuChange(mainMenuId) {
+    if (!mainMenuId) return;
+
+    const subSelect = document.getElementById('subMenuSelect');
+
+    fetch('{{ route("admin.products.sub-menus-by-main") }}?main_menu_id=' + mainMenuId, {
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    })
+    .then(r => r.json())
+    .then(data => {
+        subSelect.innerHTML = '<option value="" disabled selected>Select Sub Menu</option>';
+        data.subMenus.forEach(sm => {
+            const id = sm.id || sm._id;  // ← fix: was only sm._id
+            subSelect.innerHTML += `<option value="${id}">${sm.name}</option>`;
+        });
+        clearProductDetails(); // ← add this: reset details when main menu changes
+    })
+    .catch(() => {
+        clearProductDetails();
+    });
+}
+
+// ── Handle Sub Menu change: load product detail options ──
+function handleSubMenuChange(subMenuId) {
+    if (!subMenuId) {
+        clearProductDetails();
+        return;
+    }
+
+    const wrapper = document.getElementById('productDetailsWrapper');
+    wrapper.innerHTML = '<div class="details-loading">⏳ Loading product detail options...</div>';
+
+    fetch('{{ route("admin.products.options-by-submenu") }}?sub_menu_id=' + subMenuId, {
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.options || data.options.length === 0) {
+            wrapper.innerHTML = '<div class="details-empty">No product detail options found for this sub menu. Add options from <strong>Product Detail Options</strong> page first.</div>';
+            return;
+        }
+        renderDetailsTable(data.options, data.units, []);
+    })
+    .catch(() => {
+        wrapper.innerHTML = '<div class="details-empty">Failed to load options. Please try again.</div>';
+    });
+}
+
+function clearProductDetails() {
+    document.getElementById('productDetailsWrapper').innerHTML =
+        '<div class="details-empty" id="detailsEmptyMsg">← Please select a <strong>Sub Menu</strong> above to load product detail options.</div>';
+}
+
+function renderDetailsTable(options, units, savedDetails) {
+    let html = `<table class="details-table">
+        <thead>
+            <tr>
+                <th class="center">S.No</th>
+                <th>Option Details</th>
+                <th style="width:200px;">Unit</th>
+                <th style="width:200px;">Value</th>
+                <th class="center" style="width:120px;">Show in Badge</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    options.forEach((option, i) => {
+        const optionId   = option._id || option.id;
+        const optionName = option.option_name;
+
+        // Determine which unit IDs this option supports
+        let unitIds = [];
+        if (option.unit_ids && option.unit_ids.length) {
+            unitIds = option.unit_ids.map(String);
+        } else if (option.unit_id) {
+            unitIds = [String(option.unit_id)];
+        }
+
+        // Filter units
+        const filteredUnits = unitIds.length
+            ? units.filter(u => unitIds.includes(String(u._id || u.id)))
+            : units;
+
+        // Find saved data
+        const saved = savedDetails.find(s => String(s.option_id) === String(optionId)) || {};
+
+        let unitOptions = '<option value="">Select Unit</option>';
+        filteredUnits.forEach(u => {
+            const uid = u._id || u.id;
+            const sel = saved.unit_id && String(saved.unit_id) === String(uid) ? 'selected' : '';
+            unitOptions += `<option value="${uid}" ${sel}>${u.unit_name}</option>`;
+        });
+
+        html += `<tr>
+            <td class="sno">${i + 1}.</td>
+            <td class="option-name-cell">
+                ${optionName}
+                <input type="hidden" name="product_details[${i}][option_id]"   value="${optionId}"/>
+                <input type="hidden" name="product_details[${i}][option_name]" value="${optionName}"/>
+            </td>
+            <td><select name="product_details[${i}][unit_id]">${unitOptions}</select></td>
+            <td><input type="text" name="product_details[${i}][value]" placeholder="Enter value" value="${saved.value || ''}"/></td>
+            <td class="center">
+                <input type="checkbox" name="product_details[${i}][show_in_badge]" value="1"
+                       ${saved.show_in_badge ? 'checked' : ''}
+                       style="width:18px; height:18px; accent-color:var(--primary-d); cursor:pointer;"/>
+            </td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+    document.getElementById('productDetailsWrapper').innerHTML = html;
+}
 </script>
 
 @endsection
@@ -445,7 +544,7 @@ function toggleSection(name) {
 
 {{-- ═══ INDEX MODE ═══ --}}
 
-@section('title', 'PV Modules - Products')
+@section('title', 'Products')
 
 @section('styles')
 <style>
@@ -470,31 +569,13 @@ function toggleSection(name) {
     .data-table tbody tr:nth-child(odd) td { background:white; }
     .data-table tbody tr:nth-child(even) td { background:#FAFBFD; }
     .data-table tbody tr:hover td { background:#E0F2FE !important; }
-
     .product-thumb { width:80px; height:60px; object-fit:contain; border-radius:6px; border:1px solid var(--border); display:block; margin:0 auto; }
     .no-image { font-size:12px; color:#CBD5E1; text-align:center; }
-
-    /* Verification badges */
     .badge { display:inline-flex; align-items:center; justify-content:center; padding:5px 14px; border-radius:6px; font-size:12px; font-weight:700; min-width:80px; }
-    .badge-verified  { background:#10B981; color:white; }
-    .badge-rejected  { background:#EF4444; color:white; }
-    .badge-pending   { background:#F59E0B; color:white; }
-
-    
-    .updater-badge { 
-    background:var(--primary); 
-    color:white; 
-    padding:4px 10px; 
-    border-radius:5px; 
-    font-size:11px; 
-    font-weight:700; 
-    white-space:nowrap;
-    display:inline-block;
-    max-width:100px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-
+    .badge-verified { background:#10B981; color:white; }
+    .badge-rejected { background:#EF4444; color:white; }
+    .badge-pending  { background:#F59E0B; color:white; }
+    .updater-badge { background:var(--primary); color:white; padding:4px 10px; border-radius:5px; font-size:11px; font-weight:700; white-space:nowrap; display:inline-block; max-width:100px; overflow:hidden; text-overflow:ellipsis; }
     .action-btns { display:flex; align-items:center; justify-content:center; gap:6px; }
     .action-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1.5px solid transparent; background:none; border-radius:7px; transition:all .15s; text-decoration:none; }
     .action-icon svg { width:15px; height:15px; }
@@ -507,7 +588,6 @@ function toggleSection(name) {
     .action-icon.reject:hover { background:#F3F4F6; border-color:#9CA3AF; }
     .action-icon.edit:hover   { background:#FEF3C7; border-color:#F59E0B; }
     .action-icon.delete:hover { background:#FEE2E2; border-color:#EF4444; }
-
     .table-footer { padding:12px 20px; font-size:13px; color:var(--muted); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#FAFBFD; }
     .pagination { display:flex; gap:3px; list-style:none; }
     .pagination li a,.pagination li span { display:flex; align-items:center; justify-content:center; min-width:32px; height:32px; padding:0 8px; border-radius:6px; border:1.5px solid var(--border); font-size:13px; font-weight:500; text-decoration:none; color:var(--text); background:white; transition:all .15s; }
@@ -523,9 +603,7 @@ function toggleSection(name) {
 @section('content')
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">
-        Products
-    </h1>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Products</h1>
     <a href="{{ route('admin.products.create') }}"
        style="display:inline-flex; align-items:center; gap:7px; padding:10px 20px;
               background:var(--primary); color:white; border-radius:8px; font-size:14px;
@@ -594,8 +672,7 @@ function toggleSection(name) {
                 </td>
                 <td class="center">
                     @if($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}"
-                             class="product-thumb" alt="{{ $product->product_name }}"/>
+                        <img src="{{ asset('storage/' . $product->image) }}" class="product-thumb" alt="{{ $product->product_name }}"/>
                     @else
                         <span class="no-image">—</span>
                     @endif
@@ -612,7 +689,6 @@ function toggleSection(name) {
                 </td>
                 <td>
                     <div class="action-btns">
-                        {{-- Verify/Reject only shown for pending --}}
                         @if(($product->verification_status ?? 'pending') === 'pending')
                             <button class="action-icon verify" title="Verify"
                                 onclick="document.getElementById('verify-{{ $product->id }}').submit();">
@@ -621,8 +697,7 @@ function toggleSection(name) {
                                 </svg>
                             </button>
                             <form id="verify-{{ $product->id }}" method="POST"
-                                  action="{{ route('admin.products.verify', $product->id) }}"
-                                  style="display:none;">
+                                  action="{{ route('admin.products.verify', $product->id) }}" style="display:none;">
                                 @csrf @method('PATCH')
                             </form>
                             <button class="action-icon reject" title="Reject"
@@ -633,13 +708,11 @@ function toggleSection(name) {
                                 </svg>
                             </button>
                             <form id="reject-{{ $product->id }}" method="POST"
-                                  action="{{ route('admin.products.reject', $product->id) }}"
-                                  style="display:none;">
+                                  action="{{ route('admin.products.reject', $product->id) }}" style="display:none;">
                                 @csrf @method('PATCH')
                             </form>
                         @endif
-                        <a href="{{ route('admin.products.edit', $product->id) }}"
-                           class="action-icon edit" title="Edit">
+                        <a href="{{ route('admin.products.edit', $product->id) }}" class="action-icon edit" title="Edit">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -654,8 +727,7 @@ function toggleSection(name) {
                             </svg>
                         </button>
                         <form id="del-{{ $product->id }}" method="POST"
-                              action="{{ route('admin.products.destroy', $product->id) }}"
-                              style="display:none;">
+                              action="{{ route('admin.products.destroy', $product->id) }}" style="display:none;">
                             @csrf @method('DELETE')
                         </form>
                     </div>

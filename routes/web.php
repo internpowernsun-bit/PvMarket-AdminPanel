@@ -107,14 +107,16 @@ Route::patch('/admin/users/{id}/toggle-verified',[UserController::class, 'toggle
     
 
 Route::prefix('admin/products')->name('admin.products.')->group(function () {
-    Route::get('/',          [ProductController::class, 'index'])  ->name('index');
-    Route::get('/create',    [ProductController::class, 'create']) ->name('create');
-    Route::post('/',         [ProductController::class, 'store'])  ->name('store');
-    Route::get('/{id}/edit', [ProductController::class, 'edit'])   ->name('edit');
-    Route::put('/{id}',      [ProductController::class, 'update']) ->name('update');
-    Route::patch('/{id}/verify', [ProductController::class, 'verify'])->name('verify');
-    Route::patch('/{id}/reject', [ProductController::class, 'reject'])->name('reject');
-    Route::delete('/{id}',   [ProductController::class, 'destroy'])->name('destroy');
+    Route::get('/',                  [ProductController::class, 'index'])  ->name('index');
+    Route::get('/create',            [ProductController::class, 'create']) ->name('create');
+    Route::post('/',                 [ProductController::class, 'store'])  ->name('store');
+    Route::get('/{id}/edit',         [ProductController::class, 'edit'])   ->name('edit');
+    Route::put('/{id}',              [ProductController::class, 'update']) ->name('update');
+    Route::patch('/{id}/verify',     [ProductController::class, 'verify']) ->name('verify');
+    Route::patch('/{id}/reject',     [ProductController::class, 'reject']) ->name('reject');
+    Route::delete('/{id}',           [ProductController::class, 'destroy'])->name('destroy');
+    Route::get('/options-by-submenu',[ProductController::class, 'getOptionsBySubMenu'])  ->name('options-by-submenu');
+    Route::get('/sub-menus-by-main', [ProductController::class, 'getSubMenusByMainMenu'])->name('sub-menus-by-main');
 });
 
     
