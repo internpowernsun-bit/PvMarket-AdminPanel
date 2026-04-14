@@ -19,7 +19,6 @@ class ProductController extends Controller
     private function getDropdowns(?string $subMenuId = null): array
     {
         $brands    = Brand::where('is_active', true)->orderBy('name')->get();
-        $units     = Unit::orderBy('unit_name')->get();
         $mainMenus = MainMenu::orderBy('name')->get();
         $subMenus  = SubMenu::orderBy('name')->get();
 
@@ -32,7 +31,7 @@ class ProductController extends Controller
             $options = collect(); // empty until sub menu selected
         }
 
-        return compact('brands', 'units', 'mainMenus', 'subMenus', 'options');
+        return compact('brands', 'mainMenus', 'subMenus', 'options');
     }
 
     // ── Index ─────────────────────────────────────────
@@ -73,9 +72,7 @@ class ProductController extends Controller
             'product_name'  => 'required|string|max:500',
             'main_menu_id'  => 'required|string',
             'sub_menu_id'   => 'required|string',
-            'brand_id'      => 'nullable|string',
-            'image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
-            'alt_tag'       => 'nullable|string|max:255',
+            'brand_id'      => 'nullable|string',           
             'one_pallet'    => 'nullable|string|max:100',
             'one_container' => 'nullable|string|max:100',
             'description'   => 'nullable|string',
@@ -86,22 +83,16 @@ class ProductController extends Controller
             'main_menu_id'        => $request->main_menu_id,
             'sub_menu_id'         => $request->sub_menu_id,
             'brand_id'            => $request->brand_id,
-            'alt_tag'             => $request->alt_tag,
             'one_pallet'          => $request->one_pallet,
             'one_container'       => $request->one_container,
             'description'         => $request->description,
             'is_popular'          => $request->boolean('is_popular'),
             'real_time_price'     => $request->boolean('real_time_price'),
-            'height'              => $request->height,
-            'width'               => $request->width,
-            'depth'               => $request->depth,
-            'weight'              => $request->weight,
-            'length'              => $request->length,
             'verification_status' => 'pending',
             'updated_by'          => Auth::user()->name,
         ];
 
-        // Resolve names for display
+        // Resolve display names
         $mainMenu = MainMenu::find($request->main_menu_id);
         $subMenu  = SubMenu::find($request->sub_menu_id);
         $data['main_menu_name'] = $mainMenu?->name;
@@ -112,10 +103,9 @@ class ProductController extends Controller
             $data['brand_name'] = $brand?->name;
         }
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
-        }
+        
 
+        // ── Datasheets ───────────────────────────────
         if ($request->hasFile('datasheets')) {
             $paths = [];
             foreach ($request->file('datasheets') as $file) {
@@ -124,23 +114,34 @@ class ProductController extends Controller
             $data['datasheets'] = $paths;
         }
 
+        // ── product_details: [{label, value, unit}] ──
         if ($request->has('product_details')) {
             $details = [];
             foreach ($request->product_details as $row) {
-                if (!empty($row['option_id'])) {
-                    $unit = isset($row['unit_id']) ? Unit::find($row['unit_id']) : null;
+                if (!empty($row['label'])) {
                     $details[] = [
-                        'option_id'      => $row['option_id'],
-                        'option_name'    => $row['option_name'] ?? '',
-                        'unit_id'        => $row['unit_id'] ?? null,
-                        'unit_name'      => $unit?->unit_name,
-                        'value'          => $row['value'] ?? '',
-                        'show_in_badge'  => !empty($row['show_in_badge']),
+                        'label' => $row['label'],
+                        'value' => $row['value'] ?? '',
+                        'unit'  => $row['unit']  ?? null,
                     ];
                 }
             }
             $data['product_details'] = $details;
         }
+
+        // ── measurement_details: {height, height_unit, …} ──
+        $data['measurement_details'] = [
+            'height'      => $request->height      ? (float) $request->height      : null,
+            'height_unit' => $request->height_unit ?? null,
+            'width'       => $request->width       ? (float) $request->width       : null,
+            'width_unit'  => $request->width_unit  ?? null,
+            'depth'       => $request->depth       ? (float) $request->depth       : null,
+            'depth_unit'  => $request->depth_unit  ?? null,
+            'weight'      => $request->weight      ? (float) $request->weight      : null,
+            'weight_unit' => $request->weight_unit ?? null,
+            'length'      => $request->length      ? (float) $request->length      : null,
+            'length_unit' => $request->length_unit ?? null,
+        ];
 
         Product::create($data);
 
@@ -153,7 +154,6 @@ class ProductController extends Controller
     {
         $record = Product::findOrFail($id);
 
-        // Load options filtered by the product's existing sub_menu_id
         return view('admin.products.products', array_merge(
             ['mode' => 'edit', 'record' => $record],
             $this->getDropdowns($record->sub_menu_id)
@@ -169,7 +169,6 @@ class ProductController extends Controller
             'product_name' => 'required|string|max:500',
             'main_menu_id' => 'required|string',
             'sub_menu_id'  => 'required|string',
-            'image'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
         $data = [
@@ -177,20 +176,15 @@ class ProductController extends Controller
             'main_menu_id'    => $request->main_menu_id,
             'sub_menu_id'     => $request->sub_menu_id,
             'brand_id'        => $request->brand_id,
-            'alt_tag'         => $request->alt_tag,
             'one_pallet'      => $request->one_pallet,
             'one_container'   => $request->one_container,
             'description'     => $request->description,
             'is_popular'      => $request->boolean('is_popular'),
             'real_time_price' => $request->boolean('real_time_price'),
-            'height'          => $request->height,
-            'width'           => $request->width,
-            'depth'           => $request->depth,
-            'weight'          => $request->weight,
-            'length'          => $request->length,
             'updated_by'      => Auth::user()->name,
         ];
 
+        // Resolve display names
         $mainMenu = MainMenu::find($request->main_menu_id);
         $subMenu  = SubMenu::find($request->sub_menu_id);
         $data['main_menu_name'] = $mainMenu?->name;
@@ -201,28 +195,40 @@ class ProductController extends Controller
             $data['brand_name'] = $brand?->name;
         }
 
+        // ── Image ────────────────────────────────────
         if ($request->hasFile('image')) {
             if ($product->image) Storage::disk('public')->delete($product->image);
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
+        // ── product_details: [{label, value, unit}] ──
         if ($request->has('product_details')) {
             $details = [];
             foreach ($request->product_details as $row) {
-                if (!empty($row['option_id'])) {
-                    $unit = isset($row['unit_id']) ? Unit::find($row['unit_id']) : null;
+                if (!empty($row['label'])) {
                     $details[] = [
-                        'option_id'     => $row['option_id'],
-                        'option_name'   => $row['option_name'] ?? '',
-                        'unit_id'       => $row['unit_id'] ?? null,
-                        'unit_name'     => $unit?->unit_name,
-                        'value'         => $row['value'] ?? '',
-                        'show_in_badge' => !empty($row['show_in_badge']),
+                        'label' => $row['label'],
+                        'value' => $row['value'] ?? '',
+                        'unit'  => $row['unit']  ?? null,
                     ];
                 }
             }
             $data['product_details'] = $details;
         }
+
+        // ── measurement_details: {height, height_unit, …} ──
+        $data['measurement_details'] = [
+            'height'      => $request->height      ? (float) $request->height      : null,
+            'height_unit' => $request->height_unit ?? null,
+            'width'       => $request->width       ? (float) $request->width       : null,
+            'width_unit'  => $request->width_unit  ?? null,
+            'depth'       => $request->depth       ? (float) $request->depth       : null,
+            'depth_unit'  => $request->depth_unit  ?? null,
+            'weight'      => $request->weight      ? (float) $request->weight      : null,
+            'weight_unit' => $request->weight_unit ?? null,
+            'length'      => $request->length      ? (float) $request->length      : null,
+            'length_unit' => $request->length_unit ?? null,
+        ];
 
         $product->update($data);
 
@@ -231,21 +237,35 @@ class ProductController extends Controller
     }
 
     // ── AJAX: Get options by sub_menu_id ──────────────
+    // Returns option names as label suggestions for the product_details rows.
+    // unit_ids are no longer needed since unit is stored as a plain string.
     public function getOptionsBySubMenu(Request $request)
-    {
-        $subMenuId = $request->input('sub_menu_id');
+{
+    $subMenuId = $request->input('sub_menu_id');
 
-        $options = ProductDetailOption::where('sub_menu_id', $subMenuId)
-                                      ->orderBy('option_name')
-                                      ->get(['_id', 'option_name', 'unit_ids', 'unit_id']);
+    $options = ProductDetailOption::where('sub_menu_id', $subMenuId)
+                                  ->orderBy('option_name')
+                                  ->get(['_id', 'option_name', 'unit_ids']);
 
-        $units = Unit::orderBy('unit_name')->get(['_id', 'unit_name']);
+    $options = $options->map(function ($option) {
+        $unitIds = $option->unit_ids ?? [];
 
-        return response()->json([
-            'options' => $options,
-            'units'   => $units,
-        ]);
-    }
+        $units = collect();
+        if (!empty($unitIds)) {
+            $units = Unit::whereIn('_id', $unitIds)
+                         ->orderBy('unit_name')
+                         ->get(['_id', 'unit_name'])
+                         ->map(fn($u) => ['unit_name' => $u->unit_name]);
+        }
+
+        return [
+            'option_name' => $option->option_name,
+            'units'       => $units,
+        ];
+    });
+
+    return response()->json(['options' => $options]);
+}
 
     // ── AJAX: Get sub menus by main_menu_id ───────────
     public function getSubMenusByMainMenu(Request $request)

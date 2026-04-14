@@ -5,23 +5,23 @@
 
 @section('styles')
 <style>
-    .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; }
+    .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; white-space:nowrap; border:1.5px solid var(--text); }
     .btn-back:hover { background:#334155; }
     .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 18px;
-    background: var(--text);
-    color: white;
-    border-radius: 8px;
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background .15s;
-    white-space: nowrap;
-    border: 1.5px solid var(--text);
-}
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 18px;
+        background: var(--text);
+        color: white;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background .15s, transform .1s;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
     .content-panel { background:white; border:1px solid var(--border); border-radius:12px; padding:28px; box-shadow:0 1px 4px rgba(0,0,0,.04); margin-bottom:20px; }
     .form-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px 24px; margin-bottom:20px; }
     .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px 24px; margin-bottom:20px; }
@@ -32,7 +32,6 @@
     .form-input:focus, .form-select:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1); }
     .form-input::placeholder { color:#CBD5E1; }
     .form-select { appearance:none; background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; cursor:pointer; }
-    
     .form-file-wrap { border:1.5px solid var(--border); border-radius:8px; overflow:hidden; display:flex; align-items:center; background:white; }
     .form-file-wrap input[type="file"] { flex:1; padding:8px 12px; border:none; outline:none; font-family:inherit; font-size:13px; background:transparent; cursor:pointer; }
     .form-file-wrap input[type="file"]::-webkit-file-upload-button { padding:6px 14px; background:var(--light); border:none; border-right:1px solid var(--border); font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; margin-right:8px; }
@@ -57,11 +56,12 @@
     .details-table td { padding:10px 14px; border-bottom:1px solid #F1F5F9; vertical-align:middle; }
     .details-table tr:last-child td { border-bottom:none; }
     .details-table td.sno { color:var(--muted); font-weight:700; font-size:13px; text-align:center; width:60px; }
-    .details-table input[type="text"], .details-table input[type="number"], .details-table select { width:100%; padding:8px 12px; border:1.5px solid var(--border); border-radius:7px; font-family:inherit; font-size:13px; color:var(--text); outline:none; transition:border-color .2s; background:white; }
-    .details-table select { appearance:none; background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 10px center; cursor:pointer; }
+    .details-table input[type="text"],
+    .details-table input[type="number"],
+    .details-table select { width:100%; padding:8px 12px; border:1.5px solid var(--border); border-radius:7px; font-family:inherit; font-size:13px; color:var(--text); outline:none; transition:border-color .2s; background:white; }
+    .details-table select { appearance:none; background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 10px center; cursor:pointer; padding-right:28px; }
     .details-table input:focus, .details-table select:focus { border-color:var(--primary); }
     .details-table input::placeholder { color:#CBD5E1; }
-    .details-table .option-name-cell { font-weight:600; font-size:13.5px; color:var(--text); }
     .quill-wrapper { border:1.5px solid #CBD5E1; border-radius:8px; overflow:hidden; background:white; }
     .quill-wrapper:focus-within { border-color:#0EA5E9; box-shadow:0 0 0 3px rgba(14,165,233,.1); }
     .form-actions { display:flex; justify-content:flex-end; padding-top:20px; border-top:1px solid var(--border); margin-top:20px; }
@@ -71,10 +71,11 @@
     .form-hint { font-size:11px; color:var(--muted); margin-top:3px; }
     .alert-error { padding:12px 16px; background:#FEE2E2; color:#991B1B; border:1px solid #FECACA; border-radius:8px; font-size:13.5px; margin-bottom:20px; }
     .divider { border:none; border-top:1px solid var(--border); margin:20px 0; }
-
-    /* Details loading state */
     .details-loading { text-align:center; padding:32px; color:var(--muted); font-size:14px; }
     .details-empty { text-align:center; padding:32px; color:var(--muted); font-size:14px; background:#FAFBFD; border-radius:8px; border:1.5px dashed var(--border); }
+    .measure-row { display:flex; gap:8px; }
+    .measure-row .form-input { flex:1; }
+    .measure-row .unit-input { width:90px; flex-shrink:0; }
 </style>
 @endsection
 
@@ -119,13 +120,13 @@
         {{-- ── Row 1: Product Name / Datasheets / Brand ── --}}
         <div class="form-grid-3">
             <div class="form-group">
-                <label class="form-label">Product Name: <span>*</span></label>
+                <label class="form-label">Product Name <span>*</span></label>
                 <input type="text" name="product_name" class="form-input"
                        placeholder="e.g. Jinko Tiger Pro 580W"
                        value="{{ old('product_name', $record->product_name ?? '') }}" required/>
             </div>
             <div class="form-group">
-                <label class="form-label">Datasheets:</label>
+                <label class="form-label">Datasheets</label>
                 <div class="form-file-wrap">
                     <input type="file" name="datasheets[]" accept=".pdf,.jpg,.png,.webp" multiple/>
                 </div>
@@ -134,7 +135,7 @@
                 @endif
             </div>
             <div class="form-group">
-                <label class="form-label">Choose Brand</label>
+                <label class="form-label">Brand</label>
                 <select name="brand_id" class="form-select">
                     <option value="">Select Brand</option>
                     @foreach($brands as $brand)
@@ -147,7 +148,7 @@
             </div>
         </div>
 
-        {{-- ── Row 2: Main Menu / Sub Menu (MANDATORY) ── --}}
+        {{-- ── Row 2: Main Menu / Sub Menu ── --}}
         <div class="form-grid-2" style="margin-bottom:20px;">
             <div class="form-group">
                 <label class="form-label">Main Menu <span>*</span></label>
@@ -181,34 +182,14 @@
             </div>
         </div>
 
-        {{-- ── Row 3: Product Image / Alt Tag ── --}}
-        <div class="form-grid-2">
-            <div class="form-group">
-                <label class="form-label">Product Image:</label>
-                @if(isset($record) && $record?->image)
-                    <img src="{{ asset('storage/' . $record->image) }}" class="img-preview" alt="Current"/>
-                @endif
-                <div class="form-file-wrap">
-                    <input type="file" name="image" accept="image/*"/>
-                </div>
-                @if(isset($record) && $record?->image)
-                    <span class="form-hint">Leave blank to keep current image</span>
-                @endif
-            </div>
-            <div class="form-group">
-                <label class="form-label">Alt Tag:</label>
-                <input type="text" name="alt_tag" class="form-input"
-                       placeholder="Image alt text"
-                       value="{{ old('alt_tag', $record->alt_tag ?? '') }}"/>
-            </div>
-        </div>
+        
 
         {{-- ── Row 4: 1 Pallet / 1 Container ── --}}
         <div class="form-grid-2">
             <div class="form-group">
                 <label class="form-label">
                     1 Pallet =
-                    <span title="Number of units per pallet" style="cursor:help; color:var(--primary-d);">ℹ</span>
+                    <span title="Number of units per pallet" style="cursor:help; color:var(--primary-d); font-weight:400;">ℹ</span>
                 </label>
                 <input type="text" name="one_pallet" class="form-input"
                        placeholder="e.g. 36 pcs"
@@ -216,8 +197,8 @@
             </div>
             <div class="form-group">
                 <label class="form-label">
-                    1 container =
-                    <span title="Number of units per container" style="cursor:help; color:var(--primary-d);">ℹ</span>
+                    1 Container =
+                    <span title="Number of units per container" style="cursor:help; color:var(--primary-d); font-weight:400;">ℹ</span>
                 </label>
                 <input type="text" name="one_container" class="form-input"
                        placeholder="e.g. 756 pcs"
@@ -243,7 +224,7 @@
             <div class="checkbox-row">
                 <input type="checkbox" name="is_popular" id="isPopular" value="1"
                        {{ old('is_popular', $record->is_popular ?? false) ? 'checked' : '' }}/>
-                <label for="isPopular">Popular Product</label>
+                <label for="isPopular">Mark as Popular Product</label>
             </div>
         </div>
 
@@ -267,60 +248,45 @@
 
         <hr class="divider">
 
-        {{-- ── Product Details (dynamically loaded by sub menu) ── --}}
+        {{-- ── Product Details ── --}}
         <div class="section-header" onclick="toggleSection('details')">
             <div class="section-title">Product Details</div>
             <div class="section-toggle" id="toggle-details">−</div>
         </div>
         <div id="section-details">
             <div id="productDetailsWrapper">
-                @if(isset($record) && $record->sub_menu_id && $options->isNotEmpty())
-                    {{-- Edit mode: render existing options with saved values --}}
-                    @php $existingDetails = $record->product_details ?? []; @endphp
+                @if($mode === 'edit' && isset($record) && !empty($record->product_details))
+                    {{-- Edit mode: render saved {label, value, unit} rows --}}
                     <table class="details-table">
                         <thead>
                             <tr>
                                 <th class="center">S.No</th>
-                                <th>Option Details</th>
-                                <th style="width:200px;">Unit</th>
+                                <th>Label</th>
                                 <th style="width:200px;">Value</th>
-                                <th class="center" style="width:120px;">Show in Badge</th>
+                                <th style="width:160px;">Unit</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($options as $i => $option)
-                            @php
-                                $saved = collect($existingDetails)->firstWhere('option_id', (string)$option->id) ?? [];
-                                $rawUnitIds = $option->unit_ids ?? ($option->unit_id ? [$option->unit_id] : []);
-                                $optionUnitIds = collect($rawUnitIds)->map(fn($id) => (string)$id)->toArray();
-                                $optionUnits = isset($units) ? $units->filter(fn($u) => in_array((string)$u->id, $optionUnitIds))->values() : collect();
-                            @endphp
+                            @foreach($record->product_details as $i => $detail)
                             <tr>
                                 <td class="sno">{{ $i + 1 }}.</td>
-                                <td class="option-name-cell">
-                                    {{ $option->option_name }}
-                                    <input type="hidden" name="product_details[{{ $i }}][option_id]"   value="{{ $option->id }}"/>
-                                    <input type="hidden" name="product_details[{{ $i }}][option_name]" value="{{ $option->option_name }}"/>
+                                <td>
+                                    <input type="text"
+                                           name="product_details[{{ $i }}][label]"
+                                           value="{{ $detail['label'] ?? '' }}"
+                                           placeholder="Label"/>
                                 </td>
                                 <td>
-                                    <select name="product_details[{{ $i }}][unit_id]">
-                                        <option value="">Select Unit</option>
-                                        @foreach($optionUnits as $unit)
-                                            <option value="{{ $unit->id }}"
-                                                {{ ($saved['unit_id'] ?? '') == $unit->id ? 'selected' : '' }}>
-                                                {{ $unit->unit_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <input type="text"
+                                           name="product_details[{{ $i }}][value]"
+                                           value="{{ $detail['value'] ?? '' }}"
+                                           placeholder="Enter value"/>
                                 </td>
                                 <td>
-                                    <input type="text" name="product_details[{{ $i }}][value]"
-                                           placeholder="Enter value" value="{{ $saved['value'] ?? '' }}"/>
-                                </td>
-                                <td class="center">
-                                    <input type="checkbox" name="product_details[{{ $i }}][show_in_badge]" value="1"
-                                           {{ !empty($saved['show_in_badge']) ? 'checked' : '' }}
-                                           style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;"/>
+                                    <input type="text"
+                                           name="product_details[{{ $i }}][unit]"
+                                           value="{{ $detail['unit'] ?? '' }}"
+                                           placeholder="e.g. W, kg, mm"/>
                                 </td>
                             </tr>
                             @endforeach
@@ -342,33 +308,64 @@
             <div class="section-toggle" id="toggle-measurement">−</div>
         </div>
         <div id="section-measurement">
+            @php $m = $record->measurement_details ?? []; @endphp
             <div class="form-grid-3" style="margin-bottom:16px;">
                 <div class="form-group">
-                    <label class="form-label">Height(mm):</label>
-                    <input type="number" name="height" class="form-input" step="0.01"
-                           placeholder="e.g. 2278" value="{{ old('height', $record->height ?? '') }}"/>
+                    <label class="form-label">Height</label>
+                    <div class="measure-row">
+                        <input type="number" name="height" class="form-input" step="0.01"
+                               placeholder="e.g. 2278"
+                               value="{{ old('height', $m['height'] ?? '') }}"/>
+                        <input type="text" name="height_unit" class="form-input unit-input"
+                               placeholder="mm"
+                               value="{{ old('height_unit', $m['height_unit'] ?? '') }}"/>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Width(mm):</label>
-                    <input type="number" name="width" class="form-input" step="0.01"
-                           placeholder="e.g. 1134" value="{{ old('width', $record->width ?? '') }}"/>
+                    <label class="form-label">Width</label>
+                    <div class="measure-row">
+                        <input type="number" name="width" class="form-input" step="0.01"
+                               placeholder="e.g. 1134"
+                               value="{{ old('width', $m['width'] ?? '') }}"/>
+                        <input type="text" name="width_unit" class="form-input unit-input"
+                               placeholder="mm"
+                               value="{{ old('width_unit', $m['width_unit'] ?? '') }}"/>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Depth(mm):</label>
-                    <input type="number" name="depth" class="form-input" step="0.01"
-                           placeholder="e.g. 35" value="{{ old('depth', $record->depth ?? '') }}"/>
+                    <label class="form-label">Depth</label>
+                    <div class="measure-row">
+                        <input type="number" name="depth" class="form-input" step="0.01"
+                               placeholder="e.g. 35"
+                               value="{{ old('depth', $m['depth'] ?? '') }}"/>
+                        <input type="text" name="depth_unit" class="form-input unit-input"
+                               placeholder="mm"
+                               value="{{ old('depth_unit', $m['depth_unit'] ?? '') }}"/>
+                    </div>
                 </div>
             </div>
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Weight(KG):</label>
-                    <input type="number" name="weight" class="form-input" step="0.01"
-                           placeholder="e.g. 32.5" value="{{ old('weight', $record->weight ?? '') }}"/>
+                    <label class="form-label">Weight</label>
+                    <div class="measure-row">
+                        <input type="number" name="weight" class="form-input" step="0.01"
+                               placeholder="e.g. 32.5"
+                               value="{{ old('weight', $m['weight'] ?? '') }}"/>
+                        <input type="text" name="weight_unit" class="form-input unit-input"
+                               placeholder="kg"
+                               value="{{ old('weight_unit', $m['weight_unit'] ?? '') }}"/>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Length(mm):</label>
-                    <input type="number" name="length" class="form-input" step="0.01"
-                           placeholder="e.g. 1134" value="{{ old('length', $record->length ?? '') }}"/>
+                    <label class="form-label">Length</label>
+                    <div class="measure-row">
+                        <input type="number" name="length" class="form-input" step="0.01"
+                               placeholder="e.g. 1134"
+                               value="{{ old('length', $m['length'] ?? '') }}"/>
+                        <input type="text" name="length_unit" class="form-input unit-input"
+                               placeholder="mm"
+                               value="{{ old('length_unit', $m['length_unit'] ?? '') }}"/>
+                    </div>
                 </div>
             </div>
         </div>
@@ -422,7 +419,7 @@ function toggleSection(name) {
     toggle.textContent    = isHidden ? '−' : '+';
 }
 
-// ── Handle Main Menu change: filter sub menus ──
+// ── Main Menu change: reload sub menus ────────────
 function handleMainMenuChange(mainMenuId) {
     if (!mainMenuId) return;
 
@@ -435,17 +432,15 @@ function handleMainMenuChange(mainMenuId) {
     .then(data => {
         subSelect.innerHTML = '<option value="" disabled selected>Select Sub Menu</option>';
         data.subMenus.forEach(sm => {
-            const id = sm.id || sm._id;  // ← fix: was only sm._id
+            const id = sm.id || sm._id;
             subSelect.innerHTML += `<option value="${id}">${sm.name}</option>`;
         });
-        clearProductDetails(); // ← add this: reset details when main menu changes
-    })
-    .catch(() => {
         clearProductDetails();
-    });
+    })
+    .catch(() => clearProductDetails());
 }
 
-// ── Handle Sub Menu change: load product detail options ──
+// ── Sub Menu change: load product detail options ──
 function handleSubMenuChange(subMenuId) {
     if (!subMenuId) {
         clearProductDetails();
@@ -453,19 +448,19 @@ function handleSubMenuChange(subMenuId) {
     }
 
     const wrapper = document.getElementById('productDetailsWrapper');
-    wrapper.innerHTML = '<div class="details-loading">⏳ Loading product detail options...</div>';
+    wrapper.innerHTML = '<div class="details-loading">⏳ Loading options...</div>';
 
     fetch('{{ route("admin.products.options-by-submenu") }}?sub_menu_id=' + subMenuId, {
         headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
     })
     .then(r => r.json())
     .then(data => {
-        if (!data.options || data.options.length === 0) {
-            wrapper.innerHTML = '<div class="details-empty">No product detail options found for this sub menu. Add options from <strong>Product Detail Options</strong> page first.</div>';
-            return;
-        }
-        renderDetailsTable(data.options, data.units, []);
-    })
+    if (!data.options || data.options.length === 0) {
+        wrapper.innerHTML = '<div class="details-empty">No options found for this sub menu. Add options from the <strong>Product Detail Options</strong> page first.</div>';
+        return;
+    }
+    renderDetailsTable(data.options, savedDetails);
+})
     .catch(() => {
         wrapper.innerHTML = '<div class="details-empty">Failed to load options. Please try again.</div>';
     });
@@ -476,73 +471,99 @@ function clearProductDetails() {
         '<div class="details-empty" id="detailsEmptyMsg">← Please select a <strong>Sub Menu</strong> above to load product detail options.</div>';
 }
 
-function renderDetailsTable(options, units, savedDetails) {
-    let html = `<table class="details-table">
-        <thead>
-            <tr>
-                <th class="center">S.No</th>
-                <th>Option Details</th>
-                <th style="width:200px;">Unit</th>
-                <th style="width:200px;">Value</th>
-                <th class="center" style="width:120px;">Show in Badge</th>
-            </tr>
-        </thead>
-        <tbody>`;
+// Renders {label, value, unit} rows from AJAX options.
+// label is pre-filled from option_name.
+// If the option has attached units, shows a dropdown; otherwise a free-text input.
+// Saved edit-mode values keyed by label — populated by Blade below
+var savedDetails = @if($mode === 'edit' && isset($record) && !empty($record->product_details))
+    (function() {
+        var map = {};
+        @foreach($record->product_details as $detail)
+            map[{{ json_encode($detail['label'] ?? '') }}] = {
+                value : {{ json_encode($detail['value'] ?? '') }},
+                unit  : {{ json_encode($detail['unit']  ?? '') }}
+            };
+        @endforeach
+        return map;
+    })()
+@else
+    {}
+@endif;
+
+function renderDetailsTable(options, savedMap) {
+    savedMap = savedMap || {};
+
+    let html = `
+        <table class="details-table">
+            <thead>
+                <tr>
+                    <th class="center">S.No</th>
+                    <th>Label</th>
+                    <th style="width:200px;">Value</th>
+                    <th style="width:160px;">Unit</th>
+                </tr>
+            </thead>
+            <tbody>`;
 
     options.forEach((option, i) => {
-        const optionId   = option._id || option.id;
-        const optionName = option.option_name;
+        const label     = option.option_name || '';
+        const saved     = savedMap[label] || {};
+        const savedVal  = saved.value || '';
+        const savedUnit = saved.unit  || '';
 
-        // Determine which unit IDs this option supports
-        let unitIds = [];
-        if (option.unit_ids && option.unit_ids.length) {
-            unitIds = option.unit_ids.map(String);
-        } else if (option.unit_id) {
-            unitIds = [String(option.unit_id)];
+        let unitField = '';
+        if (option.units && option.units.length > 0) {
+            let opts = '<option value="">Select</option>';
+            option.units.forEach(u => {
+                const uname = u.unit_name || '';
+                const sel   = (savedUnit === uname) ? 'selected' : '';
+                opts += `<option value="${uname}" ${sel}>${uname}</option>`;
+            });
+            unitField = `<select name="product_details[${i}][unit]">${opts}</select>`;
+        } else {
+            unitField = `<input type="text"
+                                name="product_details[${i}][unit]"
+                                value="${savedUnit}"
+                                placeholder="e.g. W, kg, mm"/>`;
         }
 
-        // Filter units
-        const filteredUnits = unitIds.length
-            ? units.filter(u => unitIds.includes(String(u._id || u.id)))
-            : units;
-
-        // Find saved data
-        const saved = savedDetails.find(s => String(s.option_id) === String(optionId)) || {};
-
-        let unitOptions = '<option value="">Select Unit</option>';
-        filteredUnits.forEach(u => {
-            const uid = u._id || u.id;
-            const sel = saved.unit_id && String(saved.unit_id) === String(uid) ? 'selected' : '';
-            unitOptions += `<option value="${uid}" ${sel}>${u.unit_name}</option>`;
-        });
-
-        html += `<tr>
-            <td class="sno">${i + 1}.</td>
-            <td class="option-name-cell">
-                ${optionName}
-                <input type="hidden" name="product_details[${i}][option_id]"   value="${optionId}"/>
-                <input type="hidden" name="product_details[${i}][option_name]" value="${optionName}"/>
-            </td>
-            <td><select name="product_details[${i}][unit_id]">${unitOptions}</select></td>
-            <td><input type="text" name="product_details[${i}][value]" placeholder="Enter value" value="${saved.value || ''}"/></td>
-            <td class="center">
-                <input type="checkbox" name="product_details[${i}][show_in_badge]" value="1"
-                       ${saved.show_in_badge ? 'checked' : ''}
-                       style="width:18px; height:18px; accent-color:var(--primary-d); cursor:pointer;"/>
-            </td>
-        </tr>`;
+        html += `
+            <tr>
+                <td class="sno">${i + 1}.</td>
+                <td>
+                    <input type="text"
+                           name="product_details[${i}][label]"
+                           value="${label}"
+                           placeholder="Label"/>
+                </td>
+                <td>
+                    <input type="text"
+                           name="product_details[${i}][value]"
+                           value="${savedVal}"
+                           placeholder="Enter value"/>
+                </td>
+                <td>${unitField}</td>
+            </tr>`;
     });
 
     html += '</tbody></table>';
     document.getElementById('productDetailsWrapper').innerHTML = html;
 }
+document.addEventListener('DOMContentLoaded', function () {
+    @if($mode === 'edit' && isset($record) && $record->sub_menu_id)
+        handleSubMenuChange('{{ $record->sub_menu_id }}');
+    @endif
+});
 </script>
 
 @endsection
 
 @else
 
-{{-- ═══ INDEX MODE ═══ --}}
+
+{{-- ══════════════   INDEX MODE   ════════════════ --}}
+
+
 
 @section('title', 'Products')
 
@@ -566,7 +587,7 @@ function renderDetailsTable(options, units, savedDetails) {
     .data-table th.center,.data-table td.center { text-align:center; }
     .data-table td { padding:14px 16px; font-size:13.5px; color:var(--text); border-bottom:1px solid #F1F5F9; vertical-align:middle; }
     .data-table tr:last-child td { border-bottom:none; }
-    .data-table tbody tr:nth-child(odd) td { background:white; }
+    .data-table tbody tr:nth-child(odd)  td { background:white; }
     .data-table tbody tr:nth-child(even) td { background:#FAFBFD; }
     .data-table tbody tr:hover td { background:#E0F2FE !important; }
     .product-thumb { width:80px; height:60px; object-fit:contain; border-radius:6px; border:1px solid var(--border); display:block; margin:0 auto; }
@@ -642,7 +663,7 @@ function renderDetailsTable(options, units, savedDetails) {
             Show
             <select name="entries" class="entries-select" onchange="this.form.submit()">
                 @foreach([10,25,50,100] as $n)
-                    <option value="{{ $n }}" {{ request('entries',10) == $n ? 'selected':'' }}>{{ $n }}</option>
+                    <option value="{{ $n }}" {{ request('entries',10) == $n ? 'selected' : '' }}>{{ $n }}</option>
                 @endforeach
             </select>
             entries
@@ -655,11 +676,10 @@ function renderDetailsTable(options, units, savedDetails) {
     <table class="data-table">
         <thead>
             <tr>
-                <th class="center" style="width:70px;">S.No</th>
-                <th class="center" style="width:110px;">Product Image</th>
+                <th class="center" style="width:70px;">S.No</th>           
                 <th>Product Name</th>
                 <th style="width:120px;">Brand</th>
-                <th class="center" style="width:160px;">Admin Verification Status</th>
+                <th class="center" style="width:160px;">Verification Status</th>
                 <th class="center" style="width:140px;">Updated By</th>
                 <th class="center" style="width:130px;">Action</th>
             </tr>
@@ -670,13 +690,6 @@ function renderDetailsTable(options, units, savedDetails) {
                 <td class="center" style="font-weight:700; color:var(--muted); font-size:13px;">
                     {{ $products->firstItem() + $index }}
                 </td>
-                <td class="center">
-                    @if($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" class="product-thumb" alt="{{ $product->product_name }}"/>
-                    @else
-                        <span class="no-image">—</span>
-                    @endif
-                </td>
                 <td style="font-weight:600; max-width:300px;">{{ $product->product_name }}</td>
                 <td style="color:var(--muted);">{{ $product->brand_name ?? '—' }}</td>
                 <td class="center">
@@ -685,13 +698,16 @@ function renderDetailsTable(options, units, savedDetails) {
                     </span>
                 </td>
                 <td class="center">
-                    <span class="updater-badge">{{ $product->updated_by ?? '—' }}</span>
+                    <span class="updater-badge" title="{{ $product->updated_by ?? '' }}">
+                        {{ $product->updated_by ?? '—' }}
+                    </span>
                 </td>
                 <td>
                     <div class="action-btns">
                         @if(($product->verification_status ?? 'pending') === 'pending')
+                            {{-- Verify --}}
                             <button class="action-icon verify" title="Verify"
-                                onclick="document.getElementById('verify-{{ $product->id }}').submit();">
+                                    onclick="document.getElementById('verify-{{ $product->id }}').submit();">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                     <polyline points="20 6 9 17 4 12"/>
                                 </svg>
@@ -700,8 +716,9 @@ function renderDetailsTable(options, units, savedDetails) {
                                   action="{{ route('admin.products.verify', $product->id) }}" style="display:none;">
                                 @csrf @method('PATCH')
                             </form>
+                            {{-- Reject --}}
                             <button class="action-icon reject" title="Reject"
-                                onclick="document.getElementById('reject-{{ $product->id }}').submit();">
+                                    onclick="document.getElementById('reject-{{ $product->id }}').submit();">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                     <circle cx="12" cy="12" r="9"/>
                                     <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
@@ -712,14 +729,17 @@ function renderDetailsTable(options, units, savedDetails) {
                                 @csrf @method('PATCH')
                             </form>
                         @endif
-                        <a href="{{ route('admin.products.edit', $product->id) }}" class="action-icon edit" title="Edit">
+                        {{-- Edit --}}
+                        <a href="{{ route('admin.products.edit', $product->id) }}"
+                           class="action-icon edit" title="Edit">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                             </svg>
                         </a>
+                        {{-- Delete --}}
                         <button class="action-icon delete" title="Delete"
-                            onclick="if(confirm('Delete this product?')) document.getElementById('del-{{ $product->id }}').submit();">
+                                onclick="if(confirm('Delete this product?')) document.getElementById('del-{{ $product->id }}').submit();">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"/>
                                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -749,7 +769,10 @@ function renderDetailsTable(options, units, savedDetails) {
     </table>
 
     <div class="table-footer">
-        <span>{{ $products->firstItem() ?? 0 }}–{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} entries</span>
+        <span>
+            {{ $products->firstItem() ?? 0 }}–{{ $products->lastItem() ?? 0 }}
+            of {{ $products->total() }} entries
+        </span>
         {{ $products->appends(request()->query())->links() }}
     </div>
 </div>
