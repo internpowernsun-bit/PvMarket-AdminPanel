@@ -36,32 +36,34 @@ class MainMenuController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'items'             => 'required|array|min:1',
-        'items.*.name'      => 'required|string|max:255',
-        'items.*.icon'      => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
-        'items.*.alt_tag'   => 'nullable|string|max:255',
-    ]);
+    {
+        $request->validate([
+            'items'           => 'required|array|min:1',
+            'items.*.name'    => 'required|string|max:255',
+            'items.*.icon'    => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'items.*.alt_tag' => 'nullable|string|max:255',
+        ]);
 
-    foreach ($request->items as $index => $item) {
-        $data = [
-            'name'      => $item['name'],
-            'alt_tag'   => $item['alt_tag'] ?? null,
-            'is_active' => true,
-        ];
+        foreach ($request->items as $index => $item) {
+            $data = [
+                'name'        => $item['name'],
+                'alt_tag'     => $item['alt_tag'] ?? null,
+                'is_active'   => true,
+                'stock_value' => false,
+            ];
 
-        if ($request->hasFile("items.{$index}.icon")) {
-            $data['icon'] = $request->file("items.{$index}.icon")
-                                    ->store('main-menus', 'public');
+            if ($request->hasFile("items.{$index}.icon")) {
+                $data['icon'] = $request->file("items.{$index}.icon")
+                                        ->store('main-menus', 'public');
+            }
+
+            MainMenu::create($data);
         }
 
-        MainMenu::create($data);
+        return redirect()->route('admin.setup.main-menus.index')
+                         ->with('success', count($request->items) . ' menu(s) created successfully.');
     }
 
-    return redirect()->route('admin.setup.main-menus.index')
-                     ->with('success', count($request->items) . ' menu(s) created successfully.');
-}
     public function edit($id)
     {
         $record = MainMenu::findOrFail($id);
@@ -120,6 +122,14 @@ class MainMenuController extends Controller
         $menu->update(['is_active' => !$menu->is_active]);
 
         return back()->with('success', 'Status updated.');
+    }
+
+    public function toggleStock($id)
+    {
+        $menu = MainMenu::findOrFail($id);
+        $menu->update(['stock_value' => !$menu->stock_value]);
+
+        return back()->with('success', 'Stock value updated.');
     }
 
     public function destroy($id)

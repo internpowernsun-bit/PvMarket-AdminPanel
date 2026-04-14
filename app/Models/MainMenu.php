@@ -20,5 +20,6 @@ class MainMenu extends Model
         'short_description',
         'content',
         'is_active',
+        'stock_value',
     ];
 }

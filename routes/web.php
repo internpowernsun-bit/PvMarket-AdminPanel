@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\ProductDetailOptionController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PvSpotPriceController;
+use App\Http\Controllers\Admin\PageSectionController;
 
 // ── Redirect root to login ──────────────────────────────────────────────
 Route::get('/', function () {
@@ -221,6 +222,8 @@ Route::get('/setup/sub-menus/{id}/edit',     [SubMenuController::class, 'edit'])
 Route::put('/setup/sub-menus/{id}',          [SubMenuController::class, 'update'])->name('admin.setup.sub-menus.update');
 Route::patch('/setup/sub-menus/{id}/toggle', [SubMenuController::class, 'toggleStatus'])->name('admin.setup.sub-menus.toggle');
 Route::delete('/setup/sub-menus/{id}',       [SubMenuController::class, 'destroy'])->name('admin.setup.sub-menus.destroy');
+Route::patch('sub-menus/{id}/stock-toggle', [SubMenuController::class, 'toggleStock'])
+     ->name('admin.setup.sub-menus.stock-toggle');
 
     // Main Menus
 Route::get('/setup/main-menus',                  [MainMenuController::class, 'index'])->name('admin.setup.main-menus.index');
@@ -230,6 +233,8 @@ Route::get('/setup/main-menus/{id}/edit',        [MainMenuController::class, 'ed
 Route::put('/setup/main-menus/{id}',             [MainMenuController::class, 'update'])->name('admin.setup.main-menus.update');
 Route::patch('/setup/main-menus/{id}/toggle',    [MainMenuController::class, 'toggleStatus'])->name('admin.setup.main-menus.toggle');
 Route::delete('/setup/main-menus/{id}',          [MainMenuController::class, 'destroy'])->name('admin.setup.main-menus.destroy');
+Route::patch('main-menus/{id}/stock-toggle', [MainMenuController::class, 'toggleStock'])
+     ->name('admin.setup.main-menus.stock-toggle');
 
     // News
     Route::get   ('admin/knowledge-hub/news',           [NewsController::class, 'index'])  ->name('admin.knowledge-hub.news.index');
@@ -253,6 +258,14 @@ Route::delete('/setup/main-menus/{id}',          [MainMenuController::class, 'de
     Route::get('/admin/profile',          [ProfileController::class, 'show'])           ->name('admin.profile');
     Route::put('/admin/profile',          [ProfileController::class, 'update'])         ->name('admin.profile.update');
     Route::put('/admin/profile/password', [ProfileController::class, 'updatePassword']) ->name('admin.profile.password');
+    
+     
+
+Route::prefix('admin/page-sections')->name('admin.page-sections.')->group(function () {
+    Route::get('/',           [PageSectionController::class, 'index']) ->name('index');
+    Route::get('/{page}',     [PageSectionController::class, 'edit'])  ->name('edit');
+    Route::put('/{page}',     [PageSectionController::class, 'update'])->name('update');
+});
 
     // Logout
     Route::post('/admin/logout', [AuthController::class, 'logout'])

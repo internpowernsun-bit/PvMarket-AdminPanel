@@ -47,7 +47,6 @@ class SubMenuController extends Controller
             'items.*.name'    => 'required|string|max:255',
         ]);
 
-        // Get the main menu name for display
         $mainMenu = MainMenu::findOrFail($request->main_menu_id);
 
         foreach ($request->items as $item) {
@@ -59,6 +58,7 @@ class SubMenuController extends Controller
                 'container_applicable' => isset($item['container']) ? true : false,
                 'slug'                 => Str::slug($item['name']),
                 'is_active'            => true,
+                'stock_value'          => false,
             ]);
         }
 
@@ -125,6 +125,14 @@ class SubMenuController extends Controller
         $subMenu->update(['is_active' => !$subMenu->is_active]);
 
         return back()->with('success', 'Status updated.');
+    }
+
+    public function toggleStock($id)
+    {
+        $subMenu = SubMenu::findOrFail($id);
+        $subMenu->update(['stock_value' => !$subMenu->stock_value]);
+
+        return back()->with('success', 'Stock value updated.');
     }
 
     public function destroy($id)

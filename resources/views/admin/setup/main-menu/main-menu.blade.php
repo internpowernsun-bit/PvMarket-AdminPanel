@@ -25,22 +25,8 @@
     .btn-add-row:hover { background:var(--primary-d); }
     .btn-save { display:inline-flex; align-items:center; gap:8px; padding:10px 28px; background:#10B981; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s; }
     .btn-save:hover { background:#059669; }
-    .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 18px;
-    background: var(--text);
-    color: white;
-    border-radius: 8px;
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background .15s;
-    white-space: nowrap;
-    border: 1.5px solid var(--text);
-}
-.btn-back:hover { background: #334155; border-color: #334155; }
+    .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; white-space:nowrap; border:1.5px solid var(--text); }
+    .btn-back:hover { background:#334155; border-color:#334155; }
     .btn-remove { background:none; border:none; cursor:pointer; color:#EF4444; padding:6px; border-radius:6px; transition:background .15s; }
     .btn-remove:hover { background:#FEF2F2; }
     .alert-error { padding:12px 16px; background:#FEE2E2; color:#991B1B; border:1px solid #FECACA; border-radius:8px; font-size:13.5px; margin-bottom:20px; }
@@ -151,7 +137,7 @@ function addRow() {
 
 function removeRow(btn) {
     const rows = document.querySelectorAll('#rowsBody tr');
-    if (rows.length === 1) return; // keep at least one row
+    if (rows.length === 1) return;
     btn.closest('tr').remove();
     renumberRows();
 }
@@ -194,26 +180,10 @@ function renumberRows() {
     .section-divider { border:none; border-top:1px solid var(--border); margin:24px 0; }
     .btn-save { display:inline-flex; align-items:center; gap:8px; padding:10px 28px; background:#10B981; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s; }
     .btn-save:hover { background:#059669; }
-    .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 18px;
-    background: var(--text);
-    color: white;
-    border-radius: 8px;
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background .15s;
-    white-space: nowrap;
-    border: 1.5px solid var(--text);
-}
-.btn-back:hover { background: #334155; border-color: #334155; }
+    .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; white-space:nowrap; border:1.5px solid var(--text); }
+    .btn-back:hover { background:#334155; border-color:#334155; }
     .current-icon { height:40px; border-radius:6px; border:1px solid var(--border); object-fit:contain; display:block; margin-bottom:8px; }
     .alert-error { padding:12px 16px; background:#FEE2E2; color:#991B1B; border:1px solid #FECACA; border-radius:8px; font-size:13.5px; margin-bottom:20px; }
-
-    /* Quill */
     .quill-wrapper { border:1.5px solid #CBD5E1; border-radius:8px; overflow:hidden; }
     .quill-wrapper:focus-within { border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1); }
 </style>
@@ -249,7 +219,6 @@ function renumberRows() {
         @csrf
         @method('PUT')
 
-        {{-- ── Row 1: Name + Icon + Alt Tag ── --}}
         <div class="form-grid-3">
             <div class="form-group">
                 <label class="form-label">Main Menu <span>*</span></label>
@@ -278,7 +247,6 @@ function renumberRows() {
 
         <hr class="section-divider">
 
-        {{-- ── SEO / Meta Fields ── --}}
         <div class="section-title">SEO / Meta Fields</div>
 
         <div class="form-grid-2">
@@ -318,7 +286,6 @@ function renumberRows() {
 
         <hr class="section-divider">
 
-        {{-- ── Short Description ── --}}
         <div class="form-grid-1">
             <div class="form-group">
                 <label class="form-label">Short Description</label>
@@ -327,7 +294,6 @@ function renumberRows() {
             </div>
         </div>
 
-        {{-- ── Content (Quill) ── --}}
         <div class="form-group" style="margin-bottom:20px;">
             <label class="form-label">Content</label>
             <textarea name="content" id="contentInput" style="display:none;">{{ old('content', $record->content) }}</textarea>
@@ -377,7 +343,6 @@ function renumberRows() {
         document.getElementById('contentInput').value = (html === '<p><br></p>') ? '' : html;
     });
 
-    // Auto-generate slug from name
     document.querySelector('input[name="name"]').addEventListener('input', function () {
         const slugField = document.getElementById('slugField');
         if (!slugField.dataset.touched) {
@@ -430,6 +395,10 @@ function renumberRows() {
     .action-icon.toggle.off { color:#94A3B8; border-color:#E2E8F0; background:#F8FAFC; }
     .action-icon.delete { color:#DC2626; border-color:#FECACA; background:#FEF2F2; }
     .action-icon:hover  { transform:translateY(-2px) scale(1.08); box-shadow:0 3px 8px rgba(0,0,0,.12); }
+
+    /* Checkbox styling */
+    .stock-checkbox { width:17px; height:17px; cursor:pointer; accent-color:var(--primary); }
+
     .table-footer { padding:12px 20px; font-size:13px; color:var(--muted); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#FAFBFD; }
     .pagination { display:flex; gap:3px; list-style:none; }
     .pagination li a,.pagination li span { display:flex; align-items:center; justify-content:center; min-width:32px; height:32px; padding:0 8px; border-radius:6px; border:1.5px solid var(--border); font-size:13px; font-weight:500; text-decoration:none; color:var(--text); background:white; transition:all .15s; }
@@ -501,6 +470,7 @@ function renumberRows() {
                 <th class="center" style="width:70px;">S.No</th>
                 <th class="center" style="width:120px;">Menu Icon</th>
                 <th>Menu Name</th>
+                <th class="center" style="width:140px;">Value of Stocks</th>
                 <th class="center" style="width:100px;">Action</th>
             </tr>
         </thead>
@@ -519,6 +489,25 @@ function renumberRows() {
                     @endif
                 </td>
                 <td style="font-weight:600;">{{ $menu->name }}</td>
+
+                {{-- ── Value of Stocks ── --}}
+                <td class="center">
+                    <form method="POST"
+                          action="{{ route('admin.setup.main-menus.stock-toggle', $menu->id) }}"
+                          style="display:contents;">
+                        @csrf
+                        @method('PATCH')
+                        <input
+                            type="checkbox"
+                            class="stock-checkbox"
+                            name="stock_value"
+                            onchange="this.form.submit()"
+                            {{ $menu->stock_value ? 'checked' : '' }}
+                            title="{{ $menu->stock_value ? 'Enabled — click to disable' : 'Disabled — click to enable' }}"
+                        />
+                    </form>
+                </td>
+
                 <td>
                     <div class="action-btns">
                         {{-- Edit --}}
@@ -565,7 +554,7 @@ function renumberRows() {
             </tr>
             @empty
             <tr>
-                <td colspan="4">
+                <td colspan="5">
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M4 6h16M4 12h16M4 18h7"/>
