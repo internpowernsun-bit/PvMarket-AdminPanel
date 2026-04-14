@@ -88,7 +88,7 @@ class ProductController extends Controller
             'description'         => $request->description,
             'is_popular'          => $request->boolean('is_popular'),
             'real_time_price'     => $request->boolean('real_time_price'),
-            'verification_status' => 'pending',
+            'verification_status' => Auth::user()->role === 'super_admin' ? 'verified' : 'pending',
             'updated_by'          => Auth::user()->name,
         ];
 
@@ -103,6 +103,7 @@ class ProductController extends Controller
             $data['brand_name'] = $brand?->name;
         }
 
+        
         
 
         // ── Datasheets ───────────────────────────────
