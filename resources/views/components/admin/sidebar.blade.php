@@ -160,24 +160,30 @@
             <a href="#" class="nav-sub-item">Common Meta Scripts</a>
             <a href="#" class="nav-sub-item">Non-Index URLs</a>
             <a href="#" class="nav-sub-item">SEO Meta</a>
-        </div>
+        </div>-->
 
-        {{-- Charges History --}}
-        <div class="nav-item has-children {{ request()->routeIs('admin.charges.*') ? 'active open' : '' }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                <line x1="1" y1="10" x2="23" y2="10"/>
-            </svg>
-            Charges History
-            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="nav-sub {{ request()->routeIs('admin.charges.*') ? 'open' : '' }}">
-            <a href="#" class="nav-sub-item">Offers</a>
-            <a href="#" class="nav-sub-item">Warehouses</a>
-        </div>
+        {{-- Offers --}}
+<a href="{{ route('admin.offers.index') }}"
+           class="nav-item {{ request()->routeIs('admin.offers.*') ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+        <line x1="7" y1="7" x2="7.01" y2="7"/>
+    </svg>
+    Offers
+</a>
+
+{{-- Warehouses --}}
+<a href="{{ route('admin.warehouses.index') }}"
+   class="nav-item {{ request()->routeIs('admin.warehouses.*') ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    Warehouses
+</a>
 
         {{-- Solar Projects --}}
-        
+        <!--
         <div class="nav-item has-children {{ request()->routeIs('admin.projects.*') ? 'active open' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="5"/>

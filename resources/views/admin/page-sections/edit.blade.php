@@ -656,6 +656,39 @@
         @endforeach
         </div>
 
+        {{-- ════ TYPE: customer_support ════ --}}
+@elseif($type === 'customer_support')
+<div class="fields-grid">
+    <div>
+        <label class="field-label">Card Heading</label>
+        <input type="text" class="field-input"
+               name="sections[{{ $section->id }}][title]"
+               value="{{ old("sections.{$section->id}.title", $section->title) }}"
+               placeholder="e.g. We're here to help">
+    </div>
+    <div>
+        <label class="field-label">Subtitle / Description</label>
+        <input type="text" class="field-input"
+               name="sections[{{ $section->id }}][subtitle]"
+               value="{{ old("sections.{$section->id}.subtitle", $section->subtitle) }}"
+               placeholder="e.g. Reach out to our support team and we'll get back shortly.">
+    </div>
+    <div>
+        <label class="field-label">Email Address</label>
+        <input type="email" class="field-input"
+               name="sections[{{ $section->id }}][extra][email]"
+               value="{{ old("sections.{$section->id}.extra.email", $section->extra['email'] ?? '') }}"
+               placeholder="e.g. info@pv.market">
+    </div>
+    <div>
+        <label class="field-label">Phone Number</label>
+        <input type="text" class="field-input"
+               name="sections[{{ $section->id }}][extra][phone]"
+               value="{{ old("sections.{$section->id}.extra.phone", $section->extra['phone'] ?? '') }}"
+               placeholder="e.g. +971 523825549">
+    </div>
+</div>
+
         {{-- ════ TYPE: default ════ --}}
         @else
         <div class="fields-grid">

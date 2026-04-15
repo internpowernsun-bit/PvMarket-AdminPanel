@@ -18,6 +18,7 @@ class PageSectionController extends Controller
         'delivery'    => 'Delivery & Return Policy',
         'disclaimer'  => 'Disclaimer',
         'privacy'     => 'Privacy Policy',
+        'customer_support' => 'Customer Support',
         'faq'         => 'FAQ',
     ];
 

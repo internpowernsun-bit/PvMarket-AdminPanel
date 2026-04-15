@@ -144,4 +144,6 @@ class SubMenuController extends Controller
         return redirect()->route('admin.setup.sub-menus.index')
                          ->with('success', 'Sub menu deleted.');
     }
+
+    
 }

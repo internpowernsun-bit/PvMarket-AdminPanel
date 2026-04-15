@@ -89,4 +89,70 @@ class UserController extends Controller
                          ->with('success', 'Company verification status updated.')
                          ->with('active_tab', session('active_tab', 'basic'));
     }
+
+    public function export(Request $request)
+{
+    $query = User::query();
+ 
+    // ── Apply the same filters as index ──────────────────────
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('name',  'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        });
+    }
+ 
+    if ($request->filled('user_type')) {
+        $query->where('user_type', $request->user_type);
+    }
+ 
+    $users = $query->orderBy('created_at', 'desc')->get();
+ 
+    // ── Build CSV in memory ───────────────────────────────────
+    $filename = 'users_export_' . now()->format('Y-m-d_His') . '.csv';
+ 
+    $headers = [
+        'Content-Type'        => 'text/csv; charset=UTF-8',
+        'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        'Pragma'              => 'no-cache',
+        'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+        'Expires'             => '0',
+    ];
+ 
+    $callback = function () use ($users) {
+        $handle = fopen('php://output', 'w');
+ 
+        // UTF-8 BOM so Excel opens it correctly
+        fputs($handle, "\xEF\xBB\xBF");
+ 
+        // ── Column headers ────────────────────────────────────
+        fputcsv($handle, [
+            'S.No',
+            'Name',
+            'Email',
+            'User Type',
+            'Company Type',
+            'Company Verified',
+            'Registered At',
+        ]);
+ 
+        // ── Data rows ─────────────────────────────────────────
+        foreach ($users as $i => $user) {
+            fputcsv($handle, [
+                $i + 1,
+                $user->name,
+                $user->email,
+                ucfirst($user->user_type ?? 'buyer'),
+                $user->company_type ?? '',
+                ($user->company_verified ?? false) ? 'Yes' : 'No',
+                optional($user->created_at)->format('Y-m-d H:i'),
+            ]);
+        }
+ 
+        fclose($handle);
+    };
+ 
+    return response()->stream($callback, 200, $headers);
+}
 }

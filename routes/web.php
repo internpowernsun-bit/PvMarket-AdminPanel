@@ -24,6 +24,9 @@ use App\Http\Controllers\Admin\ProductDetailOptionController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PvSpotPriceController;
 use App\Http\Controllers\Admin\PageSectionController;
+use App\Http\Controllers\Admin\WarehouseController;
+use App\Http\Controllers\Admin\OfferController;
+ 
 
 // ── Redirect root to login ──────────────────────────────────────────────
 Route::get('/', function () {
@@ -56,6 +59,8 @@ Route::middleware('auth')->group(function () {
 Route::put('/admin/users/{id}/update-basic',     [UserController::class, 'updateBasic'])         ->name('admin.users.update-basic');
 Route::put('/admin/users/{id}/update-company',   [UserController::class, 'updateCompany'])       ->name('admin.users.update-company');
 Route::patch('/admin/users/{id}/toggle-verified',[UserController::class, 'toggleCompanyVerified'])->name('admin.users.toggle-verified');
+Route::get('users/export', [UserController::class, 'export'])->name('admin.users.export');
+Route::resource('users', UserController::class)->names('admin.users');
 
     // Schedules
     Route::get('/admin/schedules', [ScheduleController::class, 'index'])
@@ -144,13 +149,14 @@ Route::prefix('admin/setup/brands')->name('admin.setup.brands.')->group(function
 
     // Sub-Admins
     Route::prefix('admin/setup/sub-admins')->name('admin.setup.sub-admins.')->group(function () {
-        Route::get('/',          [SubAdminController::class, 'index'])  ->name('index');
-        Route::get('/create',    [SubAdminController::class, 'create']) ->name('create');
-        Route::post('/',         [SubAdminController::class, 'store'])  ->name('store');
-        Route::get('/{id}/edit', [SubAdminController::class, 'edit'])   ->name('edit');
-        Route::put('/{id}',      [SubAdminController::class, 'update']) ->name('update');
-        Route::delete('/{id}',   [SubAdminController::class, 'destroy'])->name('destroy');
-    });
+    Route::get('/export',    [SubAdminController::class, 'export']) ->name('export');
+    Route::get('/',          [SubAdminController::class, 'index'])  ->name('index');
+    Route::get('/create',    [SubAdminController::class, 'create']) ->name('create');
+    Route::post('/',         [SubAdminController::class, 'store'])  ->name('store');
+    Route::get('/{id}/edit', [SubAdminController::class, 'edit'])   ->name('edit');
+    Route::put('/{id}',      [SubAdminController::class, 'update']) ->name('update');
+    Route::delete('/{id}',   [SubAdminController::class, 'destroy'])->name('destroy');
+});
 
     // Charges
     Route::prefix('admin/setup/charges')->name('admin.setup.charges.')->group(function () {
@@ -265,6 +271,31 @@ Route::prefix('admin/page-sections')->name('admin.page-sections.')->group(functi
     Route::get('/',           [PageSectionController::class, 'index']) ->name('index');
     Route::get('/{page}',     [PageSectionController::class, 'edit'])  ->name('edit');
     Route::put('/{page}',     [PageSectionController::class, 'update'])->name('update');
+});
+
+// ── Warehouses ────────────────────────────────────────
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+ 
+    // Warehouse routes
+    Route::get   ('warehouses',                  [WarehouseController::class, 'index'])      ->name('warehouses.index');
+    Route::get   ('warehouses/create',           [WarehouseController::class, 'create'])     ->name('warehouses.create');
+    Route::post  ('warehouses',                  [WarehouseController::class, 'store'])      ->name('warehouses.store');
+    Route::get   ('warehouses/{id}/edit',        [WarehouseController::class, 'edit'])       ->name('warehouses.edit');
+    Route::put   ('warehouses/{id}',             [WarehouseController::class, 'update'])     ->name('warehouses.update');
+    Route::patch ('warehouses/{id}/mark-paid',   [WarehouseController::class, 'markAsPaid'])->name('warehouses.mark-paid');
+    Route::patch ('warehouses/{id}/toggle',      [WarehouseController::class, 'toggleStatus'])->name('warehouses.toggle-status');
+    Route::delete('warehouses/{id}',             [WarehouseController::class, 'destroy'])    ->name('warehouses.destroy');
+ 
+    // Offer routes
+    Route::get   ('offers',                      [OfferController::class, 'index'])          ->name('offers.index');
+    Route::get   ('offers/create',               [OfferController::class, 'create'])         ->name('offers.create');
+    Route::post  ('offers',                      [OfferController::class, 'store'])          ->name('offers.store');
+    Route::get   ('offers/{id}/edit',            [OfferController::class, 'edit'])           ->name('offers.edit');
+    Route::put   ('offers/{id}',                 [OfferController::class, 'update'])         ->name('offers.update');
+    Route::patch ('offers/{id}/mark-paid',       [OfferController::class, 'markAsPaid'])     ->name('offers.mark-paid');
+    Route::patch ('offers/{id}/toggle',          [OfferController::class, 'toggleStatus'])   ->name('offers.toggle-status');
+    Route::delete('offers/{id}',                 [OfferController::class, 'destroy'])        ->name('offers.destroy');
+ 
 });
 
     // Logout

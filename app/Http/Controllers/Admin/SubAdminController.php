@@ -100,4 +100,46 @@ class SubAdminController extends Controller
         return redirect()->route('admin.setup.sub-admins.index')
                          ->with('success', 'Sub Admin deleted.');
     }
+    public function export(Request $request)
+{
+    $query = User::where('role', 'sub_admin');
+
+    if ($request->filled('search')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('name', 'like', '%' . $request->search . '%')
+              ->orWhere('email', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    $subAdmins = $query->orderBy('created_at', 'desc')->get();
+
+    $filename = 'sub_admins_' . now()->format('Y_m_d_His') . '.csv';
+
+    $headers = [
+        'Content-Type'        => 'text/csv',
+        'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        'Pragma'              => 'no-cache',
+        'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+        'Expires'             => '0',
+    ];
+
+    $callback = function () use ($subAdmins) {
+        $handle = fopen('php://output', 'w');
+
+        fputcsv($handle, ['S.No', 'Name', 'Email', 'Created At']);
+
+        foreach ($subAdmins as $index => $admin) {
+            fputcsv($handle, [
+                $index + 1,
+                $admin->name,
+                $admin->email,
+                $admin->created_at?->format('Y-m-d H:i:s'),
+            ]);
+        }
+
+        fclose($handle);
+    };
+
+    return response()->stream($callback, 200, $headers);
+}
 }

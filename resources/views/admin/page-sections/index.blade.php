@@ -14,7 +14,7 @@
            onmouseover="this.style.borderColor='var(--primary)'; this.style.transform='translateY(-2px)'"
            onmouseout="this.style.borderColor='var(--border)'; this.style.transform=''">
             <div style="font-size:28px; margin-bottom:10px;">
-                {{ ['home'=>'🏠','about'=>'ℹ️','contact'=>'📞','terms'=>'📄', 'disclaimer'=>'⚠️','delivery'=>'🚚','privacy'=>'🔒','faq'=>'❓'][$key] ?? '📝' }}
+                {{ ['home'=>'🏠','about'=>'ℹ️','contact'=>'📞','terms'=>'📄', 'disclaimer'=>'⚠️','delivery'=>'🚚','privacy'=>'🔒','faq'=>'❓', 'customer_support'=>'💬'][$key] ?? '📝' }}
             </div>
             <div style="font-size:15px; font-weight:700;">{{ $label }}</div>
             <div style="font-size:12px; color:var(--muted); margin-top:4px;">Edit page content</div>

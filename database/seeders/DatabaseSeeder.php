@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             DeliveryReturnPageSeeder::class,
             DisclaimerPageSeeder::class,
             HomePageSeeder::class,
+            CustomerSupportPageSeeder::class,
         ]);
     }
 

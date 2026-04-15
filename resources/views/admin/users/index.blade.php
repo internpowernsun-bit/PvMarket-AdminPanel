@@ -49,6 +49,33 @@
         box-shadow: 0 0 0 3px rgba(14,165,233,.1);
     }
 
+    /* Export button */
+    .btn-export {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 18px;
+        background: #059669;
+        color: white;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        flex: 0 0 auto;
+        border: none;
+        cursor: pointer;
+        transition: background .15s, transform .1s, box-shadow .2s;
+    }
+
+    .btn-export:hover {
+        background: #047857;
+        box-shadow: 0 4px 12px rgba(5,150,105,.3);
+        transform: translateY(-1px);
+    }
+
+    .btn-export:active { transform: scale(.97); }
+
     /* Back button — margin-left auto pushes it to the far right */
     .btn-back {
         display: inline-flex;
@@ -320,14 +347,13 @@
 
 @section('content')
 
-{{-- ── Page Header ──
-     Layout: [Title] [Filter]  ←—— auto ——→  [Back]
---}}
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
 
     <h1 style="font-size:22px; font-weight:800; color:var(--text);">Users Management</h1>
 
     <div style="display:flex; align-items:center; gap:12px;">
+
+        {{-- Filter dropdown --}}
         <form method="GET" action="{{ route('admin.users.index') }}" id="filterForm">
             <select name="user_type" class="filter-select" onchange="document.getElementById('filterForm').submit()">
                 <option value="">Buyer/Seller</option>
@@ -335,6 +361,20 @@
                 <option value="admin"  {{ request('user_type') == 'admin'  ? 'selected' : '' }}>Market Place User</option>
             </select>
         </form>
+
+        {{-- Export button — passes current filters so export matches what's on screen --}}
+        <a href="{{ route('admin.users.export', array_filter(['user_type' => request('user_type'), 'search' => request('search')])) }}"
+           class="btn-export">
+            {{-- Download / spreadsheet icon --}}
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export CSV
+        </a>
+
         <a href="{{ route('admin.dashboard') }}" class="btn-back">← Back</a>
     </div>
 
@@ -470,7 +510,7 @@
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                             <circle cx="9" cy="7" r="4"/>
                         </svg>
-                        <p>No users found matching your criteria.</p>
+                        <p>No users found.</p>
                     </div>
                 </td>
             </tr>
