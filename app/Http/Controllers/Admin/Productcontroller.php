@@ -162,8 +162,7 @@ class ProductController extends Controller
             'depth_unit'  => $request->depth_unit  ?? null,
             'weight'      => $request->weight      ? (float) $request->weight      : null,
             'weight_unit' => $request->weight_unit ?? null,
-            'length'      => $request->length      ? (float) $request->length      : null,
-            'length_unit' => $request->length_unit ?? null,
+            
         ];
 
         Product::create($data);
@@ -261,8 +260,7 @@ class ProductController extends Controller
             'depth_unit'  => $request->depth_unit  ?? null,
             'weight'      => $request->weight      ? (float) $request->weight      : null,
             'weight_unit' => $request->weight_unit ?? null,
-            'length'      => $request->length      ? (float) $request->length      : null,
-            'length_unit' => $request->length_unit ?? null,
+            
         ];
 
         $product->update($data);
