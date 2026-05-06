@@ -57,8 +57,8 @@
             <thead>
                 <tr>
                     <th style="width:60px;">S.No</th>
-                    <th>Menu Name</th>
-                    <th>Menu Icon</th>
+                    <th>Category Name</th>
+                    <th>Category Icon</th>
                     <th>Alt Tag</th>
                     <th style="width:60px;">Actions</th>
                 </tr>
@@ -203,7 +203,7 @@ function renumberRows() {
 </style>
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Edit Main Menu</h1>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Edit Category</h1>
     <a href="{{ route('admin.setup.main-menus.index') }}" class="btn-back">← Back</a>
 </div>
 
@@ -221,26 +221,27 @@ function renumberRows() {
 
         <div class="form-grid-3">
             <div class="form-group">
-                <label class="form-label">Main Menu <span>*</span></label>
-                <input type="text" name="name" class="form-input"
-                       value="{{ old('name', $record->name) }}" required/>
+                <label class="form-label">Category Name <span>*</span></label>
+<input type="text" name="category_name" class="form-input"
+       value="{{ old('category_name', $record->category_name) }}" required/>
             </div>
             <div class="form-group">
                 <label class="form-label">Menu Icon</label>
-                @if($record->icon)
-                    <img src="{{ asset('storage/' . $record->icon) }}" class="current-icon" alt="current"/>
-                @endif
+                @if(!empty($record->category_icon_image['url']))
+    <img src="{{ asset('storage/' . $record->category_icon_image['url']) }}"
+         class="current-icon" alt="current"/>
+@endif
                 <div class="form-file-wrap">
                     <input type="file" name="icon" accept="image/*"/>
                 </div>
-                @if($record->icon)
-                    <span class="form-hint">Leave blank to keep current icon</span>
-                @endif
+                @if(!empty($record->category_icon_image['url']))
+    <span class="form-hint">Leave blank to keep current icon</span>
+@endif
             </div>
             <div class="form-group">
                 <label class="form-label">Alt Tag</label>
                 <input type="text" name="alt_tag" class="form-input"
-                       value="{{ old('alt_tag', $record->alt_tag) }}"
+       value="{{ old('alt_tag', $record->icon_alt_tag) }}"
                        placeholder="e.g. PV Market – ESS"/>
             </div>
         </div>
@@ -287,10 +288,10 @@ function renumberRows() {
         <hr class="section-divider">
 
         <div class="form-grid-1">
-            <div class="form-group">
+            <div class="form-group"> 
                 <label class="form-label">Short Description</label>
                 <textarea name="short_description" class="form-input" style="min-height:90px;"
-                          placeholder="Enter short description">{{ old('short_description', $record->short_description) }}</textarea>
+                          placeholder="Enter short description">{{ old('short_description', lang($record, 'short_description')) }}</textarea>
             </div>
         </div>
 
@@ -343,7 +344,7 @@ function renumberRows() {
         document.getElementById('contentInput').value = (html === '<p><br></p>') ? '' : html;
     });
 
-    document.querySelector('input[name="name"]').addEventListener('input', function () {
+    document.querySelector('input[name="category_name"]').addEventListener('input', function () {
         const slugField = document.getElementById('slugField');
         if (!slugField.dataset.touched) {
             slugField.value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -414,7 +415,7 @@ function renumberRows() {
 @section('content')
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Main Menus</h1>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Categories</h1>
     <a href="{{ route('admin.setup.main-menus.create') }}"
        style="display:inline-flex; align-items:center; gap:7px; padding:10px 20px;
               background:var(--primary); color:white; border-radius:8px; font-size:14px;
@@ -446,7 +447,7 @@ function renumberRows() {
                     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
                 <input type="text" name="search" value="{{ request('search') }}"
-                       placeholder="Search By Menu..." class="search-input"/>
+                       placeholder="Search By Category..." class="search-input"/>
             </div>
         </form>
 
@@ -468,8 +469,8 @@ function renumberRows() {
         <thead>
             <tr>
                 <th class="center" style="width:70px;">S.No</th>
-                <th class="center" style="width:120px;">Menu Icon</th>
-                <th>Menu Name</th>
+                <th class="center" style="width:120px;">Category Icon</th>
+                <th>Category Name</th>
                 <th class="center" style="width:140px;">Value of Stocks</th>
                 <th class="center" style="width:100px;">Action</th>
             </tr>
@@ -481,14 +482,14 @@ function renumberRows() {
                     {{ $menus->firstItem() + $index }}
                 </td>
                 <td class="center">
-                    @if($menu->icon)
-                        <img src="{{ asset('storage/' . $menu->icon) }}"
-                             class="menu-icon-thumb" alt="{{ $menu->alt_tag ?? $menu->name }}"/>
-                    @else
+                    @if(!empty($menu->category_icon_image['url']))
+    <img src="{{ asset('storage/' . $menu->category_icon_image['url']) }}"
+         class="menu-icon-thumb" alt="{{ $menu->icon_alt_tag ?? '' }}"/>
+@else
                         <span style="color:#CBD5E1; font-size:12px;">—</span>
                     @endif
                 </td>
-                <td style="font-weight:600;">{{ $menu->name }}</td>
+                <td style="font-weight:600;">{{ lang($menu, 'category_name') }}</td>
 
                 {{-- ── Value of Stocks ── --}}
                 <td class="center">

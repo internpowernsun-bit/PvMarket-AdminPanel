@@ -26,6 +26,13 @@ use App\Http\Controllers\Admin\PvSpotPriceController;
 use App\Http\Controllers\Admin\PageSectionController;
 use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\OfferController;
+use App\Http\Controllers\Admin\TranslationController;
+use App\Http\Controllers\Admin\LanguageController;
+use App\Http\Controllers\Admin\SalesController;
+use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\Admin\BidRequestController;
+use App\Http\Controllers\Admin\ProductListingController;
+
  
 
 // ── Redirect root to login ──────────────────────────────────────────────
@@ -125,6 +132,32 @@ Route::prefix('admin/products')->name('admin.products.')->group(function () {
     Route::get('/sub-menus-by-main', [ProductController::class, 'getSubMenusByMainMenu'])->name('sub-menus-by-main');
 });
 
+
+ 
+Route::prefix('admin/bids')->name('admin.bids.')->group(function () {
+    Route::get('/',             [BidRequestController::class, 'index'])        ->name('index');
+    Route::get('/{id}',         [BidRequestController::class, 'show'])         ->name('show');
+    Route::post('/{id}/status', [BidRequestController::class, 'updateStatus']) ->name('update-status');
+    Route::delete('/{id}',      [BidRequestController::class, 'destroy'])      ->name('destroy');
+});
+
+ 
+// Leads Management
+Route::prefix('admin/leads')->name('admin.leads.')->group(function () {
+    Route::get('/',              [LeadController::class, 'index'])         ->name('index');
+    Route::get('/{id}/edit',     [LeadController::class, 'edit'])          ->name('edit');
+    Route::put('/{id}',          [LeadController::class, 'update'])        ->name('update');
+    Route::delete('/{id}',       [LeadController::class, 'destroy'])       ->name('destroy');
+    Route::post('/{id}/status',  [LeadController::class, 'updateStatus'])  ->name('update-status');
+ 
+    // Product Visits sub-section
+    Route::prefix('visits')->name('visits.')->group(function () {
+        Route::get('/',          [LeadController::class, 'productVisits'])  ->name('index');
+        Route::delete('/{id}',   [LeadController::class, 'destroyVisit'])   ->name('destroy');
+        Route::get('/export',    [LeadController::class, 'exportVisits'])   ->name('export');
+    });
+});
+
     
 
 Route::get('/setup/units',               [UnitController::class, 'index'])->name('admin.setup.units.index');
@@ -186,6 +219,10 @@ Route::prefix('admin/setup/brands')->name('admin.setup.brands.')->group(function
         Route::get('/{id}/edit', [BlogController::class, 'edit'])   ->name('edit');
         Route::put('/{id}',      [BlogController::class, 'update']) ->name('update');
         Route::delete('/{id}',   [BlogController::class, 'destroy'])->name('destroy');
+
+        Route::post  ('/{id}/comments',                [BlogController::class, 'addComment'])    ->name('comments.store');
+    Route::put   ('/{blogId}/comments/{index}',    [BlogController::class, 'updateComment']) ->name('comments.update');
+    Route::delete('/{blogId}/comments/{index}',    [BlogController::class, 'deleteComment']) ->name('comments.destroy');
     });
 
     // Price Promotions
@@ -209,6 +246,32 @@ Route::prefix('admin/products/detail-options')->name('admin.products.detail-opti
 });
 
 
+ 
+Route::prefix('admin/sales')->name('admin.sales.')->group(function () {
+    Route::get('/',                        [SalesController::class, 'index'])               ->name('index');
+    Route::post('/{id}/verify-payment',    [SalesController::class, 'markPaymentVerified']) ->name('verify-payment');
+    Route::post('/{id}/status',            [SalesController::class, 'updateStatus'])        ->name('update-status');
+    Route::get('/{id}/proof',              [SalesController::class, 'viewProof'])           ->name('proof');
+});
+
+Route::middleware(['auth'])->group(function () {
+ 
+    Route::prefix('user/listings')->name('product_listing.')->group(function () {
+ 
+        Route::get('/',               [ProductListingController::class, 'index'])        ->name('index');
+        Route::get('/create',         [ProductListingController::class, 'create'])       ->name('create');
+        Route::post('/',              [ProductListingController::class, 'store'])         ->name('store');
+        Route::get('/{id}',           [ProductListingController::class, 'show'])          ->name('show');
+        Route::get('/{id}/edit',      [ProductListingController::class, 'edit'])          ->name('edit');
+        Route::put('/{id}',           [ProductListingController::class, 'update'])        ->name('update');
+        Route::delete('/{id}',        [ProductListingController::class, 'destroy'])       ->name('destroy');
+        Route::patch('/{id}/toggle',  [ProductListingController::class, 'toggleActive'])  ->name('toggle');
+ 
+    });
+ 
+});
+
+
 
 Route::prefix('admin/knowledge-hub/pv-spot-price')->name('admin.knowledge-hub.pv-spot-price.')->group(function () {
     Route::get('/',          [PvSpotPriceController::class, 'index'])  ->name('index');
@@ -219,6 +282,30 @@ Route::prefix('admin/knowledge-hub/pv-spot-price')->name('admin.knowledge-hub.pv
     Route::delete('/{id}',   [PvSpotPriceController::class, 'destroy'])->name('destroy');
 });
 
+
+
+ 
+Route::prefix('setup')->name('admin.setup.')->group(function () {
+ 
+    
+ 
+    Route::get   ('languages',            [LanguageController::class, 'index'])      ->name('languages.index');
+    Route::post  ('languages',            [LanguageController::class, 'store'])      ->name('languages.store');
+    Route::put   ('languages/{code}',     [LanguageController::class, 'update'])     ->name('languages.update');
+    Route::delete('languages/{code}',     [LanguageController::class, 'destroy'])    ->name('languages.destroy');
+    Route::post  ('languages/set-default',[LanguageController::class, 'setDefault'])->name('languages.set-default');
+ 
+});
+
+
+
+// Translation routes — no index page needed
+Route::prefix('admin/translations')->name('admin.translations.')->group(function () {
+    Route::post('/switch-language',  [TranslationController::class, 'switchLanguage'])   ->name('switch-language');
+    Route::post('/translate-all',    [TranslationController::class, 'translateAll'])     ->name('translate-all');
+    Route::post('/translate-record', [TranslationController::class, 'translateRecord'])  ->name('translate-record');
+    Route::post('/translate-all-models', [TranslationController::class, 'translateAllModels'])->name('translate-all-models');
+});
     
 
 Route::get('/setup/sub-menus',               [SubMenuController::class, 'index'])->name('admin.setup.sub-menus.index');
@@ -296,6 +383,36 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::patch ('offers/{id}/toggle',          [OfferController::class, 'toggleStatus'])   ->name('offers.toggle-status');
     Route::delete('offers/{id}',                 [OfferController::class, 'destroy'])        ->name('offers.destroy');
  
+});
+
+Route::get('/admin/test-aws', function () {
+    try {
+        $client = new \Aws\Translate\TranslateClient([
+            'version'     => 'latest',
+            'region'      => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'credentials' => [
+                'key'    => env('AWS_ACCESS_KEY_ID'),
+                'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            ],
+        ]);
+
+        $result = $client->translateText([
+            'SourceLanguageCode' => 'en',
+            'TargetLanguageCode' => 'ar',
+            'Text'               => 'Hello, this is a test.',
+        ]);
+
+        return response()->json([
+            'success'    => true,
+            'translated' => $result['TranslatedText'],
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error'   => $e->getMessage(),
+        ]);
+    }
 });
 
     // Logout

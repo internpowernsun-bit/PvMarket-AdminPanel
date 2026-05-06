@@ -2,7 +2,7 @@
 @extends('layouts.admin')
 {{-- ═══ CREATE / EDIT MODE ═══ --}}
 
-@section('title', $mode === 'create' ? 'Add Product Detail Option' : 'Edit Product Detail Option')
+@section('title', $mode === 'create' ? 'Add Specification' : 'Edit Specification')
 
 @section('styles')
 <style>
@@ -80,7 +80,7 @@
 
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">{{ $mode === 'create' ? 'Add Product Detail Option' : 'Edit Product Detail Option' }}</h1>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">{{ $mode === 'create' ? 'Add Product specifications' : 'Edit Product specifications' }}</h1>
     <a href="{{ route('admin.products.detail-options.index') }}" class="btn-back">← Back</a>
 </div>
 
@@ -119,12 +119,12 @@
             {{-- Main Menu --}}
             <div class="form-group">
                 <label class="form-label">Main Menu:</label>
-                <select name="main_menu_id" id="detailMainMenuSelect" class="form-select" onchange="handleDetailMainMenuChange(this.value)">
-                    <option value=""> Select Main Menu </option>
+                <select name="category_id" id="detailMainMenuSelect" class="form-select" onchange="handleDetailMainMenuChange(this.value)">
+                    <option value=""> Select Category </option>
                     @foreach($mainMenus as $menu)
                         <option value="{{ $menu->id }}"
-                            {{ old('main_menu_id', $record->main_menu_id ?? '') == $menu->id ? 'selected' : '' }}>
-                            {{ $menu->name }}
+                            {{ old('category_id',     $record->category_id     ?? '') == $menu->id ? 'selected' : '' }}>
+                            {{ $menu->category_name }} 
                         </option>
                     @endforeach
                 </select>
@@ -133,12 +133,12 @@
             {{-- Sub Menu --}}
             <div class="form-group">
                 <label class="form-label">Sub Menu:</label>
-                <select name="sub_menu_id" id="detailSubMenuSelect" class="form-select">
-                    <option value=""> Select Sub Menu </option>
+                <select name="sub_category_id" id="detailSubMenuSelect" class="form-select">
+                    <option value=""> Select Sub Category </option>
                     @foreach($subMenus as $menu)
                         <option value="{{ $menu->id }}"
-                            {{ old('sub_menu_id', $record->sub_menu_id ?? '') == $menu->id ? 'selected' : '' }}>
-                            {{ $menu->name }}
+                            {{ old('sub_category_id', $record->sub_category_id ?? '') == $menu->id ? 'selected' : '' }}>
+                            {{ $menu->sub_category_name }}
                         </option>
                     @endforeach
                 </select>
@@ -231,12 +231,12 @@ function handleDetailMainMenuChange(mainMenuId) {
     .then(data => {
         subSelect.innerHTML = '<option value=""> Select Sub Menu </option>';
         data.subMenus.forEach(sm => {
-            const id = sm.id || sm._id;
-            subSelect.innerHTML += `<option value="${id}">${sm.name}</option>`;
-        });
+    const id = sm.id || sm._id;
+    subSelect.innerHTML += `<option value="${id}">${sm.sub_category_name}</option>`; 
+});
 
         // Re-select the previously saved sub_menu_id in edit mode (if it matches)
-        const savedSubMenuId = '{{ old('sub_menu_id', $record->sub_menu_id ?? '') }}';
+        const savedSubMenuId = '{{ old('sub_category_id', $record->sub_category_id ?? '') }}';
         if (savedSubMenuId) {
             subSelect.value = savedSubMenuId;
         }
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 {{-- ═══ INDEX MODE ═══ --}}
 
-@section('title', 'Product Detail Options')
+@section('title', 'Product Specifications')
 
 @section('styles')
 <style>
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
     <h1 class="page-title">
-        <span>Products</span> - Product Detail Options
+        <span>Products</span> - Specifications
     </h1>
     <a href="{{ route('admin.products.detail-options.create') }}"
        style="display:inline-flex; align-items:center; gap:7px; padding:10px 20px;
@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                         <polyline points="14 2 14 8 20 8"/>
                     </svg>
-                    <p>No product detail options yet. Click <strong>Add +</strong> to create one.</p>
+                    <p>No product specifications yet. Click <strong>Add +</strong> to create one.</p>
                 </div>
             </td>
         </tr>

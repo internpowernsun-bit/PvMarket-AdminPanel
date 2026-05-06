@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use App\Traits\HasTranslations;
 
 class PvSpotPrice extends Model
 {
+    use HasTranslations;
     protected $connection = 'mongodb';
     protected $collection = 'pv_spot_prices';
 
@@ -18,4 +20,6 @@ class PvSpotPrice extends Model
     protected $casts = [
         'items' => 'array',
     ];
+
+    public array $translatable = ['heading'];
 }

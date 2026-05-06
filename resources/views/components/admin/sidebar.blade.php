@@ -12,7 +12,8 @@
     <nav class="sidebar-nav">
 
         {{-- Setup --}}
-        <div class="nav-item has-children {{ request()->routeIs('admin.setup.*') ? 'active open' : '' }}">
+        <div class="nav-item has-children {{ request()->routeIs('admin.setup.*') ? 'active open' : '' }}"
+             onclick="toggleNav(this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -23,11 +24,11 @@
         <div class="nav-sub {{ request()->routeIs('admin.setup.*') ? 'open' : '' }}">
             <a href="{{ route('admin.setup.main-menus.index') }}"
                class="nav-sub-item {{ request()->routeIs('admin.setup.main-menus.*') ? 'active' : '' }}">
-               Main Menu
+               Categories
             </a>
             <a href="{{ route('admin.setup.sub-menus.index') }}"
                class="nav-sub-item {{ request()->routeIs('admin.setup.sub-menus.*') ? 'active' : '' }}">
-               Sub Menu
+               Sub Categories
             </a>
             <a href="{{ route('admin.setup.brands.index') }}"
                class="nav-sub-item {{ request()->routeIs('admin.setup.brands.*') ? 'active' : '' }}">
@@ -65,38 +66,25 @@
                class="nav-sub-item {{ request()->routeIs('admin.setup.incoterms.*') ? 'active' : '' }}">
                Incoterms
             </a>
-            <!--<a href="#" class="nav-sub-item">Home Sections</a>-->
+            <a href="{{ route('admin.setup.languages.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.setup.languages.*') ? 'active' : '' }}">
+               Languages
+            </a>
         </div>
 
         {{-- ═══ CMS / PAGE SECTIONS ═══ --}}
-
-
-<a href="{{ route('admin.page-sections.index') }}"
-   class="nav-item {{ request()->routeIs('admin.page-sections.*') ? 'active' : '' }}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 20h9"/>
-        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-    </svg>
-    Static Pages
-</a>
-
-        {{-- Page Templates --}}
-        <!--
-        <div class="nav-item has-children {{ request()->routeIs('admin.templates.*') ? 'active open' : '' }}">
+        <a href="{{ route('admin.page-sections.index') }}"
+           class="nav-item {{ request()->routeIs('admin.page-sections.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
             </svg>
-            Page Templates
-            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="nav-sub {{ request()->routeIs('admin.templates.*') ? 'open' : '' }}">
-            <a href="#" class="nav-sub-item">Static Pages</a>
-            <a href="#" class="nav-sub-item">Static Page Meta</a>
-        </div>-->
+            Static Pages
+        </a>
 
         {{-- Knowledge Hub --}}
-        <div class="nav-item has-children {{ request()->routeIs('admin.knowledge-hub.*') ? 'active open' : '' }}">
+        <div class="nav-item has-children {{ request()->routeIs('admin.knowledge-hub.*') ? 'active open' : '' }}"
+             onclick="toggleNav(this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
@@ -117,86 +105,35 @@
                class="nav-sub-item {{ request()->routeIs('admin.knowledge-hub.blogs.*') ? 'active' : '' }}">
                Blogs
             </a>
-            <!--
-            <a href="#" class="nav-sub-item">Blog Comments</a>-->
             <a href="{{ route('admin.knowledge-hub.price-promotions.index') }}"
                class="nav-sub-item {{ request()->routeIs('admin.knowledge-hub.price-promotions.*') ? 'active' : '' }}">
                Price Promotions
             </a>
             <a href="{{ route('admin.knowledge-hub.pv-spot-price.index') }}"
-   class="nav-sub-item {{ request()->routeIs('admin.knowledge-hub.pv-spot-price.*') ? 'active' : '' }}">
-   PV Spot Price
-</a>
+               class="nav-sub-item {{ request()->routeIs('admin.knowledge-hub.pv-spot-price.*') ? 'active' : '' }}">
+               PV Spot Price
+            </a>
         </div>
-
-        {{-- Courses/Profile Setup --}}
-        <!--
-        <div class="nav-item has-children {{ request()->routeIs('admin.courses.*') ? 'active open' : '' }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-            </svg>
-            Courses/Profile Setup
-            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="nav-sub {{ request()->routeIs('admin.courses.*') ? 'open' : '' }}">
-            <a href="#" class="nav-sub-item">Course Categories</a>
-            <a href="#" class="nav-sub-item">Courses</a>
-            <a href="#" class="nav-sub-item">Course Coupons</a>
-            <a href="#" class="nav-sub-item">Profiles</a>
-        </div>
-
-        {{-- Meta Data --}}
-        <div class="nav-item has-children {{ request()->routeIs('admin.metadata.*') ? 'active open' : '' }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <path d="M3 9h18M9 21V9"/>
-            </svg>
-            Meta Data
-            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="nav-sub {{ request()->routeIs('admin.metadata.*') ? 'open' : '' }}">
-            <a href="#" class="nav-sub-item">Home Meta</a>
-            <a href="#" class="nav-sub-item">Common Meta Scripts</a>
-            <a href="#" class="nav-sub-item">Non-Index URLs</a>
-            <a href="#" class="nav-sub-item">SEO Meta</a>
-        </div>-->
 
         {{-- Offers --}}
-<a href="{{ route('admin.offers.index') }}"
+        <a href="{{ route('admin.offers.index') }}"
            class="nav-item {{ request()->routeIs('admin.offers.*') ? 'active' : '' }}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-        <line x1="7" y1="7" x2="7.01" y2="7"/>
-    </svg>
-    Offers
-</a>
-
-{{-- Warehouses --}}
-<a href="{{ route('admin.warehouses.index') }}"
-   class="nav-item {{ request()->routeIs('admin.warehouses.*') ? 'active' : '' }}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
-    Warehouses
-</a>
-
-        {{-- Solar Projects --}}
-        <!--
-        <div class="nav-item has-children {{ request()->routeIs('admin.projects.*') ? 'active open' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="5"/>
-                <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                <line x1="7" y1="7" x2="7.01" y2="7"/>
             </svg>
-            Solar Projects
-            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="nav-sub {{ request()->routeIs('admin.projects.*') ? 'open' : '' }}">
-            <a href="#" class="nav-sub-item">All Projects</a>
-            <a href="#" class="nav-sub-item">Add Project</a>
-        </div>-->
+            Offers
+        </a>
 
+        {{-- Warehouses --}}
+        <a href="{{ route('admin.warehouses.index') }}"
+           class="nav-item {{ request()->routeIs('admin.warehouses.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Warehouses
+        </a>
 
         {{-- User Management --}}
         <a href="{{ route('admin.users.index') }}"
@@ -222,105 +159,77 @@
         </a>
 
         {{-- Sales --}}
-        <!--
-        <a href="#" class="nav-item {{ request()->routeIs('admin.sales.*') ? 'active' : '' }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <a href="{{ route('admin.sales.index') }}"
+           class="nav-item {{ request()->routeIs('admin.sales.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                 <line x1="12" y1="1" x2="12" y2="23"/>
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
             Sales
         </a>
 
-        {{-- Lead Generations --}}
-        <div class="nav-item has-children {{ request()->routeIs('admin.leads.*') ? 'active open' : '' }}">
+        {{-- Leads --}}
+        <div class="nav-item has-children {{ request()->routeIs('admin.leads.*') ? 'active open' : '' }}"
+             onclick="toggleNav(this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
             </svg>
-            Lead Generations
+            Lead Generation
             <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div class="nav-sub {{ request()->routeIs('admin.leads.*') ? 'open' : '' }}">
-            <a href="#" class="nav-sub-item">Leads</a>
-            <a href="#" class="nav-sub-item">LoggedIn User Leads</a>
-        </div>
-
-        {{-- Discount Center --}}
-        <div class="nav-item has-children {{ request()->routeIs('admin.discount.*') ? 'active open' : '' }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                <line x1="7" y1="7" x2="7.01" y2="7"/>
-            </svg>
-            Discount Center
-            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="nav-sub {{ request()->routeIs('admin.discount.*') ? 'open' : '' }}">
-            <a href="#" class="nav-sub-item">Clearance Sales Offers</a>
-            <a href="#" class="nav-sub-item">Top Discount Product Offers</a>
+            <a href="{{ route('admin.leads.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.leads.index') ? 'active' : '' }}">
+                Leads
+            </a>
+            <a href="{{ route('admin.leads.visits.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.leads.visits.*') ? 'active' : '' }}">
+                LoggedIn User Leads
+            </a>
         </div>
 
         {{-- Bid/Fair Price Requests --}}
-        <a href="#" class="nav-item {{ request()->routeIs('admin.bids.*') ? 'active' : '' }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                <line x1="7" y1="7" x2="7.01" y2="7"/>
+        <a href="{{ route('admin.bids.index') }}"
+           class="nav-item {{ request()->routeIs('admin.bids.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
             </svg>
-            Bid/Fair Price Requests
+            Bid/Fair Requests
         </a>
 
-        {{-- Sell on PVMarket Requests --}}
-        <a href="#" class="nav-item {{ request()->routeIs('admin.sell.*') ? 'active' : '' }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 0 1-8 0"/>
+        
+    <a href="{{ route('product_listing.index') }}"
+       class="nav-item {{ request()->routeIs('product_listing.*') ? 'active' : '' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
             </svg>
-            Sell on PVMarket Requests
-        </a>-->
-
-        {{-- ══ Products  ══ --}}
-<div class="nav-item has-children {{ request()->routeIs('admin.products.*') ? 'active open' : '' }}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="2" y="3" width="20" height="14" rx="2"/>
-        <line x1="8" y1="21" x2="16" y2="21"/>
-        <line x1="12" y1="17" x2="12" y2="21"/>
-    </svg>
-    Products
-    <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-</div>
-<div class="nav-sub {{ request()->routeIs('admin.products.*') ? 'open' : '' }}">
-    <a href="{{ route('admin.products.index') }}"
-       class="nav-sub-item {{ request()->routeIs('admin.products.index') || request()->routeIs('admin.products.create') || request()->routeIs('admin.products.edit') || request()->routeIs('admin.products.show') ? 'active' : '' }}">
-       Products
+        <span>Manage Listings</span>
     </a>
-    <a href="{{ route('admin.products.detail-options.index') }}"
-       class="nav-sub-item {{ request()->routeIs('admin.products.detail-options.*') ? 'active' : '' }}">
-       Product Details Options
-    </a>
-</div>
 
-        {{-- Export --}}
-        <!--
-        <a href="#" class="nav-item {{ request()->routeIs('admin.export.*') ? 'active' : '' }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="12" y1="18" x2="12" y2="12"/>
-                <line x1="9" y1="15" x2="12" y2="18"/>
-                <line x1="15" y1="15" x2="12" y2="18"/>
-            </svg>
-            Export
-        </a>
 
-        {{-- Miscellaneous Export --}}
-        <a href="#" class="nav-item {{ request()->routeIs('admin.misc-export.*') ? 'active' : '' }}">
+        {{-- Products --}}
+        <div class="nav-item has-children {{ request()->routeIs('admin.products.*') ? 'active open' : '' }}"
+             onclick="toggleNav(this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="8" y1="13" x2="16" y2="13"/>
-                <line x1="8" y1="17" x2="16" y2="17"/>
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
             </svg>
-            Miscellaneous Export
-        </a>-->
+            Products
+            <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="nav-sub {{ request()->routeIs('admin.products.*') ? 'open' : '' }}">
+            <a href="{{ route('admin.products.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.products.index') || request()->routeIs('admin.products.create') || request()->routeIs('admin.products.edit') || request()->routeIs('admin.products.show') ? 'active' : '' }}">
+               Products
+            </a>
+            <a href="{{ route('admin.products.detail-options.index') }}"
+               class="nav-sub-item {{ request()->routeIs('admin.products.detail-options.*') ? 'active' : '' }}">
+                Specifications
+            </a>
+        </div>
 
     </nav>
 
@@ -340,3 +249,34 @@
     </div>
 
 </aside>
+
+{{-- ═══ Sidebar Toggle Script ═══ --}}
+<script>
+    function toggleNav(clickedItem) {
+        const subMenu = clickedItem.nextElementSibling;
+        const isOpen = clickedItem.classList.contains('open');
+
+        // Close all other open menus
+        document.querySelectorAll('.nav-item.has-children.open').forEach(function (item) {
+            if (item !== clickedItem) {
+                item.classList.remove('open');
+                if (item.nextElementSibling && item.nextElementSibling.classList.contains('nav-sub')) {
+                    item.nextElementSibling.classList.remove('open');
+                }
+            }
+        });
+
+        // Toggle the clicked one
+        if (isOpen) {
+            clickedItem.classList.remove('open');
+            if (subMenu && subMenu.classList.contains('nav-sub')) {
+                subMenu.classList.remove('open');
+            }
+        } else {
+            clickedItem.classList.add('open');
+            if (subMenu && subMenu.classList.contains('nav-sub')) {
+                subMenu.classList.add('open');
+            }
+        }
+    }
+</script>

@@ -339,15 +339,15 @@
                     {{ $events->firstItem() + $index }}
                 </td>
                 <td>
-                    <span class="truncate" title="{{ $event->heading }}">{{ $event->heading }}</span>
+                    <span class="truncate" title="{{ lang($event, 'heading') }}">{{ lang($event, 'heading') }}</span>
                 </td>
                 <td style="color:var(--muted); font-size:13px;">
                     {{ $event->event_date ?? '—' }}
                 </td>
-                <td>{{ $event->place ?? '—' }}</td>
+                <td>{{ lang($event, 'place') ?: '—' }}</td>
                 <td>
                     <span class="content-preview" title="{{ strip_tags($event->description ?? '') }}">
-                        {{ Str::limit(strip_tags($event->description ?? ''), 80) }}
+                        {{ Str::limit(strip_tags(lang($event, 'description')), 80) }}
                     </span>
                 </td>
                 <td class="center">

@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\PricePromotion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\TranslationService;
 
 class PricePromotionController extends Controller
 {
+    public function __construct(protected TranslationService $translator) {}
     public function index(Request $request)
     {
         $query = PricePromotion::query();
@@ -55,6 +57,8 @@ class PricePromotionController extends Controller
             $data['image'] = $request->file('image')->store('price-promotions', 'public');
         }
 
+        $data = $this->translator->translate($data, PricePromotion::class);
+
         PricePromotion::create($data);
 
         return redirect()->route('admin.knowledge-hub.price-promotions.index')
@@ -95,6 +99,7 @@ class PricePromotionController extends Controller
             $data['image'] = $request->file('image')->store('price-promotions', 'public');
         }
 
+        $data = $this->translator->translate($data, PricePromotion::class);
         $promotion->update($data);
 
         return redirect()->route('admin.knowledge-hub.price-promotions.index')
@@ -110,4 +115,29 @@ class PricePromotionController extends Controller
         return redirect()->route('admin.knowledge-hub.price-promotions.index')
                          ->with('success', 'Price promotion deleted.');
     }
+
+    private function attachTranslations(array $data, $modelInstance): array
+{
+    $languages    = array_keys(config('languages.available'));
+    $translatable = $modelInstance->translatable ?? [];
+
+    foreach ($languages as $locale) {
+        if ($locale === 'en') continue;
+
+        $translated = [];
+        foreach ($translatable as $field) {
+            if (!empty($data[$field])) {
+                $translated[$field] = $this->translator->translateText(
+                    $data[$field], $locale, 'en'
+                );
+            }
+        }
+
+        if (!empty($translated)) {
+            $data[$locale] = $translated;
+        }
+    }
+
+    return $data;
+}
 }

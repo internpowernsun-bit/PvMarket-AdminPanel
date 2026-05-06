@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\TranslationService;
 
 class SliderController extends ResourceController
 {
+    public function __construct(protected TranslationService $translator) {}
     protected string $model   = Slider::class;
     protected string $view    = 'admin.setup.sliders.sliders';
     protected string $route   = 'admin.setup.sliders';
@@ -44,6 +46,7 @@ class SliderController extends ResourceController
             if ($request->hasFile("sliders.{$i}.image")) {
                 $row['image'] = $request->file("sliders.{$i}.image")->store('sliders', 'public');
             }
+            $row = $this->attachTranslations($row, new Slider());
             Slider::create($row);
         }
 
@@ -62,6 +65,7 @@ class SliderController extends ResourceController
             if ($slider->image) Storage::disk('public')->delete($slider->image);
             $data['image'] = $request->file('image')->store('sliders', 'public');
         }
+        $data = $this->attachTranslations($data, $slider);
 
         $slider->update($data);
 
@@ -92,4 +96,29 @@ class SliderController extends ResourceController
         }
         return response()->json(['success' => true]);
     }
+
+    private function attachTranslations(array $data, $modelInstance): array
+{
+    $languages    = array_keys(config('languages.available'));
+    $translatable = $modelInstance->translatable ?? [];
+
+    foreach ($languages as $locale) {
+        if ($locale === 'en') continue;
+
+        $translated = [];
+        foreach ($translatable as $field) {
+            if (!empty($data[$field])) {
+                $translated[$field] = $this->translator->translateText(
+                    $data[$field], $locale, 'en'
+                );
+            }
+        }
+
+        if (!empty($translated)) {
+            $data[$locale] = $translated;
+        }
+    }
+
+    return $data;
+}
 }

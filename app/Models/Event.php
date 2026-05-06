@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use App\Traits\HasTranslations; 
 
 class Event extends Model
 {
+    use HasTranslations;
     protected $connection = 'mongodb';
     protected $collection = 'events';
 
@@ -17,4 +19,6 @@ class Event extends Model
         'image',
         'alt_tag',
     ];
+
+    public array $translatable = ['heading', 'description', 'place'];
 }

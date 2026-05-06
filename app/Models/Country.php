@@ -20,21 +20,23 @@ class Country extends Model
         'flag',
         'alt_tag',
         'is_default',
+        'country_files',
     ];
 
     protected $casts = [
-        'is_default' => 'boolean',
+        'is_default'    => 'boolean',
+        'country_files' => 'array',
     ];
 
-    public function getFlagUrlAttribute(): ?string
-{
-    if (!$this->flag) {
-        return null;
+    public function getTable(): string
+    {
+        return $this->collection ?? parent::getTable();
     }
 
-    // Build URL directly — no network call needed
-    $baseUrl = rtrim(config('filesystems.disks.r2.url'), '/');
-
-    return $baseUrl . '/' . $this->flag;
-}
+    public function getFlagUrlAttribute(): ?string
+    {
+        if (!$this->flag) return null;
+        $baseUrl = rtrim(config('filesystems.disks.r2.url'), '/');
+        return $baseUrl . '/' . $this->flag;
+    }
 }

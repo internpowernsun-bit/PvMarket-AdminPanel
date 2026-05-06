@@ -1,7 +1,7 @@
 @if($mode === 'create')
 @extends('layouts.admin')
 {{-- ═══ CREATE MODE ═══ --}}
-@section('title', 'Add Sub Menu')
+@section('title', 'Add Sub Category')
 
 @section('styles')
 <style>
@@ -20,6 +20,9 @@
     .form-row-input { width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; color:var(--text); outline:none; transition:border-color .2s; background:white; }
     .form-row-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1); }
     .form-row-input::placeholder { color:#CBD5E1; }
+    .form-file-wrap { border:1.5px solid var(--border); border-radius:8px; overflow:hidden; display:flex; align-items:center; background:white; }
+    .form-file-wrap input[type="file"] { flex:1; padding:7px 10px; border:none; outline:none; font-family:inherit; font-size:13px; background:transparent; cursor:pointer; }
+    .form-file-wrap input[type="file"]::-webkit-file-upload-button { padding:5px 12px; background:var(--light); border:none; border-right:1px solid var(--border); font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; margin-right:8px; }
     .checkbox-wrap { display:flex; align-items:center; justify-content:center; gap:6px; }
     .checkbox-wrap input[type="checkbox"] { width:16px; height:16px; cursor:pointer; accent-color:var(--primary); }
     .btn-add-row { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--primary); color:white; border:none; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:background .15s; }
@@ -38,7 +41,7 @@
 @section('content')
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Add Sub Menu</h1>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Add Sub Category</h1>
     <a href="{{ route('admin.setup.sub-menus.index') }}" class="btn-back">← Back</a>
 </div>
 
@@ -47,17 +50,17 @@
 @endif
 
 <div class="content-panel">
-    <form method="POST" action="{{ route('admin.setup.sub-menus.store') }}" id="createForm">
+    <form method="POST" action="{{ route('admin.setup.sub-menus.store') }}" enctype="multipart/form-data" id="createForm">
         @csrf
 
         <div class="toolbar-row">
             <div class="form-group" style="margin-bottom:0; min-width:320px;">
-                <label class="form-label">Choose Main Menu</label>
-                <select name="main_menu_id" class="form-input" required>
-                    <option value="">Select Main Menu</option>
+                <label class="form-label">Choose Category</label>
+                <select name="category_id" class="form-input" required>
+                    <option value="">Select Category</option>
                     @foreach($mainMenus as $menu)
-                        <option value="{{ $menu->id }}" {{ old('main_menu_id') == $menu->id ? 'selected' : '' }}>
-                            {{ $menu->name }}
+                        <option value="{{ $menu->id }}" {{ old('category_id') == $menu->id ? 'selected' : '' }}>
+                            {{ $menu->category_name }}
                         </option>
                     @endforeach
                 </select>
@@ -69,7 +72,9 @@
             <thead>
                 <tr>
                     <th style="width:60px;">S.No</th>
-                    <th>Sub Menu</th>
+                    <th>Sub Category Name</th>
+                    <th>Sub Category Icon</th>
+                    <th>Alt Tag</th>
                     <th style="width:220px; text-align:center;">Pallet/Container Sell Applicable</th>
                     <th style="width:60px;">Actions</th>
                 </tr>
@@ -77,7 +82,13 @@
             <tbody id="rowsBody">
                 <tr id="row-1">
                     <td class="sno">1.</td>
-                    <td><input type="text" name="items[0][name]" class="form-row-input" placeholder="Sub Menu Name" required/></td>
+                    <td><input type="text" name="items[0][name]" class="form-row-input" placeholder="Sub Category Name" required/></td>
+                    <td>
+                        <div class="form-file-wrap">
+                            <input type="file" name="items[0][icon]" accept="image/*"/>
+                        </div>
+                    </td>
+                    <td><input type="text" name="items[0][alt_tag]" class="form-row-input" placeholder="Alt Tag"/></td>
                     <td>
                         <div class="checkbox-wrap">
                             <input type="checkbox" name="items[0][pallet]" id="pallet_0" value="1"/>
@@ -125,7 +136,13 @@ function addRow() {
     tr.id = 'row-' + rowCount;
     tr.innerHTML = `
         <td class="sno">${rowCount}.</td>
-        <td><input type="text" name="items[${idx}][name]" class="form-row-input" placeholder="Sub Menu Name" required/></td>
+        <td><input type="text" name="items[${idx}][name]" class="form-row-input" placeholder="Sub Category Name" required/></td>
+        <td>
+            <div class="form-file-wrap">
+                <input type="file" name="items[${idx}][icon]" accept="image/*"/>
+            </div>
+        </td>
+        <td><input type="text" name="items[${idx}][alt_tag]" class="form-row-input" placeholder="Alt Tag"/></td>
         <td>
             <div class="checkbox-wrap">
                 <input type="checkbox" name="items[${idx}][pallet]" id="pallet_${idx}" value="1"/>
@@ -159,6 +176,9 @@ function renumber() {
         tr.querySelectorAll('input[type="text"]').forEach(inp => {
             inp.name = inp.name.replace(/items\[\d+\]/, `items[${i}]`);
         });
+        tr.querySelectorAll('input[type="file"]').forEach(inp => {
+            inp.name = inp.name.replace(/items\[\d+\]/, `items[${i}]`);
+        });
         tr.querySelectorAll('input[type="checkbox"]').forEach(inp => {
             inp.name = inp.name.replace(/items\[\d+\]/, `items[${i}]`);
         });
@@ -171,7 +191,7 @@ function renumber() {
 @elseif($mode === 'edit')
 
 {{-- ═══ EDIT MODE ═══ --}}
-@section('title', 'Update Sub Menu')
+@section('title', 'Update Sub Category')
 
 @section('styles')
 <style>
@@ -191,6 +211,7 @@ function renumber() {
     .form-file-wrap input[type="file"] { flex:1; padding:7px 10px; border:none; outline:none; font-family:inherit; font-size:13px; background:transparent; cursor:pointer; }
     .form-file-wrap input[type="file"]::-webkit-file-upload-button { padding:5px 12px; background:var(--light); border:none; border-right:1px solid var(--border); font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; margin-right:8px; }
     .form-hint { font-size:11px; color:var(--muted); margin-top:3px; }
+    .current-icon { height:40px; border-radius:6px; border:1px solid var(--border); object-fit:contain; display:block; margin-bottom:8px; }
     .section-title { font-size:16px; font-weight:800; color:var(--primary-d); margin-bottom:16px; padding-bottom:10px; border-bottom:2px solid var(--primary-l); }
     .section-divider { border:none; border-top:1px solid var(--border); margin:24px 0; }
     .btn-save { display:inline-flex; align-items:center; gap:8px; padding:10px 28px; background:#10B981; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s; }
@@ -220,7 +241,7 @@ function renumber() {
 </style>
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Update Sub Menu</h1>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Update Sub Category</h1>
     <a href="{{ route('admin.setup.sub-menus.index') }}" class="btn-back">← Back</a>
 </div>
 
@@ -236,20 +257,21 @@ function renumber() {
         @csrf
         @method('PUT')
 
+        {{-- Row 1: Name + Category + Pallet/Container --}}
         <div class="form-grid-3">
             <div class="form-group">
-                <label class="form-label">Sub Menu <span>*</span></label>
-                <input type="text" name="name" class="form-input"
-                       value="{{ old('name', $record->name) }}" required/>
+                <label class="form-label">Sub Category Name <span>*</span></label>
+                <input type="text" name="sub_category_name" class="form-input"
+                       value="{{ old('sub_category_name', $record->sub_category_name) }}" required/>
             </div>
             <div class="form-group">
-                <label class="form-label">Main Menu <span>*</span></label>
-                <select name="main_menu_id" class="form-input" required>
-                    <option value="">Select Main Menu</option>
+                <label class="form-label">Category <span>*</span></label>
+                <select name="category_id" class="form-input" required>
+                    <option value="">Select Category</option>
                     @foreach($mainMenus as $menu)
                         <option value="{{ $menu->id }}"
-                            {{ old('main_menu_id', $record->main_menu_id) == $menu->id ? 'selected' : '' }}>
-                            {{ $menu->name }}
+                            {{ old('category_id', $record->category_id) == $menu->id ? 'selected' : '' }}>
+                            {{ $menu->category_name }}
                         </option>
                     @endforeach
                 </select>
@@ -273,41 +295,63 @@ function renumber() {
 
         <hr class="section-divider">
 
-        <div class="section-title">SEO / Meta Fields</div>
-
-        <div class="form-grid-2">
+        {{-- Row 2: Icon + Alt Tag + Slug --}}
+        <div class="form-grid-3">
+            <div class="form-group">
+                <label class="form-label">Sub Category Icon</label>
+                @if($record->sub_category_icon_image)
+                    <img src="{{ asset('storage/' . $record->sub_category_icon_image) }}"
+                         class="current-icon" alt="current"/>
+                    <span class="form-hint">Leave blank to keep current icon</span>
+                @endif
+                <div class="form-file-wrap">
+                    <input type="file" name="icon" accept="image/*"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Alt Tag</label>
+                <input type="text" name="alt_tag" class="form-input"
+                       value="{{ old('alt_tag', $record->icon_alt_tag) }}"
+                       placeholder="e.g. solar-panels"/>
+            </div>
             <div class="form-group">
                 <label class="form-label">Slug</label>
                 <input type="text" name="slug" class="form-input" id="slugField"
                        value="{{ old('slug', $record->slug) }}"
                        placeholder="auto-generated if empty"/>
             </div>
+        </div>
+
+        <hr class="section-divider">
+
+        {{-- SEO / Meta --}}
+        <div class="section-title">SEO / Meta Fields</div>
+
+        <div class="form-grid-2">
             <div class="form-group">
                 <label class="form-label">Meta Title</label>
                 <input type="text" name="meta_title" class="form-input"
                        value="{{ old('meta_title', $record->meta_title) }}"
                        placeholder="Meta Title"/>
             </div>
+            <div class="form-group">
+                <label class="form-label">Meta Description</label>
+                <textarea name="meta_description" class="form-input"
+                          placeholder="Meta Description">{{ old('meta_description', $record->meta_description) }}</textarea>
+            </div>
         </div>
 
-        <div class="form-grid-2">
+        <div class="form-grid-1">
             <div class="form-group">
                 <label class="form-label">Meta Image</label>
                 @if($record->meta_image)
                     <img src="{{ asset('storage/' . $record->meta_image) }}"
                          style="height:40px; border-radius:6px; border:1px solid var(--border); object-fit:contain; display:block; margin-bottom:8px;" alt="meta"/>
+                    <span class="form-hint">Leave blank to keep current image</span>
                 @endif
                 <div class="form-file-wrap">
                     <input type="file" name="meta_image" accept="image/*"/>
                 </div>
-                @if($record->meta_image)
-                    <span class="form-hint">Leave blank to keep current image</span>
-                @endif
-            </div>
-            <div class="form-group">
-                <label class="form-label">Meta Description</label>
-                <textarea name="meta_description" class="form-input"
-                          placeholder="Meta Description">{{ old('meta_description', $record->meta_description) }}</textarea>
             </div>
         </div>
 
@@ -317,7 +361,7 @@ function renumber() {
             <div class="form-group">
                 <label class="form-label">Short Description</label>
                 <textarea name="short_description" class="form-input" style="min-height:90px;"
-                          placeholder="Enter short description">{{ old('short_description', $record->short_description) }}</textarea>
+          placeholder="Enter short description">{{ old('short_description', lang($record, 'short_description')) }}</textarea>
             </div>
         </div>
 
@@ -369,7 +413,7 @@ function renumber() {
         document.getElementById('contentInput').value = (html === '<p><br></p>') ? '' : html;
     });
 
-    document.querySelector('input[name="name"]').addEventListener('input', function () {
+    document.querySelector('input[name="sub_category_name"]').addEventListener('input', function () {
         const sf = document.getElementById('slugField');
         if (!sf.dataset.touched) {
             sf.value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -387,7 +431,7 @@ function renumber() {
 @else
 
 {{-- ═══ INDEX MODE ═══ --}}
-@section('title', 'Sub Menus')
+@section('title', 'Sub Categories')
 
 @section('styles')
 <style>
@@ -439,7 +483,7 @@ function renumber() {
 @section('content')
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Sub Menus</h1>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Sub Categories</h1>
     <a href="{{ route('admin.setup.sub-menus.create') }}"
        style="display:inline-flex; align-items:center; gap:7px; padding:10px 20px;
               background:var(--primary); color:white; border-radius:8px; font-size:14px;
@@ -449,7 +493,7 @@ function renumber() {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        Add +
+        Add 
     </a>
 </div>
 
@@ -471,7 +515,7 @@ function renumber() {
                     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
                 <input type="text" name="search" value="{{ request('search') }}"
-                       placeholder="Search By Sub Menu..." class="search-input"/>
+                       placeholder="Search By Sub Category..." class="search-input"/>
             </div>
         </form>
 
@@ -493,8 +537,8 @@ function renumber() {
         <thead>
             <tr>
                 <th class="center" style="width:70px;">S.No</th>
-                <th>Sub Menu</th>
-                <th>Main Menu</th>
+                <th>Sub Category</th>
+                <th>Category</th>
                 <th class="center" style="width:110px;">Pallet</th>
                 <th class="center" style="width:120px;">Container</th>
                 <th class="center" style="width:140px;">Value of Stocks</th>
@@ -507,11 +551,11 @@ function renumber() {
                 <td class="center" style="font-weight:700; color:var(--muted); font-size:13px;">
                     {{ $subMenus->firstItem() + $index }}
                 </td>
-                <td style="font-weight:600;">{{ $sub->name }}</td>
+                <td style="font-weight:600;">{{ lang($sub, 'sub_category_name') }}</td>
                 <td>
                     <span style="display:inline-block; padding:3px 10px; background:var(--primary-l);
                                  color:var(--primary-d); border-radius:6px; font-size:12px; font-weight:600;">
-                        {{ $sub->main_menu_name ?? '—' }}
+                        {{ $sub->category_name ?? '—' }}
                     </span>
                 </td>
                 <td class="center">
@@ -558,18 +602,18 @@ function renumber() {
                               style="display:contents;">
                             @csrf @method('PATCH')
                             <button type="submit"
-                                    class="action-icon toggle {{ $sub->is_active ? '' : 'off' }}"
-                                    title="{{ $sub->is_active ? 'Active' : 'Inactive' }}">
+                                    class="action-icon toggle {{ !$sub->is_hold ? '' : 'off' }}"
+                                    title="{{ !$sub->is_hold ? 'Active — click to hold' : 'On Hold — click to activate' }}">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="1" y="5" width="22" height="14" rx="7"/>
-                                    <circle cx="{{ $sub->is_active ? '16' : '8' }}" cy="12" r="4"
+                                    <circle cx="{{ !$sub->is_hold ? '16' : '8' }}" cy="12" r="4"
                                             fill="currentColor" stroke="none"/>
                                 </svg>
                             </button>
                         </form>
 
                         <button class="action-icon delete" title="Delete"
-                            onclick="if(confirm('Delete this sub menu?')) document.getElementById('del-{{ $sub->id }}').submit();">
+                            onclick="if(confirm('Delete this sub category?')) document.getElementById('del-{{ $sub->id }}').submit();">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"/>
                                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -591,7 +635,7 @@ function renumber() {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M4 6h16M4 12h10M4 18h6"/>
                         </svg>
-                        <p>No sub menus yet. Click <strong>Add +</strong> to create one.</p>
+                        <p>No sub categories yet. Click <strong>Add Sub Category</strong> to create one.</p>
                     </div>
                 </td>
             </tr>

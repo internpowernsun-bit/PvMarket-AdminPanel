@@ -160,7 +160,7 @@
                     @foreach($mainMenus as $menu)
                         <option value="{{ $menu->id }}"
                             {{ old('category_id', $record->category_id ?? '') == $menu->id ? 'selected' : '' }}>
-                            {{ $menu->name }}
+                            {{ $menu->category_name }}
                         </option>
                     @endforeach
                 </select>
@@ -175,7 +175,7 @@
                     @foreach($subMenus as $menu)
                         <option value="{{ $menu->id }}"
                             {{ old('sub_category_id', $record->sub_category_id ?? '') == $menu->id ? 'selected' : '' }}>
-                            {{ $menu->name }}
+                            {{ $menu->sub_category_name }}
                         </option>
                     @endforeach
                 </select>
@@ -420,7 +420,7 @@ function handleCategoryChange(categoryId) {
         subSelect.innerHTML = '<option value="" disabled selected>Select Sub Category</option>';
         data.subMenus.forEach(sm => {
             const id = sm.id || sm._id;
-            subSelect.innerHTML += `<option value="${id}">${sm.name}</option>`;
+            subSelect.innerHTML += `<option value="${id}">${sm.sub_category_name}</option>`; // ✅
         });
         clearProductDetails();
     })

@@ -61,7 +61,7 @@
                 @endif
             </td>
             {{-- Name --}}
-            <td style="font-weight:600;">{{ $slider->name }}</td>
+            <td style="font-weight:600;">{{ lang($slider, 'name') }}</td>
             {{-- Link --}}
             <td>
                 @if($slider->redirect_link)

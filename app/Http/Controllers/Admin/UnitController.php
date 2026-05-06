@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use App\Services\TranslationService;
 
 class UnitController extends Controller
 {
+    public function __construct(protected TranslationService $translator) {}
     public function index(Request $request)
     {
         $query = Unit::query();
@@ -43,12 +45,14 @@ class UnitController extends Controller
         ]);
 
         foreach ($request->units as $item) {
-            Unit::create([
-                'unit_name'   => $item['unit_name'],
-                'unit_code'   => strtoupper($item['unit_code']),
-                'description' => $item['description'] ?? null,
-                'is_active'   => true,
-            ]);
+            $data = [
+    'unit_name'   => $item['unit_name'],
+    'unit_code'   => strtoupper($item['unit_code']),
+    'description' => $item['description'] ?? null,
+    'is_active'   => true,
+];
+$data = $this->attachTranslations($data, new Unit());
+Unit::create($data);
         }
 
         return redirect()->route('admin.setup.units.index')
@@ -75,11 +79,13 @@ class UnitController extends Controller
             'description' => 'nullable|string|max:500',
         ]);
 
-        $unit->update([
-            'unit_name'   => $request->unit_name,
-            'unit_code'   => strtoupper($request->unit_code),
-            'description' => $request->description,
-        ]);
+        $data = [
+    'unit_name'   => $request->unit_name,
+    'unit_code'   => strtoupper($request->unit_code),
+    'description' => $request->description,
+];
+$data = $this->attachTranslations($data, $unit);
+$unit->update($data);
 
         return redirect()->route('admin.setup.units.index')
                          ->with('success', 'Unit updated successfully.');
@@ -100,4 +106,29 @@ class UnitController extends Controller
         return redirect()->route('admin.setup.units.index')
                          ->with('success', 'Unit deleted.');
     }
+
+    private function attachTranslations(array $data, $modelInstance): array
+{
+    $languages    = array_keys(config('languages.available'));
+    $translatable = $modelInstance->translatable ?? [];
+
+    foreach ($languages as $locale) {
+        if ($locale === 'en') continue;
+
+        $translated = [];
+        foreach ($translatable as $field) {
+            if (!empty($data[$field])) {
+                $translated[$field] = $this->translator->translateText(
+                    $data[$field], $locale, 'en'
+                );
+            }
+        }
+
+        if (!empty($translated)) {
+            $data[$locale] = $translated;
+        }
+    }
+
+    return $data;
+}
 }

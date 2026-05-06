@@ -10,13 +10,35 @@ class Warehouse extends Model
     protected $collection = 'warehouses';
 
     protected $fillable = [
-        'name',
-        'payment_status',  // 'paid' | 'pending'
-        'is_active',       // boolean – the status toggle
+        'user_id',
+        'warehouse_name',
+        'country',
+        'zip_code',
+        'street',
+        'apartment_suite',
+        'city',
+        'warehouse_email',
+        'contact_name',
+        'contact_mobile',
+        'ddp_deliverable_countries',
+        'is_paid',
+        'is_active',
         'updated_by',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'                 => 'boolean',
+        'is_paid'                   => 'boolean',
+        'ddp_deliverable_countries' => 'array',
     ];
+
+    public function getNameAttribute(): ?string
+{
+    return $this->warehouse_name;
+}
+
+    public function getTable(): string
+    {
+        return $this->collection ?? parent::getTable();
+    }
 }

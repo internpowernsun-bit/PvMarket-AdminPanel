@@ -356,7 +356,7 @@
                 <td class="center" style="font-weight:700; color:var(--muted); font-size:13px;">
                     {{ $spotPrices->firstItem() + $index }}
                 </td>
-               <td class="center" style="font-weight:600;">{{ $sp->heading }}</td>
+               <td class="center" style="font-weight:600;">{{ lang($sp, 'heading') }}</td>
 <td class="center" style="color:var(--muted);">{{ $sp->upload_date }}</td>
                 <td>
                     <div class="action-btns">

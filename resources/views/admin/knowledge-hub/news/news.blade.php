@@ -343,15 +343,16 @@
                     {{ $news->firstItem() + $index }}
                 </td>
                 <td>
-                    <span class="truncate" style="max-width:280px;" title="{{ $item->heading }}">
-                        {{ $item->heading }}
+                    <span class="truncate" style="max-width:280px;" title="{{ lang($item, 'heading') }}">
+                        {{ lang($item, 'heading') }}
+
                     </span>
                 </td>
                 <td>
                     <span class="truncate" style="max-width:260px; color:#64748B;"
-                          title="{{ strip_tags($item->content ?? '') }}">
-                        {{ Str::limit(strip_tags($item->content ?? ''), 80) }}
-                    </span>
+      title="{{ strip_tags(lang($item, 'content')) }}">
+    {{ Str::limit(strip_tags(lang($item, 'content')), 80) ?: '—' }}
+</span>
                 </td>
                 <td class="center">
                     @if($item->image)

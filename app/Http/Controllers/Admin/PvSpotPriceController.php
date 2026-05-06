@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PvSpotPrice;
 use Illuminate\Http\Request;
+use App\Services\TranslationService;
 
 class PvSpotPriceController extends Controller
 {
+    public function __construct(protected TranslationService $translator) {}
     public function index(Request $request)
     {
         $query = PvSpotPrice::query();
@@ -63,6 +65,10 @@ class PvSpotPriceController extends Controller
             'items'       => $items,
         ]);
 
+        $data = $this->attachTranslations($data, new PvSpotPrice()); // ← ADD
+
+    PvSpotPrice::create($data); 
+
         return redirect()->route('admin.knowledge-hub.pv-spot-price.index')
                          ->with('success', 'PV Spot Price created successfully.');
     }
@@ -109,6 +115,10 @@ class PvSpotPriceController extends Controller
             'items'       => $items,
         ]);
 
+        $data = $this->attachTranslations($data, $spotPrice); 
+
+        $spotPrice->update($data);
+
         return redirect()->route('admin.knowledge-hub.pv-spot-price.index')
                          ->with('success', 'PV Spot Price updated.');
     }
@@ -120,4 +130,29 @@ class PvSpotPriceController extends Controller
         return redirect()->route('admin.knowledge-hub.pv-spot-price.index')
                          ->with('success', 'PV Spot Price deleted.');
     }
+
+    private function attachTranslations(array $data, $modelInstance): array
+{
+    $languages    = array_keys(config('languages.available'));
+    $translatable = $modelInstance->translatable ?? [];
+
+    foreach ($languages as $locale) {
+        if ($locale === 'en') continue;
+
+        $translated = [];
+        foreach ($translatable as $field) {
+            if (!empty($data[$field])) {
+                $translated[$field] = $this->translator->translateText(
+                    $data[$field], $locale, 'en'
+                );
+            }
+        }
+
+        if (!empty($translated)) {
+            $data[$locale] = $translated;
+        }
+    }
+
+    return $data;
+}
 }

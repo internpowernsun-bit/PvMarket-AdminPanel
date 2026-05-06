@@ -358,17 +358,17 @@
                     {{ $promotions->firstItem() + $index }}
                 </td>
                 <td>
-                    <span class="truncate" style="max-width:280px;" title="{{ $promo->heading }}">
-                        {{ $promo->heading }}
+                    <span class="truncate" style="max-width:280px;" title="{{ lang($promo, 'heading') }}">
+                        {{ lang($promo, 'heading') }}
                     </span>
                 </td>
                 <td style="color:var(--muted); font-size:13px;">{{ $promo->event_date ?? '—' }}</td>
-                <td style="color:var(--muted);">{{ $promo->event_place ?? '—' }}</td>
+                <td style="color:var(--muted);">{{ lang($promo, 'event_place') ?: '—' }}</td>
                 <td>
                     <span class="truncate" style="max-width:220px; color:var(--muted); font-size:13px;"
-                          title="{{ strip_tags($promo->description ?? '') }}">
-                        {{ Str::limit(strip_tags($promo->description ?? ''), 60) ?: '—' }}
-                    </span>
+      title="{{ strip_tags(lang($promo, 'description')) }}">
+    {{ Str::limit(strip_tags(lang($promo, 'description')), 60) ?: '—' }}
+</span>
                 </td>
                 <td class="center">
                     @if($promo->image)

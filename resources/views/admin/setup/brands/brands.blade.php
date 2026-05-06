@@ -25,21 +25,7 @@
     .form-file-wrap input[type="file"]::-webkit-file-upload-button { padding:5px 12px; background:var(--light); border:none; border-right:1px solid var(--border); font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; margin-right:8px; }
     .btn-add-row { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--primary); color:white; border:none; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:background .15s; }
     .btn-add-row:hover { background:var(--primary-d); }
-    .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 18px;
-    background: var(--text);
-    color: white;
-    border-radius: 8px;
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background .15s;
-    white-space: nowrap;
-    border: 1.5px solid var(--text);
-}
+    .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; white-space:nowrap; border:1.5px solid var(--text); }
     .btn-save { display:inline-flex; align-items:center; gap:8px; padding:10px 28px; background:#10B981; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s; }
     .btn-save:hover { background:#059669; }
     .btn-remove { background:none; border:none; cursor:pointer; color:#EF4444; padding:6px; border-radius:6px; transition:background .15s; }
@@ -73,9 +59,10 @@
             <thead>
                 <tr>
                     <th style="width:60px;">S.No</th>
-                    <th style="min-width:200px;">Brand</th>
+                    <th style="min-width:180px;">Brand Name</th>
                     <th style="min-width:220px;">Brand Image</th>
-                    <th style="min-width:180px;">Alt Tag</th>
+                    <th style="min-width:160px;">Alt Tag</th>
+                    <th style="min-width:110px;">Menu Order</th>
                     <th style="width:60px;">Action</th>
                 </tr>
             </thead>
@@ -94,6 +81,10 @@
                     <td>
                         <input type="text" name="brands[0][alt_tag]" class="form-row-input"
                                placeholder="e.g. Jinko Solar Logo"/>
+                    </td>
+                    <td>
+                        <input type="number" name="brands[0][menu_order]" class="form-row-input"
+                               placeholder="e.g. 1" min="0"/>
                     </td>
                     <td>
                         <button type="button" class="btn-remove" onclick="removeRow(this)" title="Remove">
@@ -149,6 +140,10 @@ function addRow() {
                    placeholder="e.g. Jinko Solar Logo"/>
         </td>
         <td>
+            <input type="number" name="brands[${idx}][menu_order]" class="form-row-input"
+                   placeholder="e.g. 1" min="0"/>
+        </td>
+        <td>
             <button type="button" class="btn-remove" onclick="removeRow(this)" title="Remove">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"/>
@@ -184,6 +179,8 @@ function renumber() {
 
 
 {{-- ═══ EDIT MODE ═══ --}}
+@extends('layouts.admin')
+
 @section('title', 'Edit Brand')
 
 @section('styles')
@@ -202,21 +199,7 @@ function renumber() {
     .form-hint { font-size:11px; color:var(--muted); margin-top:3px; }
     .btn-save { display:inline-flex; align-items:center; gap:8px; padding:10px 28px; background:#10B981; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s; }
     .btn-save:hover { background:#059669; }
-    .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 18px;
-    background: var(--text);
-    color: white;
-    border-radius: 8px;
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background .15s;
-    white-space: nowrap;
-    border: 1.5px solid var(--text);
-}
+    .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; white-space:nowrap; border:1.5px solid var(--text); }
     .alert-error { padding:12px 16px; background:#FEE2E2; color:#991B1B; border:1px solid #FECACA; border-radius:8px; font-size:13.5px; margin-bottom:20px; }
     .current-img { height:50px; border-radius:6px; border:1px solid var(--border); object-fit:contain; display:block; margin-bottom:8px; }
 </style>
@@ -242,6 +225,7 @@ function renumber() {
 
         <div class="form-grid">
 
+            {{-- Brand Name --}}
             <div class="form-group">
                 <label class="form-label">Brand Name <span>*</span></label>
                 <input type="text" name="name" class="form-input"
@@ -249,11 +233,30 @@ function renumber() {
                        value="{{ old('name', $record->name) }}" required/>
             </div>
 
+            {{-- Slug --}}
+            <div class="form-group">
+                <label class="form-label">Slug</label>
+                <input type="text" name="slug" class="form-input"
+                       placeholder="auto-generated if blank"
+                       value="{{ old('slug', $record->slug) }}"/>
+                <span class="form-hint">Leave blank to auto-generate from name</span>
+            </div>
+
+            {{-- Alt Tag --}}
+            <div class="form-group">
+                <label class="form-label">Alt Tag</label>
+                <input type="text" name="alt_tag" class="form-input"
+                       placeholder="e.g. Jinko Solar Logo"
+                       value="{{ old('alt_tag', $record->alt_tag) }}"/>
+            </div>
+
+            {{-- Brand Image --}}
             <div class="form-group">
                 <label class="form-label">Brand Image</label>
-                @if($record->image)
-                    <img src="{{ asset('storage/' . $record->image) }}"
-                         class="current-img" alt="{{ $record->name }}"/>
+                @if(!empty($record->brand_image['url']))
+                    <img src="{{ asset('storage/' . $record->brand_image['url']) }}"
+                         class="current-img"
+                         alt="{{ $record->alt_tag ?? $record->name }}"/>
                 @endif
                 <div class="form-file-wrap">
                     <input type="file" name="image" accept="image/*"/>
@@ -261,11 +264,13 @@ function renumber() {
                 <span class="form-hint">Leave blank to keep current image</span>
             </div>
 
+            {{-- Menu Order --}}
             <div class="form-group">
-                <label class="form-label">Alt Tag</label>
-                <input type="text" name="alt_tag" class="form-input"
-                       placeholder="e.g. Jinko Solar Logo"
-                       value="{{ old('alt_tag', $record->alt_tag) }}"/>
+                <label class="form-label">Menu Order</label>
+                <input type="number" name="menu_order" class="form-input"
+                       placeholder="e.g. 1" min="0"
+                       value="{{ old('menu_order', $record->menu_order ?? 0) }}"/>
+                <span class="form-hint">Lower number appears first</span>
             </div>
 
         </div>
@@ -290,6 +295,8 @@ function renumber() {
 
 
 {{-- ═══ INDEX MODE ═══ --}}
+@extends('layouts.admin')
+
 @section('title', 'Brands')
 
 @section('styles')
@@ -319,6 +326,8 @@ function renumber() {
     .brand-img { max-height:70px; max-width:180px; object-fit:contain; border-radius:6px; }
     .brand-img-placeholder { width:120px; height:60px; border:1.5px dashed var(--border); background:var(--light); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#CBD5E1; }
     .brand-name { font-weight:700; font-size:15px; color:var(--text); }
+    .brand-slug { font-size:12px; color:var(--muted); margin-top:3px; font-family:monospace; }
+    .order-badge { display:inline-flex; align-items:center; justify-content:center; min-width:28px; height:28px; padding:0 8px; background:#F0F9FF; border:1.5px solid #BAE6FD; border-radius:6px; font-size:13px; font-weight:700; color:var(--primary-d); }
     .action-btns { display:flex; align-items:center; justify-content:center; gap:8px; }
     .action-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1.5px solid transparent; background:none; border-radius:7px; transition:all .15s; text-decoration:none; }
     .action-icon svg { width:15px; height:15px; }
@@ -397,9 +406,10 @@ function renumber() {
     <table class="data-table">
         <thead>
             <tr>
-                <th class="center" style="width:80px;">S.No</th>
-                <th class="center">Brand Image</th>
+                <th class="center" style="width:70px;">S.No</th>
+                <th class="center" style="width:160px;">Brand Image</th>
                 <th>Brand</th>
+                <th class="center" style="width:100px;">Order</th>
                 <th class="center" style="width:130px;">Action</th>
             </tr>
         </thead>
@@ -411,8 +421,8 @@ function renumber() {
                 </td>
                 <td class="center">
                     <div class="brand-img-wrap">
-                        @if($brand->image)
-                            <img src="{{ asset('storage/' . $brand->image) }}"
+                        @if(!empty($brand->brand_image['url']))
+                            <img src="{{ asset('storage/' . $brand->brand_image['url']) }}"
                                  class="brand-img"
                                  alt="{{ $brand->alt_tag ?? $brand->name }}"/>
                         @else
@@ -427,7 +437,13 @@ function renumber() {
                     </div>
                 </td>
                 <td>
-                    <span class="brand-name">{{ $brand->name }}</span>
+                    <span class="brand-name">{{ lang($brand, 'name') }}</span>
+                    @if($brand->slug)
+                        <div class="brand-slug">/{{ $brand->slug }}</div>
+                    @endif
+                </td>
+                <td class="center">
+                    <span class="order-badge">{{ $brand->menu_order ?? 0 }}</span>
                 </td>
                 <td>
                     <div class="action-btns">
@@ -468,7 +484,7 @@ function renumber() {
             </tr>
             @empty
             <tr>
-                <td colspan="4">
+                <td colspan="5">
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <rect x="3" y="3" width="18" height="18" rx="2"/>

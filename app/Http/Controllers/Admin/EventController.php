@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\TranslationService;
 
 class EventController extends Controller
 {
+
+        public function __construct(protected TranslationService $translator) {}
     public function index(Request $request)
     {
         $query = Event::query();
@@ -57,6 +60,8 @@ class EventController extends Controller
             $data['image'] = $request->file('image')->store('events', 'public');
         }
 
+        $data = $this->attachTranslations($data, new Event());
+
         Event::create($data);
 
         return redirect()->route('admin.knowledge-hub.events.index')
@@ -99,6 +104,8 @@ class EventController extends Controller
             $data['image'] = $request->file('image')->store('events', 'public');
         }
 
+        $data = $this->attachTranslations($data, new Event());
+
         $event->update($data);
 
         return redirect()->route('admin.knowledge-hub.events.index')
@@ -114,4 +121,29 @@ class EventController extends Controller
         return redirect()->route('admin.knowledge-hub.events.index')
                          ->with('success', 'Event deleted successfully.');
     }
+
+    private function attachTranslations(array $data, $modelInstance): array
+{
+    $languages    = array_keys(config('languages.available'));
+    $translatable = $modelInstance->translatable ?? [];
+
+    foreach ($languages as $locale) {
+        if ($locale === 'en') continue;
+
+        $translated = [];
+        foreach ($translatable as $field) {
+            if (!empty($data[$field])) {
+                $translated[$field] = $this->translator->translateText(
+                    $data[$field], $locale, 'en' // ← translateText, not translate
+                );
+            }
+        }
+
+        if (!empty($translated)) {
+            $data[$locale] = $translated;
+        }
+    }
+
+    return $data;
+}
 }

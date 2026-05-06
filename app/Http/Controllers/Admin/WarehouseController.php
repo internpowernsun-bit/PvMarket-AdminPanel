@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Warehouse;
+use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -30,9 +31,12 @@ class WarehouseController extends Controller
     // ── Create ────────────────────────────────────────
     public function create()
     {
+        $countries = Country::orderBy('name', 'asc')->get(['_id', 'name']);
+
         return view('admin.warehouses.warehouses', [
-            'mode'   => 'create',
-            'record' => null,
+            'mode'      => 'create',
+            'record'    => null,
+            'countries' => $countries,
         ]);
     }
 
@@ -40,14 +44,34 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:300',
+            'warehouse_name'            => 'required|string|max:300',
+            'country'                   => 'required|string',
+            'zip_code'                  => 'required|string|max:20',
+            'street'                    => 'required|string|max:300',
+            'apartment_suite'           => 'nullable|string|max:300',
+            'city'                      => 'required|string|max:100',
+            'warehouse_email'           => 'required|email|max:255',
+            'contact_name'              => 'required|string|max:150',
+            'contact_mobile'            => 'required|string|max:30',
+            'ddp_deliverable_countries' => 'nullable|array',
+            'ddp_deliverable_countries.*' => 'string',
         ]);
 
         Warehouse::create([
-            'name'           => $request->name,
-            'payment_status' => 'pending',
-            'is_active'      => true,
-            'updated_by'     => Auth::user()->name,
+            'user_id'                   => (string) Auth::id(),
+            'warehouse_name'            => $request->name,
+            'country'                   => $request->country,
+            'zip_code'                  => $request->zip_code,
+            'street'                    => $request->street,
+            'apartment_suite'           => $request->apartment_suite,
+            'city'                      => $request->city,
+            'warehouse_email'           => $request->warehouse_email,
+            'contact_name'              => $request->contact_name,
+            'contact_mobile'            => $request->contact_mobile,
+            'ddp_deliverable_countries' => $request->ddp_deliverable_countries ?? [],
+            'is_paid'                   => false,
+            'is_active'                 => true,
+            'updated_by'                => Auth::user()->name,
         ]);
 
         return redirect()->route('admin.warehouses.index')
@@ -57,10 +81,13 @@ class WarehouseController extends Controller
     // ── Edit ──────────────────────────────────────────
     public function edit($id)
     {
-        $record = Warehouse::findOrFail($id);
+        $record    = Warehouse::findOrFail($id);
+        $countries = Country::orderBy('name', 'asc')->get(['_id', 'name']);
+
         return view('admin.warehouses.warehouses', [
-            'mode'   => 'edit',
-            'record' => $record,
+            'mode'      => 'edit',
+            'record'    => $record,
+            'countries' => $countries,
         ]);
     }
 
@@ -68,12 +95,31 @@ class WarehouseController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:300',
+            'warehouse_name'              => 'required|string|max:300',
+            'country'                     => 'required|string',
+            'zip_code'                    => 'required|string|max:20',
+            'street'                      => 'required|string|max:300',
+            'apartment_suite'             => 'nullable|string|max:300',
+            'city'                        => 'required|string|max:100',
+            'warehouse_email'             => 'required|email|max:255',
+            'contact_name'                => 'required|string|max:150',
+            'contact_mobile'              => 'required|string|max:30',
+            'ddp_deliverable_countries'   => 'nullable|array',
+            'ddp_deliverable_countries.*' => 'string',
         ]);
 
         Warehouse::findOrFail($id)->update([
-            'name'       => $request->name,
-            'updated_by' => Auth::user()->name,
+            'warehouse_name'            => $request->name,
+            'country'                   => $request->country,
+            'zip_code'                  => $request->zip_code,
+            'street'                    => $request->street,
+            'apartment_suite'           => $request->apartment_suite,
+            'city'                      => $request->city,
+            'warehouse_email'           => $request->warehouse_email,
+            'contact_name'              => $request->contact_name,
+            'contact_mobile'            => $request->contact_mobile,
+            'ddp_deliverable_countries' => $request->ddp_deliverable_countries ?? [],
+            'updated_by'                => Auth::user()->name,
         ]);
 
         return redirect()->route('admin.warehouses.index')
@@ -84,15 +130,15 @@ class WarehouseController extends Controller
     public function markAsPaid($id)
     {
         Warehouse::findOrFail($id)->update([
-            'payment_status' => 'paid',
-            'updated_by'     => Auth::user()->name,
+            'is_paid'    => true,
+            'updated_by' => Auth::user()->name,
         ]);
 
         return redirect()->route('admin.warehouses.index')
                          ->with('success', 'Warehouse marked as paid.');
     }
 
-    // ── Toggle active status ──────────────────────────
+    // ── Toggle Active Status ───────────────────────────
     public function toggleStatus($id)
     {
         $warehouse = Warehouse::findOrFail($id);
@@ -109,6 +155,7 @@ class WarehouseController extends Controller
     public function destroy($id)
     {
         Warehouse::findOrFail($id)->delete();
+
         return redirect()->route('admin.warehouses.index')
                          ->with('success', 'Warehouse deleted.');
     }

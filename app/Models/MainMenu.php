@@ -3,23 +3,47 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use App\Traits\HasTranslations;
 
 class MainMenu extends Model
 {
+    use HasTranslations;
+
     protected $connection = 'mongodb';
-    protected $collection = 'main_menus';
+    protected $collection = 'categories';
 
     protected $fillable = [
-        'name',
-        'icon',
-        'alt_tag',
+        'category_name',
         'slug',
+        'category_icon_image',
+        'stock_value',
+        'icon_alt_tag',
+        'is_hold',
+        'created_by',
+        'short_description',
         'meta_title',
         'meta_description',
         'meta_image',
-        'short_description',
         'content',
-        'is_active',
-        'stock_value',
+    ];
+
+    protected $casts = [
+        'is_hold'    => 'boolean',
+        'stock_value' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public function getTable(): string
+    {
+        return $this->collection ?? parent::getTable();
+    }
+
+    public array $translatable = [
+        'category_name',
+        'short_description',
+        'meta_title',
+        'meta_description',
+        'content',
     ];
 }

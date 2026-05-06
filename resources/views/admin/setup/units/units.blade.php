@@ -392,14 +392,14 @@ function renumber() {
                 <td class="center" style="font-weight:700; color:var(--muted); font-size:13px;">
                     {{ $units->firstItem() + $index }}
                 </td>
-                <td style="font-weight:600;">{{ $unit->unit_name }}</td>
+                <td style="font-weight:600;">{{ lang($unit, 'unit_name') }}</td>
                 <td>
                     <span class="unit-code-badge">{{ $unit->unit_code }}</span>
                 </td>
                 <td>
-                    <span class="description-text" title="{{ $unit->description }}">
-                        {{ $unit->description ?? '—' }}
-                    </span>
+                    <span class="description-text" title="{{ lang($unit, 'description') }}">
+    {{ lang($unit, 'description') ?: '—' }}
+</span>
                 </td>
                 <td class="center">
                     <span class="status-badge {{ $unit->is_active ? 'active' : 'inactive' }}">

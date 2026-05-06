@@ -36,11 +36,11 @@ class ProductController extends Controller
     private function getDropdowns(?string $subCategoryId = null): array
     {
         $brands      = Brand::where('is_active', true)->orderBy('name')->get();
-        $mainMenus   = MainMenu::orderBy('name')->get();
-        $subMenus    = SubMenu::orderBy('name')->get();
+        $mainMenus = MainMenu::orderBy('category_name')->get();
+        $subMenus  = SubMenu::orderBy('sub_category_name')->get();
 
         if ($subCategoryId) {
-            $options = ProductDetailOption::where('sub_menu_id', $subCategoryId)
+            $options = ProductDetailOption::where('sub_category_id', $subCategoryId)
                                           ->orderBy('option_name')
                                           ->get();
         } else {
@@ -103,9 +103,9 @@ class ProductController extends Controller
             'product_name'          => $request->product_name,
             'product_description'   => $request->product_description,
             'category_id'           => $request->category_id,
-            'category_name'         => $category?->name,
+            'category_name'     => $category?->category_name,
             'sub_category_id'       => $request->sub_category_id,
-            'sub_category_name'     => $subCategory?->name,
+            'sub_category_name' => $subCategory?->sub_category_name,
             'brand_id'              => $request->brand_id,
             'pieces_per_pallet'     => $request->pieces_per_pallet,
             'pallets_per_container' => $request->pallets_per_container,
@@ -200,9 +200,9 @@ class ProductController extends Controller
             'product_name'          => $request->product_name,
             'product_description'   => $request->product_description,
             'category_id'           => $request->category_id,
-            'category_name'         => $category?->name,
+            'category_name'     => $category?->category_name,
             'sub_category_id'       => $request->sub_category_id,
-            'sub_category_name'     => $subCategory?->name,
+            'sub_category_name' => $subCategory?->sub_category_name,
             'brand_id'              => $request->brand_id,
             'pieces_per_pallet'     => $request->pieces_per_pallet,
             'pallets_per_container' => $request->pallets_per_container,
@@ -271,36 +271,36 @@ class ProductController extends Controller
 
     // ── AJAX: Get options by sub_category_id ──────────
     public function getOptionsBySubMenu(Request $request)
-    {
-        $subCategoryId = $request->input('sub_menu_id');
+{
+    $subCategoryId = $request->input('sub_menu_id');
 
-        $options = ProductDetailOption::where('sub_menu_id', $subCategoryId)
-                                      ->orderBy('option_name')
-                                      ->get(['_id', 'option_name', 'unit_ids']);
+    $options = ProductDetailOption::where('sub_category_id', $subCategoryId)  // ✅ fix here
+                                  ->orderBy('option_name')
+                                  ->get(['_id', 'option_name', 'unit_ids']);
 
-        $options = $options->map(function ($option) {
-            $unitIds = $option->unit_ids ?? [];
-            $units   = collect();
-            if (!empty($unitIds)) {
-                $units = Unit::whereIn('_id', $unitIds)
-                             ->orderBy('unit_name')
-                             ->get(['_id', 'unit_name'])
-                             ->map(fn($u) => ['unit_name' => $u->unit_name]);
-            }
-            return [
-                'option_name' => $option->option_name,
-                'units'       => $units,
-            ];
-        });
+    $options = $options->map(function ($option) {
+        $unitIds = $option->unit_ids ?? [];
+        $units   = collect();
+        if (!empty($unitIds)) {
+            $units = Unit::whereIn('_id', $unitIds)
+                         ->orderBy('unit_name')
+                         ->get(['_id', 'unit_name'])
+                         ->map(fn($u) => ['unit_name' => $u->unit_name]);
+        }
+        return [
+            'option_name' => $option->option_name,
+            'units'       => $units,
+        ];
+    });
 
-        return response()->json(['options' => $options]);
-    }
+    return response()->json(['options' => $options]);
+}
 
     // ── AJAX: Get sub categories by category_id ───────
     public function getSubMenusByMainMenu(Request $request)
     {
         $categoryId  = $request->input('main_menu_id');
-        $subMenus    = SubMenu::where('main_menu_id', $categoryId)->orderBy('name')->get(['_id', 'name']);
+        $subMenus = SubMenu::where('category_id', $categoryId)->orderBy('sub_category_name')->get(['_id', 'sub_category_name']);
         return response()->json(['subMenus' => $subMenus]);
     }
 

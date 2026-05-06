@@ -39,6 +39,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--light);
             color: var(--text);
+            overflow-x: hidden;
         }
 
         .admin-layout { display: flex; min-height: 100vh; }
@@ -61,13 +62,8 @@
             transition: transform .25s ease;
         }
 
-        .sidebar.sidebar-hidden {
-    transform: translateX(-100%);
-}
-
-.main-wrap.main-expanded {
-    margin-left: 0;
-}
+        .sidebar.sidebar-hidden { transform: translateX(-100%); }
+        .main-wrap.main-expanded { margin-left: 0; }
 
         .sidebar-logo {
             padding: 14px 18px;
@@ -209,7 +205,7 @@
         }
 
         .nav-item:hover .nav-arrow { transform: translateX(2px) !important; }
-        .nav-item.open .nav-arrow { transform: rotate(90deg) !important; }
+        .nav-item.open .nav-arrow  { transform: rotate(90deg) !important; }
 
         .nav-sub { display: none; padding-left: 38px; }
         .nav-sub.open { display: block; }
@@ -279,26 +275,28 @@
             flex-direction: column;
             min-height: 100vh;
             transition: margin-left .25s ease;
+            overflow-x: hidden;
         }
 
         /* ══════════════════════
            TOPBAR
         ══════════════════════ */
         .topbar {
-    height: var(--topbar-h);
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    position: sticky;
-    top: 12px;
-    z-index: 50;
-    margin: 12px 16px 0 16px;
-    box-shadow: 0 4px 24px rgba(14,165,233,.10), 0 1px 4px rgba(0,0,0,.06);
-}
+            height: var(--topbar-h);
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 12px;
+            z-index: 50;
+            margin: 12px 16px 0 16px;
+            box-shadow: 0 4px 24px rgba(14,165,233,.10), 0 1px 4px rgba(0,0,0,.06);
+        }
+
         .topbar-left { display: flex; align-items: center; gap: 12px; }
 
         .topbar-hamburger {
@@ -344,10 +342,7 @@
             box-shadow: 0 4px 12px rgba(14,165,233,.18);
         }
 
-        .topbar-bell:hover svg {
-    animation: bellRing .45s ease;
-    display: block;
-}
+        .topbar-bell:hover svg { animation: bellRing .45s ease; display: block; }
 
         @keyframes bellRing {
             0%   { transform: rotate(0deg); }
@@ -369,38 +364,29 @@
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: .7; }
+            50%       { transform: scale(1.3); opacity: .7; }
         }
 
         /* ── Avatar wrap ── */
-        .topbar-avatar-wrap {
-            position: relative;
-        }
+        .topbar-avatar-wrap { position: relative; }
 
-        /* ── Avatar button ── */
         .topbar-avatar {
             width: 40px; height: 40px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-d) 100%);
             display: flex; align-items: center; justify-content: center;
-            font-size: 15px;
-            font-weight: 700;
-            color: white;
+            font-size: 15px; font-weight: 700; color: white;
             cursor: pointer;
             border: 2px solid var(--primary-m);
             transition: all .2s;
             user-select: none;
             box-shadow: 0 2px 8px rgba(14,165,233,.25);
-            overflow: hidden;
-            padding: 0;
-            position: relative;
+            overflow: hidden; padding: 0; position: relative;
         }
 
-        /* Glowing ring on hover */
         .topbar-avatar::after {
             content: '';
-            position: absolute;
-            inset: -5px;
+            position: absolute; inset: -5px;
             border-radius: 50%;
             border: 2.5px solid var(--primary);
             opacity: 0;
@@ -409,11 +395,7 @@
             pointer-events: none;
         }
 
-        .topbar-avatar:hover::after {
-            opacity: 1;
-            transform: scale(1);
-        }
-
+        .topbar-avatar:hover::after { opacity: 1; transform: scale(1); }
         .topbar-avatar:hover {
             transform: scale(1.08);
             box-shadow: 0 4px 16px rgba(14,165,233,.4);
@@ -423,67 +405,39 @@
         /* ── Tooltip ── */
         .avatar-tooltip {
             position: absolute;
-            top: calc(100% + 12px);
-            right: 0;
-            background: var(--text);
-            color: white;
-            padding: 8px 13px;
-            border-radius: 9px;
-            font-size: 12px;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
+            top: calc(100% + 12px); right: 0;
+            background: var(--text); color: white;
+            padding: 8px 13px; border-radius: 9px;
+            font-size: 12px; white-space: nowrap;
+            pointer-events: none; opacity: 0;
             transform: translateY(-6px);
             transition: opacity .2s, transform .2s;
             z-index: 300;
             box-shadow: 0 6px 18px rgba(0,0,0,.22);
         }
 
-        /* Arrow pointing up */
         .avatar-tooltip::before {
             content: '';
-            position: absolute;
-            bottom: 100%;
-            right: 14px;
+            position: absolute; bottom: 100%; right: 14px;
             border: 6px solid transparent;
             border-bottom-color: var(--text);
         }
 
-        .avatar-tooltip-name {
-            font-weight: 700;
-            font-size: 12.5px;
-        }
+        .avatar-tooltip-name { font-weight: 700; font-size: 12.5px; }
+        .avatar-tooltip-role { font-size: 11px; opacity: .65; margin-top: 2px; text-transform: capitalize; }
 
-        .avatar-tooltip-role {
-            font-size: 11px;
-            opacity: .65;
-            margin-top: 2px;
-            text-transform: capitalize;
-        }
-
-        .topbar-avatar-wrap:hover .avatar-tooltip {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Hide tooltip when dropdown open */
-        .topbar-avatar-wrap:has(#avatarDropdown.open) .avatar-tooltip {
-            display: none;
-        }
+        .topbar-avatar-wrap:hover .avatar-tooltip { opacity: 1; transform: translateY(0); }
+        .topbar-avatar-wrap:has(#avatarDropdown.open) .avatar-tooltip { display: none; }
 
         /* ── Dropdown ── */
         .topbar-dropdown {
             position: absolute;
-            top: calc(100% + 12px);
-            right: 0;
-            width: 240px;
-            background: white;
+            top: calc(100% + 12px); right: 0;
+            width: 240px; background: white;
             border: 1px solid var(--border);
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(14,165,233,.14), 0 2px 10px rgba(0,0,0,.07);
-            display: none;
-            z-index: 200;
-            overflow: hidden;
+            display: none; z-index: 200; overflow: hidden;
             animation: dropIn .18s ease;
         }
 
@@ -494,74 +448,46 @@
 
         .topbar-dropdown.open { display: block; }
 
-        /* Dropdown header with avatar */
         .dropdown-header {
             padding: 16px;
             background: linear-gradient(135deg, var(--primary-l) 0%, #E0F2FE 100%);
             border-bottom: 1px solid var(--primary-m);
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            display: flex; align-items: center; gap: 12px;
         }
 
         .dropdown-avatar {
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
+            width: 44px; height: 44px; border-radius: 50%;
+            overflow: hidden; flex-shrink: 0;
             border: 2.5px solid var(--primary-m);
             background: var(--primary);
             display: flex; align-items: center; justify-content: center;
             font-size: 17px; font-weight: 700; color: white;
         }
 
-        .dropdown-avatar img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-        }
+        .dropdown-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
         .dropdown-header-info { min-width: 0; }
-        .dropdown-header-name { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dropdown-header-name  { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .dropdown-header-email { font-size: 11px; color: var(--muted); margin-top: 1px; word-break: break-all; }
 
         .dropdown-header-role {
-            display: inline-block;
-            margin-top: 5px;
-            padding: 2px 10px;
-            background: var(--primary-d);
-            color: white;
-            border-radius: 20px;
-            font-size: 10.5px;
-            font-weight: 600;
-            text-transform: capitalize;
+            display: inline-block; margin-top: 5px;
+            padding: 2px 10px; background: var(--primary-d);
+            color: white; border-radius: 20px;
+            font-size: 10.5px; font-weight: 600; text-transform: capitalize;
         }
 
         .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            font-size: 13px;
-            color: var(--text);
-            text-decoration: none;
-            transition: all .12s;
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 100%;
-            font-family: inherit;
-            font-weight: 500;
-            text-align: left;
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 16px; font-size: 13px; color: var(--text);
+            text-decoration: none; transition: all .12s;
+            cursor: pointer; border: none; background: none;
+            width: 100%; font-family: inherit; font-weight: 500; text-align: left;
         }
 
         .dropdown-item svg { width: 15px; height: 15px; color: var(--muted); transition: color .12s; flex-shrink: 0; }
 
-        .dropdown-item:hover {
-            background: var(--primary-l);
-            color: var(--primary-d);
-            padding-left: 20px;
-        }
-
+        .dropdown-item:hover { background: var(--primary-l); color: var(--primary-d); padding-left: 20px; }
         .dropdown-item:hover svg { color: var(--primary); }
         .dropdown-item.danger { color: var(--danger); }
         .dropdown-item.danger svg { color: var(--danger); }
@@ -575,36 +501,28 @@
         .page-content { flex: 1; padding: 24px; }
 
         .card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
+            background: white; border: 1px solid var(--border);
+            border-radius: 12px; padding: 24px;
         }
 
         /* ══════════════════════
            SETTINGS MODAL
         ══════════════════════ */
         .settings-overlay {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background: rgba(0,0,0,.45);
-            z-index: 9998;
-            display: none;
-            align-items: center;
-            justify-content: center;
+            z-index: 9998; display: none;
+            align-items: center; justify-content: center;
             backdrop-filter: blur(2px);
         }
 
         .settings-overlay.open { display: flex; }
 
         .settings-modal {
-            background: white;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 420px;
+            background: white; border-radius: 16px;
+            width: 100%; max-width: 420px;
             box-shadow: 0 20px 60px rgba(0,0,0,.2);
-            overflow: hidden;
-            animation: modalIn .2s ease;
+            overflow: hidden; animation: modalIn .2s ease;
         }
 
         @keyframes modalIn {
@@ -613,8 +531,7 @@
         }
 
         .settings-modal-header {
-            display: flex;
-            align-items: center;
+            display: flex; align-items: center;
             justify-content: space-between;
             padding: 18px 22px;
             border-bottom: 1px solid var(--border);
@@ -622,12 +539,8 @@
         }
 
         .settings-modal-header h3 {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 15px; font-weight: 800; color: var(--text);
+            display: flex; align-items: center; gap: 8px;
         }
 
         .settings-close-btn {
@@ -643,40 +556,26 @@
         .settings-modal-body { padding: 22px; }
 
         .settings-section-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 14px;
+            font-size: 11px; font-weight: 700; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;
         }
 
         .theme-options { display: flex; gap: 12px; }
 
         .theme-btn {
-            flex: 1;
-            padding: 16px 12px;
-            border: 2.5px solid var(--border);
-            border-radius: 12px;
-            background: white;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all .2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            position: relative;
+            flex: 1; padding: 16px 12px;
+            border: 2.5px solid var(--border); border-radius: 12px;
+            background: white; cursor: pointer; font-family: inherit;
+            transition: all .2s; display: flex; flex-direction: column;
+            align-items: center; gap: 8px; position: relative;
         }
 
         .theme-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.1); }
-
-        .theme-btn[data-theme="blue"].active  { border-color: #0284C7; background: #EFF9FF; }
+        .theme-btn[data-theme="blue"].active   { border-color: #0284C7; background: #EFF9FF; }
         .theme-btn[data-theme="orange"].active { border-color: #EA580C; background: #FFF7ED; }
 
         .theme-preview {
-            width: 52px; height: 52px;
-            border-radius: 50%;
+            width: 52px; height: 52px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
         }
 
@@ -684,15 +583,11 @@
         .theme-preview.orange { background: linear-gradient(135deg, #F97316, #EA580C); }
 
         .theme-check {
-            position: absolute;
-            top: 8px; right: 8px;
-            width: 20px; height: 20px;
-            border-radius: 50%;
+            position: absolute; top: 8px; right: 8px;
+            width: 20px; height: 20px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 700;
-            color: white;
-            opacity: 0;
-            transition: opacity .2s;
+            font-size: 11px; font-weight: 700; color: white;
+            opacity: 0; transition: opacity .2s;
         }
 
         .theme-btn[data-theme="blue"]   .theme-check { background: #0284C7; }
@@ -701,6 +596,50 @@
 
         .theme-name { font-size: 13px; font-weight: 700; color: var(--text); }
         .theme-desc { font-size: 11px; color: var(--muted); font-weight: 400; margin-top: -4px; }
+
+        /* ── Visit Timer section ── */
+        .settings-divider {
+            height: 1px; background: var(--border);
+            margin: 20px 0;
+        }
+
+        .timer-row {
+            display: flex; align-items: flex-end; gap: 10px;
+        }
+
+        .timer-input-wrap { flex: 1; }
+
+        .timer-label {
+            display: block; font-size: 12px; font-weight: 600;
+            color: var(--muted); margin-bottom: 6px;
+        }
+
+        .timer-input {
+            width: 100%; padding: 9px 12px;
+            border: 1.5px solid var(--border); border-radius: 8px;
+            font-family: inherit; font-size: 14px; color: var(--text);
+            outline: none; transition: border-color .2s;
+            background: white;
+        }
+
+        .timer-input:focus { border-color: var(--primary); }
+
+        .btn-timer-save {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 9px 18px;
+            background: #2DD4BF; color: white;
+            border: none; border-radius: 8px;
+            font-family: inherit; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: background .15s;
+            white-space: nowrap; flex-shrink: 0;
+        }
+
+        .btn-timer-save:hover { background: #14B8A6; }
+
+        .timer-msg {
+            font-size: 12px; margin-top: 7px;
+            min-height: 18px; font-weight: 500;
+        }
 
         @yield('styles')
     </style>
@@ -735,6 +674,8 @@
 
             <div class="topbar-right">
 
+                @include('components.admin.lang-switcher')
+
                 {{-- Bell --}}
                 <button class="topbar-bell" type="button" title="Notifications">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -747,7 +688,6 @@
                 {{-- Avatar + Tooltip + Dropdown --}}
                 <div class="topbar-avatar-wrap">
 
-                    {{-- Avatar circle --}}
                     <div class="topbar-avatar" id="avatarToggle">
                         @if(Auth::user()->avatar)
                             <img src="{{ asset('storage/' . Auth::user()->avatar) }}"
@@ -758,16 +698,13 @@
                         @endif
                     </div>
 
-                    {{-- Hover tooltip --}}
                     <div class="avatar-tooltip">
                         <div class="avatar-tooltip-name">{{ Auth::user()->name }}</div>
                         <div class="avatar-tooltip-role">{{ ucfirst(str_replace('_', ' ', Auth::user()->role ?? 'Admin')) }}</div>
                     </div>
 
-                    {{-- Dropdown menu --}}
                     <div class="topbar-dropdown" id="avatarDropdown">
 
-                        {{-- Header with avatar --}}
                         <div class="dropdown-header">
                             <div class="dropdown-avatar">
                                 @if(Auth::user()->avatar)
@@ -827,7 +764,9 @@
     </div>
 </div>
 
-{{-- SETTINGS MODAL --}}
+{{-- ══════════════════════════════════════
+     SETTINGS MODAL
+══════════════════════════════════════ --}}
 <div class="settings-overlay" id="settingsOverlay" onclick="closeOnBackdrop(event)">
     <div class="settings-modal">
 
@@ -843,6 +782,8 @@
         </div>
 
         <div class="settings-modal-body">
+
+            {{-- ── Theme Color ── --}}
             <div class="settings-section-title">Theme Color</div>
             <div class="theme-options">
 
@@ -869,11 +810,41 @@
                 </button>
 
             </div>
+
+            {{-- ── Divider ── --}}
+            <div class="settings-divider"></div>
+
+            {{-- ── Product Visit Timing ── --}}
+            <div class="settings-section-title">Product Visit Timing</div>
+            <div class="timer-row">
+                <div class="timer-input-wrap">
+                    <label class="timer-label" for="visitTimerInput">
+                        Duration (Seconds)
+                    </label>
+                    <input type="number"
+                           id="visitTimerInput"
+                           class="timer-input"
+                           min="1"
+                           max="86400"
+                           value="30"
+                           placeholder="e.g. 30"/>
+                </div>
+                <button class="btn-timer-save" onclick="saveVisitTimer()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Save
+                </button>
+            </div>
+            <div class="timer-msg" id="visitTimerMsg"></div>
+
         </div>
     </div>
 </div>
 
 <script>
+    const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+
     // ── Sidebar submenus ──
     document.querySelectorAll('.nav-item.has-children').forEach(item => {
         item.addEventListener('click', () => {
@@ -895,10 +866,10 @@
     document.addEventListener('click', () => avatarDropdown.classList.remove('open'));
 
     // ── Sidebar toggle ──
-document.querySelector('.topbar-hamburger').addEventListener('click', () => {
-    document.querySelector('.sidebar').classList.toggle('sidebar-hidden');
-    document.querySelector('.main-wrap').classList.toggle('main-expanded');
-});
+    document.querySelector('.topbar-hamburger').addEventListener('click', () => {
+        document.querySelector('.sidebar').classList.toggle('sidebar-hidden');
+        document.querySelector('.main-wrap').classList.toggle('main-expanded');
+    });
 
     // ── Theme functions ──
     function setTheme(theme) {
@@ -916,10 +887,23 @@ document.querySelector('.topbar-hamburger').addEventListener('click', () => {
     // ── Settings modal ──
     function openSettingsModal() {
         document.getElementById('settingsOverlay').classList.add('open');
+
+        // Restore theme selection
         const current = localStorage.getItem('pvmarket_theme') || 'blue';
         document.querySelectorAll('.theme-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.theme === current);
         });
+
+        // Restore saved timer value from localStorage
+        const savedTimer = localStorage.getItem('visit_timer_seconds');
+        if (savedTimer) {
+            document.getElementById('visitTimerInput').value = savedTimer;
+        }
+
+        // Clear any previous message
+        const msg = document.getElementById('visitTimerMsg');
+        msg.textContent = '';
+        msg.style.color = '';
     }
 
     function closeSettingsModal() {
@@ -933,6 +917,48 @@ document.querySelector('.topbar-hamburger').addEventListener('click', () => {
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') closeSettingsModal();
     });
+
+    // ── Visit Timer Save ──
+    async function saveVisitTimer() {
+        const input   = document.getElementById('visitTimerInput');
+        const msg     = document.getElementById('visitTimerMsg');
+        const seconds = parseInt(input.value);
+
+        msg.textContent = '';
+
+        if (!seconds || seconds < 1) {
+            msg.style.color = '#DC2626';
+            msg.textContent = '✕ Please enter a valid number (min 1 second).';
+            return;
+        }
+
+        try {
+            const res  = await fetch('/admin/settings/visit-timer', {
+                method:  'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF,
+                },
+                body: JSON.stringify({ visit_timer_seconds: seconds }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                // Persist in localStorage so frontend can read it too
+                localStorage.setItem('visit_timer_seconds', seconds);
+                msg.style.color = '#059669';
+                msg.textContent = '✓ Timer saved successfully.';
+                // Clear message after 3 seconds
+                setTimeout(() => { msg.textContent = ''; }, 3000);
+            } else {
+                msg.style.color = '#DC2626';
+                msg.textContent = '✕ Failed to save. Please try again.';
+            }
+        } catch (e) {
+            msg.style.color = '#DC2626';
+            msg.textContent = '✕ Network error. Please try again.';
+        }
+    }
 </script>
 
 @yield('scripts')

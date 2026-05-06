@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Advertisement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Controller;
+use App\Services\TranslationService;    
 
 class AdvertisementController extends ResourceController
 {
+    public function __construct(protected TranslationService $translator) {}
     protected string $model  = Advertisement::class;
     protected string $view   = 'admin.setup.advertisements.advertisements';
     protected string $route  = 'admin.setup.advertisements';
@@ -30,6 +33,7 @@ class AdvertisementController extends ResourceController
             $data['image'] = $request->file('image')->store('advertisements', 'public');
         }
         $data['is_active'] = true;
+        $data = $this->attachTranslations($data, new Advertisement());
         Advertisement::create($data);
         return redirect()->route($this->route . '.index')->with('success', 'Advertisement created.');
     }
@@ -43,6 +47,7 @@ class AdvertisementController extends ResourceController
             if ($ad->image) Storage::disk('public')->delete($ad->image);
             $data['image'] = $request->file('image')->store('advertisements', 'public');
         }
+        $data = $this->attachTranslations($data, $ad);
         $ad->update($data);
         return redirect()->route($this->route . '.index')->with('success', 'Advertisement updated.');
     }
@@ -61,4 +66,29 @@ class AdvertisementController extends ResourceController
         $ad->delete();
         return redirect()->route($this->route . '.index')->with('success', 'Deleted.');
     }
+
+    private function attachTranslations(array $data, $modelInstance): array
+{
+    $languages    = array_keys(config('languages.available'));
+    $translatable = $modelInstance->translatable ?? [];
+
+    foreach ($languages as $locale) {
+        if ($locale === 'en') continue;
+
+        $translated = [];
+        foreach ($translatable as $field) {
+            if (!empty($data[$field])) {
+                $translated[$field] = $this->translator->translateText(
+                    $data[$field], $locale, 'en'
+                );
+            }
+        }
+
+        if (!empty($translated)) {
+            $data[$locale] = $translated;
+        }
+    }
+
+    return $data;
+}
 }

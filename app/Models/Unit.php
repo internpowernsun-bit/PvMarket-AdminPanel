@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use App\Traits\HasTranslations;
 
 class Unit extends Model
 {
+    use HasTranslations;
     protected $connection = 'mongodb';
     protected $collection = 'units';
 
@@ -15,4 +17,6 @@ class Unit extends Model
         'description',
         'is_active',
     ];
+
+    public array $translatable = ['unit_name', 'description'];
 }

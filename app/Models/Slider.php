@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use App\Traits\HasTranslations;
 
 class Slider extends Model
 {
+    use HasTranslations;
     protected $connection = 'mongodb';
     protected $collection = 'sliders';
 
@@ -22,4 +24,6 @@ class Slider extends Model
         'is_active'  => 'boolean',
         'sort_order' => 'integer',
     ];
+
+    public array $translatable = ['name', 'alt_tag'];
 }

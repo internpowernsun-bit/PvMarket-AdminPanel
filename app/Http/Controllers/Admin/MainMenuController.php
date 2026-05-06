@@ -7,15 +7,18 @@ use App\Models\MainMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\TranslationService;
 
 class MainMenuController extends Controller
 {
+    public function __construct(protected TranslationService $translator) {}
+
     public function index(Request $request)
     {
         $query = MainMenu::query();
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('category_name', 'like', '%' . $request->search . '%');
         }
 
         $menus = $query->orderBy('created_at', 'desc')
@@ -45,18 +48,43 @@ class MainMenuController extends Controller
         ]);
 
         foreach ($request->items as $index => $item) {
-            $data = [
-                'name'        => $item['name'],
-                'alt_tag'     => $item['alt_tag'] ?? null,
-                'is_active'   => true,
-                'stock_value' => false,
+            $iconData = [
+                'size'          => 0,
+                'uploaded_at'   => now()->toISOString(),
+                'filename'      => '',
+                'original_name' => '',
+                'path'          => '',
+                'url'           => '',
+                'mime_type'     => '',
             ];
 
             if ($request->hasFile("items.{$index}.icon")) {
-                $data['icon'] = $request->file("items.{$index}.icon")
-                                        ->store('main-menus', 'public');
+                $file     = $request->file("items.{$index}.icon");
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $path     = $file->storeAs('uploads/categories', $filename, 'public');
+
+                $iconData = [
+                    'size'          => $file->getSize(),
+                    'uploaded_at'   => now()->toISOString(),
+                    'filename'      => $filename,
+                    'original_name' => $file->getClientOriginalName(),
+                    'path'          => $path,
+                    'url'           => $path,
+                    'mime_type'     => $file->getMimeType(),
+                ];
             }
 
+            $data = [
+                'category_name'       => $item['name'],
+                'slug'                => Str::slug($item['name']),
+                'category_icon_image' => $iconData,
+                'icon_alt_tag'        => $item['alt_tag'] ?? Str::slug($item['name']),
+                'is_hold'             => false,
+                'stock_value'         => false,
+                'created_by'          => auth()->id(),
+            ];
+
+            $data = $this->attachTranslations($data, new MainMenu());
             MainMenu::create($data);
         }
 
@@ -79,37 +107,70 @@ class MainMenuController extends Controller
         $menu = MainMenu::findOrFail($id);
 
         $request->validate([
-            'name'              => 'required|string|max:255',
-            'icon'              => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
-            'alt_tag'           => 'nullable|string|max:255',
-            'slug'              => 'nullable|string|max:255',
-            'meta_title'        => 'nullable|string|max:255',
-            'meta_description'  => 'nullable|string',
-            'meta_image'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
-            'short_description' => 'nullable|string',
-            'content'           => 'nullable|string',
+            'category_name'   => 'required|string|max:255',
+            'slug'            => 'nullable|string|max:255',
+            'alt_tag'         => 'nullable|string|max:255',
+            'icon'            => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'meta_image'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'meta_title'      => 'nullable|string|max:255',
+            'meta_description'=> 'nullable|string',
+            'short_description'=> 'nullable|string',
+            'content'         => 'nullable|string',
         ]);
 
-        $data = [
-            'name'              => $request->name,
-            'alt_tag'           => $request->alt_tag,
-            'slug'              => $request->slug ?? Str::slug($request->name),
-            'meta_title'        => $request->meta_title,
-            'meta_description'  => $request->meta_description,
-            'short_description' => $request->short_description,
-            'content'           => $request->content,
+        // ── Icon ──────────────────────────────────────────────
+        $iconData = $menu->category_icon_image ?? [
+            'size'          => 0,
+            'uploaded_at'   => now()->toISOString(),
+            'filename'      => '',
+            'original_name' => '',
+            'path'          => '',
+            'url'           => '',
+            'mime_type'     => '',
         ];
 
         if ($request->hasFile('icon')) {
-            if ($menu->icon) Storage::disk('public')->delete($menu->icon);
-            $data['icon'] = $request->file('icon')->store('main-menus', 'public');
+            $file     = $request->file('icon');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path     = $file->storeAs('uploads/categories', $filename, 'public');
+
+            $iconData = [
+                'size'          => $file->getSize(),
+                'uploaded_at'   => now()->toISOString(),
+                'filename'      => $filename,
+                'original_name' => $file->getClientOriginalName(),
+                'path'          => $path,
+                'url'           => $path,
+                'mime_type'     => $file->getMimeType(),
+            ];
         }
+
+        // ── Meta Image ────────────────────────────────────────
+        $metaImage = $menu->meta_image;
 
         if ($request->hasFile('meta_image')) {
-            if ($menu->meta_image) Storage::disk('public')->delete($menu->meta_image);
-            $data['meta_image'] = $request->file('meta_image')->store('main-menus/meta', 'public');
+            if ($menu->meta_image) {
+                Storage::disk('public')->delete($menu->meta_image);
+            }
+            $metaFile  = $request->file('meta_image');
+            $metaName  = time() . '_' . $metaFile->getClientOriginalName();
+            $metaImage = $metaFile->storeAs('uploads/meta', $metaName, 'public');
         }
 
+        // ── Build data ────────────────────────────────────────
+        $data = [
+            'category_name'       => $request->category_name,
+            'slug'                => $request->slug ?: Str::slug($request->category_name),
+            'category_icon_image' => $iconData,
+            'icon_alt_tag'        => $request->alt_tag ?? Str::slug($request->category_name),
+            'short_description'   => $request->short_description,
+            'meta_title'          => $request->meta_title,
+            'meta_description'    => $request->meta_description,
+            'meta_image'          => $metaImage,
+            'content'             => $request->content,
+        ];
+
+        $data = $this->attachTranslations($data, $menu);
         $menu->update($data);
 
         return redirect()->route('admin.setup.main-menus.index')
@@ -119,7 +180,7 @@ class MainMenuController extends Controller
     public function toggleStatus($id)
     {
         $menu = MainMenu::findOrFail($id);
-        $menu->update(['is_active' => !$menu->is_active]);
+        $menu->update(['is_hold' => !$menu->is_hold]);
 
         return back()->with('success', 'Status updated.');
     }
@@ -135,11 +196,40 @@ class MainMenuController extends Controller
     public function destroy($id)
     {
         $menu = MainMenu::findOrFail($id);
-        if ($menu->icon) Storage::disk('public')->delete($menu->icon);
+
+        $iconPath = $menu->category_icon_image['path'] ?? null;
+        if ($iconPath) Storage::disk('public')->delete($iconPath);
+
         if ($menu->meta_image) Storage::disk('public')->delete($menu->meta_image);
+
         $menu->delete();
 
         return redirect()->route('admin.setup.main-menus.index')
-                         ->with('success', 'Main menu deleted.');
+                         ->with('success', 'Category deleted.');
+    }
+
+    private function attachTranslations(array $data, $modelInstance): array
+    {
+        $languages    = array_keys(config('languages.available'));
+        $translatable = $modelInstance->translatable ?? [];
+
+        foreach ($languages as $locale) {
+            if ($locale === 'en') continue;
+
+            $translated = [];
+            foreach ($translatable as $field) {
+                if (!empty($data[$field])) {
+                    $translated[$field] = $this->translator->translateText(
+                        $data[$field], $locale, 'en'
+                    );
+                }
+            }
+
+            if (!empty($translated)) {
+                $data[$locale] = $translated;
+            }
+        }
+
+        return $data;
     }
 }
