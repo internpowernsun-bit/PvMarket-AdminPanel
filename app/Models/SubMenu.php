@@ -25,6 +25,8 @@ class SubMenu extends Model
         'pallet_applicable',     
         'container_applicable',   
         'created_by',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [

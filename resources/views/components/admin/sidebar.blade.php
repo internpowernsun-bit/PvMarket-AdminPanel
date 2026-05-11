@@ -50,6 +50,10 @@
                class="nav-sub-item {{ request()->routeIs('admin.setup.charges.*') ? 'active' : '' }}">
                Charges Setup
             </a>
+                <a href="{{ route('admin.setup.commissions.index') }}"
+                class="nav-sub-item {{ request()->routeIs('admin.setup.commissions.*') ? 'active' : '' }}">
+                Commissions Setup
+            </a>
             <a href="{{ route('admin.setup.sub-admins.index') }}"
                class="nav-sub-item {{ request()->routeIs('admin.setup.sub-admins.*') ? 'active' : '' }}">
                Sub Admins
@@ -201,12 +205,14 @@
 
         
     <a href="{{ route('product_listing.index') }}"
-       class="nav-item {{ request()->routeIs('product_listing.*') ? 'active' : '' }}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-        <span>Manage Listings</span>
-    </a>
+   class="nav-item {{ request()->routeIs('product_listing.*') ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+        <rect x="9" y="3" width="6" height="4" rx="1"/>
+        <path d="M9 12h6M9 16h4"/>
+    </svg>
+    Manage Listings
+</a>
 
 
         {{-- Products --}}

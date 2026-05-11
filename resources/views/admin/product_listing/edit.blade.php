@@ -1,167 +1,712 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Listing — Manage Listings')
+@section('title', 'Edit Listing')
 
-@push('styles')
+@section('styles')
 <style>
     :root {
-        --pv-orange:    #F97316;
-        --pv-orange-lt: #FFF7ED;
-        --pv-text:      #1F2937;
-        --pv-muted:     #6B7280;
-        --pv-border:    #E5E7EB;
-        --pv-bg:        #F3F4F6;
-        --pv-white:     #FFFFFF;
-        --pv-green:     #10B981;
-        --pv-red:       #EF4444;
+        --or:      #F97316;
+        --or-lt:   #FFF7ED;
+        --or-d:    #EA6C0A;
+        --text:    #1F2937;
+        --muted:   #6B7280;
+        --border:  #E5E7EB;
+        --bg:      #F3F4F6;
+        --white:   #FFFFFF;
+        --green:   #10B981;
+        --red:     #EF4444;
+        --blue:    #3B82F6;
+        --blue-lt: #EFF6FF;
+        --blue-d:  #2563EB;
     }
 
-    .edit-page        { display:flex; gap:24px; padding:28px; background:var(--pv-bg); min-height:100vh; align-items:flex-start; }
-    .edit-main        { flex:1; min-width:0; display:flex; flex-direction:column; gap:20px; }
-    .edit-sidebar     { width:280px; flex-shrink:0; position:sticky; top:80px; }
+    .edit-page {
+        display: flex;
+        gap: 24px;
+        padding: 28px;
+        background: var(--bg);
+        min-height: 100vh;
+        align-items: flex-start;
+    }
 
-    /* ── section card ── */
-    .section-card     { background:#fff; border:1px solid var(--pv-border); border-radius:14px; overflow:hidden; }
-    .section-header   { display:flex; align-items:center; gap:12px; padding:18px 22px; border-bottom:1px solid var(--pv-border); }
-    .section-icon     { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; }
-    .icon-orange      { background:var(--pv-orange-lt); color:var(--pv-orange); }
-    .icon-green       { background:#D1FAE5; color:#059669; }
-    .icon-blue        { background:#EFF6FF; color:#3B82F6; }
-    .section-title    { font-size:.95rem; font-weight:700; color:var(--pv-text); margin:0; }
-    .section-subtitle { font-size:.78rem; color:var(--pv-muted); margin:2px 0 0; }
-    .section-body     { padding:22px; }
+    .edit-main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 
-    /* ── notice banner ── */
-    .notice-banner    { background:#F9FAFB; border-bottom:1px solid var(--pv-border); padding:10px 22px; font-size:.8rem; color:var(--pv-muted); }
+    .edit-sidebar {
+        width: 280px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 80px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
 
-    /* ── form elements ── */
-    .form-row         { display:grid; gap:18px; }
-    .form-row.cols-3  { grid-template-columns:1fr 1fr 1fr; }
-    .form-row.cols-2  { grid-template-columns:1fr 1fr; }
-    .form-row.cols-1  { grid-template-columns:1fr; }
-    .form-group       { display:flex; flex-direction:column; gap:5px; }
-    .form-label       { font-size:.8rem; font-weight:600; color:var(--pv-text); }
-    .form-label .req  { color:var(--pv-orange); }
+    /* ── Page header ── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 4px;
+    }
+
+    .btn-back-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        background: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: var(--text);
+        flex-shrink: 0;
+        transition: background .15s;
+    }
+    .btn-back-circle:hover { background: var(--bg); }
+
+    .page-header h1 { font-size: 1.35rem; font-weight: 800; color: var(--text); margin: 0; }
+    .page-header p  { font-size: .8rem; color: var(--muted); margin: 2px 0 0; }
+
+    /* ── Section card ── */
+    .section-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .section-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .icon-blue   { background: var(--blue-lt); color: var(--blue); }
+    .icon-green  { background: #D1FAE5;        color: #059669; }
+    .icon-orange { background: var(--or-lt);   color: var(--or); }
+
+    .section-title    { font-size: .95rem; font-weight: 700; color: var(--blue); margin: 0; }
+    .section-subtitle { font-size: .78rem; color: var(--muted); margin: 2px 0 0; }
+
+    .section-body { padding: 22px; }
+
+    /* ── Notice banner ── */
+    .notice-banner {
+        background: #FFFBEB;
+        border-bottom: 1px solid #FDE68A;
+        padding: 10px 22px;
+        font-size: .8rem;
+        color: #92400E;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ── Form elements ── */
+    .form-row       { display: grid; gap: 16px; }
+    .form-row.cols-3 { grid-template-columns: repeat(3,1fr); }
+    .form-row.cols-2 { grid-template-columns: repeat(2,1fr); }
+    .form-row.cols-1 { grid-template-columns: 1fr; }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+    .form-label { font-size: .8rem; font-weight: 600; color: var(--text); }
+    .form-label .req { color: var(--or); }
+
     .form-control, .form-select {
-        padding:9px 13px; border:1px solid var(--pv-border); border-radius:9px;
-        font-size:.88rem; color:var(--pv-text); outline:none; background:#fff; width:100%;
+        padding: 9px 13px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        font-size: .88rem;
+        color: var(--text);
+        outline: none;
+        background: #fff;
+        width: 100%;
+        font-family: inherit;
+        transition: border-color .15s, box-shadow .15s;
     }
-    .form-control:focus, .form-select:focus { border-color:var(--pv-orange); box-shadow:0 0 0 3px rgba(249,115,22,.12); }
-    .input-suffix     { display:flex; }
-    .input-suffix .form-control { border-radius:9px 0 0 9px; border-right:none; }
-    .suffix-label     { padding:9px 12px; background:#F3F4F6; border:1px solid var(--pv-border); border-radius:0 9px 9px 0; font-size:.85rem; color:var(--pv-muted); white-space:nowrap; }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+    }
+    .form-control:disabled {
+        background: #F9FAFB;
+        color: var(--muted);
+        cursor: not-allowed;
+    }
 
-    /* ── warehouse banner in inventory ── */
-    .warehouse-row    { display:flex; align-items:center; gap:8px; padding:10px 14px; background:#F9FAFB; border:1px solid var(--pv-border); border-radius:9px; margin-bottom:18px; font-size:.85rem; color:var(--pv-text); font-weight:500; }
+    .input-suffix { display: flex; }
+    .input-suffix .form-control { border-radius: 9px 0 0 9px; border-right: none; }
+    .suffix-label {
+        padding: 9px 12px;
+        background: #F3F4F6;
+        border: 1px solid var(--border);
+        border-radius: 0 9px 9px 0;
+        font-size: .85rem;
+        color: var(--muted);
+        white-space: nowrap;
+    }
 
-    /* ── hold toggle ── */
-    .hold-card        { background:#fff; border:1px solid var(--pv-border); border-radius:14px; }
-    .hold-body        { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; }
-    .hold-info        { display:flex; align-items:center; gap:12px; }
-    .hold-check       { width:30px; height:30px; background:#D1FAE5; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#059669; flex-shrink:0; }
-    .hold-label       { font-size:.92rem; font-weight:700; color:var(--pv-text); margin:0; }
-    .hold-sublabel    { font-size:.78rem; color:var(--pv-muted); margin:2px 0 0; }
+    .error-msg { color: var(--red); font-size: .75rem; margin-top: 3px; }
 
-    /* ── toggle switch ── */
-    .toggle-wrap      { position:relative; display:inline-block; width:48px; height:26px; }
-    .toggle-wrap input { opacity:0; width:0; height:0; }
-    .toggle-slider    { position:absolute; inset:0; background:#D1D5DB; border-radius:26px; cursor:pointer; transition:.3s; }
-    .toggle-slider:before { content:''; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.3s; }
-    input:checked + .toggle-slider { background:var(--pv-orange); }
-    input:checked + .toggle-slider:before { transform:translateX(22px); }
+    /* ── Warehouse pill ── */
+    .warehouse-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: #F9FAFB;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        margin-bottom: 18px;
+        font-size: .85rem;
+        color: var(--text);
+        font-weight: 500;
+    }
 
-    /* ── price tier section ── */
-    .tier-section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-    .tier-count-badge { font-size:.78rem; color:var(--pv-muted); }
-    .btn-add-tier     { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border:1px solid var(--pv-border); background:#fff; border-radius:8px; font-size:.82rem; color:var(--pv-text); cursor:pointer; }
-    .btn-add-tier:hover { border-color:#9CA3AF; }
+    /* ── Inventory action buttons ── */
+    .inventory-actions {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+    }
 
-    /* ── tier row ── */
-    .tier-row         { display:flex; align-items:center; justify-content:space-between; background:#F9FAFB; border:1px solid var(--pv-border); border-radius:10px; padding:14px 18px; margin-bottom:10px; }
-    .tier-num         { width:28px; height:28px; background:var(--pv-orange); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; flex-shrink:0; }
-    .tier-range       { font-size:.88rem; color:var(--pv-text); font-weight:500; }
-    .tier-type        { font-size:.75rem; color:var(--pv-muted); }
-    .tier-price       { font-size:1rem; font-weight:700; color:var(--pv-text); text-align:right; }
-    .tier-price-sub   { font-size:.73rem; color:var(--pv-muted); }
+    .btn-sm-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 7px 13px;
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 8px;
+        font-size: .78rem;
+        color: var(--text);
+        cursor: pointer;
+        font-family: inherit;
+        transition: border-color .15s;
+    }
+    .btn-sm-outline:hover { border-color: #9CA3AF; }
 
-    /* ── add tier form ── */
-    .new-tier-card    { border:2px solid var(--pv-orange); border-radius:12px; padding:18px 20px; margin-top:10px; background:#FFFBF5; }
-    .new-tier-title   { display:flex; align-items:center; justify-content:space-between; font-size:.88rem; font-weight:700; color:var(--pv-text); margin-bottom:16px; }
-    .range-badge      { font-size:.75rem; color:var(--pv-muted); background:#F3F4F6; border:1px solid var(--pv-border); border-radius:6px; padding:2px 8px; }
-    .tier-form-row    { display:grid; grid-template-columns:auto 1fr auto 1fr 1fr; gap:10px; align-items:end; }
-    .tier-form-label  { font-size:.78rem; font-weight:600; color:var(--pv-text); display:block; margin-bottom:4px; }
-    .btn-range-type   { padding:8px 11px; border:2px solid var(--pv-orange); background:var(--pv-orange); color:#fff; border-radius:8px; font-size:.78rem; font-weight:700; cursor:pointer; white-space:nowrap; }
-    .btn-range-more   { font-size:.72rem; color:var(--pv-muted); display:block; text-align:center; margin-top:2px; }
-    .tier-form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:14px; }
-    .btn-cancel       { padding:8px 18px; background:#fff; border:1px solid var(--pv-border); border-radius:8px; font-size:.85rem; color:var(--pv-text); cursor:pointer; }
-    .btn-add-tier-confirm { padding:8px 20px; background:var(--pv-orange); color:#fff; border:none; border-radius:8px; font-size:.85rem; font-weight:600; cursor:pointer; }
+    /* ── Toggle rows ── */
+    .toggle-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 0 22px 22px;
+    }
 
-    /* ── inventory history ── */
-    .inv-history-empty { text-align:center; padding:36px 20px; color:var(--pv-muted); font-size:.85rem; }
+    .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        background: #F9FAFB;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: border-color .2s;
+    }
+    .toggle-row:hover { border-color: #D1D5DB; }
 
-    /* ── offer summary sidebar ── */
-    .summary-card     { background:#fff; border:1px solid var(--pv-border); border-radius:14px; overflow:hidden; }
-    .summary-header   { display:flex; align-items:center; gap:10px; padding:16px 18px; border-bottom:1px solid var(--pv-border); }
-    .summary-body     { padding:16px 18px; }
-    .summary-row      { display:flex; justify-content:space-between; align-items:flex-start; padding:9px 0; border-bottom:1px solid #F3F4F6; gap:12px; }
-    .summary-row:last-child { border-bottom:none; }
-    .summary-key      { font-size:.8rem; color:var(--pv-muted); }
-    .summary-val      { font-size:.82rem; font-weight:600; color:var(--pv-text); text-align:right; max-width:55%; }
-    .btn-update       { width:100%; padding:12px; background:var(--pv-orange); color:#fff; border:none; border-radius:10px; font-size:.9rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; }
-    .btn-update:hover { background:#EA6C0A; }
-    .update-note      { text-align:center; font-size:.73rem; color:var(--pv-muted); margin-top:8px; }
+    .toggle-left { display: flex; align-items: center; gap: 12px; }
 
-    /* ── adjust stock / set alert buttons ── */
-    .inventory-actions { display:flex; gap:10px; margin-left:auto; }
-    .btn-sm-outline   { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border:1px solid var(--pv-border); background:#fff; border-radius:8px; font-size:.78rem; color:var(--pv-text); cursor:pointer; }
-    .btn-sm-outline:hover { border-color:#9CA3AF; }
+    .toggle-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .toggle-info-title { font-size: .85rem; font-weight: 700; color: var(--text); }
+    .toggle-info-sub   { font-size: .73rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Custom toggle switch ── */
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-track {
+        position: absolute;
+        inset: 0;
+        background: #D1D5DB;
+        border-radius: 24px;
+        transition: background .2s;
+    }
+    .toggle-thumb {
+        position: absolute;
+        left: 2px; top: 2px;
+        width: 20px; height: 20px;
+        background: #fff;
+        border-radius: 50%;
+        transition: transform .2s;
+        box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+
+    .toggle-switch input:checked ~ .toggle-track { background: var(--blue); }
+    .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(20px); }
+    .toggle-switch.sold-off-switch input:checked ~ .toggle-track { background: var(--red); }
+    .toggle-switch.popular-switch  input:checked ~ .toggle-track { background: #F59E0B; }
+
+    /* ── Price Tiers ── */
+    .slots-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+    }
+    .slots-label { font-size: .88rem; font-weight: 700; color: var(--text); }
+    .slots-hint  { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+
+    .btn-add-slot {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border: 1px solid var(--border);
+        background: var(--white);
+        border-radius: 8px;
+        font-size: .82rem;
+        color: var(--text);
+        cursor: pointer;
+        font-family: inherit;
+        transition: border-color .15s;
+    }
+    .btn-add-slot:hover { border-color: #9CA3AF; }
+
+    .slot-list-box {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        min-height: 52px;
+    }
+
+    .slot-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid #F3F4F6;
+        font-size: .83rem;
+    }
+    .slot-item:last-child { border-bottom: none; }
+
+    .slot-num {
+        width: 24px; height: 24px;
+        border-radius: 50%;
+        background: var(--blue);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .72rem; font-weight: 700;
+        flex-shrink: 0;
+        margin-right: 10px;
+    }
+
+    .slot-price-tag { font-size: .9rem; font-weight: 700; color: var(--text); }
+    .slot-price-sub { font-size: .72rem; color: var(--muted); }
+    .slot-item-empty { padding: 18px; text-align: center; color: #9CA3AF; font-size: .82rem; }
+
+    .btn-icon-sm {
+        background: none; border: none; cursor: pointer;
+        padding: 4px; color: #9ca3af; font-size: .8rem;
+    }
+    .btn-icon-sm:hover { color: var(--blue); }
+
+    /* ── Add slot form ── */
+    .slot-form-box {
+        border: 2px solid var(--blue);
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin-top: 12px;
+        background: #F0F7FF;
+    }
+    .slot-form-title {
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 16px;
+    }
+    .range-badge {
+        font-size: .73rem; color: var(--muted);
+        background: #F3F4F6; border: 1px solid var(--border);
+        border-radius: 6px; padding: 2px 8px;
+    }
+    .slot-form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+
+    .btn-cancel {
+        padding: 8px 18px; background: var(--white);
+        border: 1px solid var(--border); border-radius: 8px;
+        font-size: .85rem; color: var(--text); cursor: pointer; font-family: inherit;
+    }
+    .btn-save-slot {
+        padding: 8px 20px; background: var(--blue); color: #fff;
+        border: none; border-radius: 8px; font-size: .85rem;
+        font-weight: 600; cursor: pointer; font-family: inherit; transition: background .15s;
+    }
+    .btn-save-slot:hover { background: var(--blue-d); }
+
+    /* ── Inventory History ── */
+    .inv-history-empty {
+        text-align: center; padding: 36px 20px;
+        color: var(--muted); font-size: .85rem;
+    }
+
+    /* ── Image upload ── */
+    .upload-zone {
+        border: 2px dashed var(--border);
+        border-radius: 12px;
+        padding: 22px 14px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color .2s, background .2s;
+    }
+    .upload-zone:hover { border-color: var(--blue); background: var(--blue-lt); }
+
+    .upload-icon {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: #F3F4F6;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 8px; color: var(--blue);
+    }
+    .upload-title { font-size: .85rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .upload-sub   { font-size: .72rem; color: var(--muted); }
+
+    /* ── Image grids ── */
+    .img-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .img-grid-item {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        aspect-ratio: 1;
+        background: #F9FAFB;
+    }
+
+    .img-grid-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .img-remove-btn {
+        position: absolute;
+        top: 4px; right: 4px;
+        width: 20px; height: 20px;
+        background: rgba(0,0,0,.55);
+        border: none;
+        border-radius: 50%;
+        color: #fff;
+        font-size: .65rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        transition: background .15s;
+    }
+    .img-remove-btn:hover { background: var(--red); }
+
+    .img-new-badge {
+        position: absolute;
+        bottom: 4px; left: 4px;
+        background: var(--blue);
+        color: #fff;
+        font-size: .6rem;
+        font-weight: 700;
+        padding: 1px 5px;
+        border-radius: 4px;
+    }
+
+    .img-section-label {
+        font-size: .75rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: 8px;
+        margin-top: 4px;
+    }
+
+    .img-count-note {
+        font-size: .73rem;
+        color: var(--muted);
+        text-align: center;
+        margin-top: 8px;
+    }
+
+    /* ── Sidebar ── */
+    .summary-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .summary-header {
+        display: flex; align-items: center; gap: 10px;
+        padding: 16px 18px; border-bottom: 1px solid var(--border);
+    }
+    .summary-header-title { font-size: .9rem; font-weight: 700; color: var(--blue); }
+    .summary-header-sub   { font-size: .73rem; color: var(--muted); }
+
+    .summary-body { padding: 16px 18px; }
+    .summary-row {
+        display: flex; justify-content: space-between; align-items: flex-start;
+        padding: 9px 0; border-bottom: 1px solid #F3F4F6; gap: 12px;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-key { font-size: .8rem; color: var(--muted); }
+    .summary-val { font-size: .82rem; font-weight: 600; color: var(--text); text-align: right; max-width: 55%; }
+
+    .btn-update {
+        width: 100%; padding: 12px; background: var(--blue); color: #fff;
+        border: none; border-radius: 10px; font-size: .9rem; font-weight: 700;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        gap: 8px; margin-top: 14px; font-family: inherit; transition: background .15s;
+    }
+    .btn-update:hover { background: var(--blue-d); }
+
+    .update-note { text-align: center; font-size: .72rem; color: var(--muted); margin-top: 8px; }
+
+    /* ── Alert ── */
+    .alert-error {
+        background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b;
+        padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: .85rem;
+    }
+
+    /* ── Sticky bottom bar ── */
+    .sticky-submit-bar {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--white);
+        border-top: 1px solid var(--border);
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        box-shadow: 0 -4px 16px rgba(0,0,0,.06);
+        z-index: 50;
+        border-radius: 0 0 14px 14px;
+        margin-top: 4px;
+    }
+
+    .sticky-submit-info {
+        font-size: .8rem;
+        color: var(--muted);
+    }
+
+    .sticky-submit-info strong {
+        color: var(--text);
+        font-weight: 700;
+    }
+
+    .btn-update-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 28px;
+        background: var(--blue);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: .92rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background .15s, transform .1s;
+        white-space: nowrap;
+    }
+    .btn-update-main:hover  { background: var(--blue-d); }
+    .btn-update-main:active { transform: scale(.98); }
+
+    .btn-update-main .spinner {
+        display: none;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 900px) {
+        .edit-page { flex-direction: column; padding: 16px; }
+        .edit-sidebar { width: 100%; position: static; }
+        .form-row.cols-3 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+        .form-row.cols-3,
+        .form-row.cols-2 { grid-template-columns: 1fr; }
+        .slot-form-row { grid-template-columns: 1fr 1fr; }
+        .toggle-section { margin: 0 16px 16px; }
+        .sticky-submit-bar { flex-direction: column; align-items: stretch; }
+        .btn-update-main { justify-content: center; }
+    }
 </style>
-@endpush
+@endsection
 
 @section('content')
 <div class="edit-page">
 
-    <form method="POST" action="{{ route('product_listing.update', $listing->_id) }}" id="editForm">
-        @csrf @method('PUT')
+    <form method="POST" action="{{ route('product_listing.update', $listing->_id) }}"
+          id="editForm"
+          style="display:contents;"
+          enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
 
-        {{-- ════════════════════════════════════
+        {{-- ══════════════════════════════
              MAIN COLUMN
-        ════════════════════════════════════ --}}
+        ══════════════════════════════ --}}
         <div class="edit-main">
+
+            {{-- Page header --}}
+            <div>
+                <div class="page-header">
+                    <a href="{{ route('product_listing.index') }}" class="btn-back-circle">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
+                    <div>
+                        <h1>Edit Listing</h1>
+                        <p>Update your offer details and pricing</p>
+                    </div>
+                    <div style="margin-left:auto;">
+                        <span style="font-size:.75rem; color:var(--muted); background:var(--white); border:1px solid var(--border); border-radius:20px; padding:4px 12px;">
+                            SKU: {{ $listing->sku_code }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            @if($errors->any())
+                <div class="alert-error">
+                    <ul style="margin:0; padding-left:18px;">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             {{-- ── Product Details (read-only) ── --}}
             <div class="section-card">
                 <div class="section-header">
-                    <div class="section-icon icon-orange">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    <div class="section-icon icon-blue">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
                     </div>
                     <div>
                         <p class="section-title">Product Details</p>
                         <p class="section-subtitle">Select the product you want to list</p>
                     </div>
                 </div>
-                <div class="notice-banner">
-                    Product and location details cannot be changed. Create a new listing if you need different options.
-                </div>
+                <div class="section-body">
+    <div class="form-row cols-3">
+        <div class="form-group">
+            <label class="form-label">Main Category <span class="req">*</span></label>
+            <select name="main_category_id" class="form-select" id="mainCatSelect">
+                @foreach($mainCategories as $cat)
+                    <option value="{{ $cat->id }}" {{ (string)$listing->main_category_id === (string)$cat->id ? 'selected' : '' }}>
+                        {{ $cat->category_name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Sub Category <span class="req">*</span></label>
+            <select name="sub_category_id" class="form-select" id="subCatSelect">
+                @foreach($subCategories as $sub)
+                    <option value="{{ $sub->id }}" {{ (string)$listing->sub_category_id === (string)$sub->id ? 'selected' : '' }}>
+                        {{ $sub->sub_category_name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Product <span class="req">*</span></label>
+            <select name="product_id" class="form-select" id="productSelect">
+                @foreach($products as $prod)
+                    <option value="{{ $prod->id }}" {{ (string)$listing->product_id === (string)$prod->id ? 'selected' : '' }}>
+                        {{ $prod->product_name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class="form-row cols-1" style="margin-top:16px;">
+        <div class="form-group">
+            <label class="form-label">Warehouse <span class="req">*</span></label>
+            <select name="warehouse_id" class="form-select">
+                @foreach($warehouses as $wh)
+                    <option value="{{ $wh->id }}" {{ (string)$listing->warehouse_id === (string)$wh->id ? 'selected' : '' }}>
+                        {{ $wh->warehouse_name }} — {{ $wh->city }}, {{ $wh->country }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+</div>
                 <div class="section-body">
                     <div class="form-row cols-3">
                         <div class="form-group">
                             <label class="form-label">Main Category</label>
-                            <input type="text" class="form-control" value="{{ $listing->main_category_id }}" disabled>
+                            <input type="text" class="form-control"
+       value="{{ $mainCategory?->category_name ?? $listing->main_category_id }}" disabled>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Sub Category</label>
-                            <input type="text" class="form-control" value="{{ $listing->sub_category_id }}" disabled>
+                            <input type="text" class="form-control"
+       value="{{ $subCategory?->sub_category_name ?? $listing->sub_category_id }}" disabled>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Product</label>
-                            <input type="text" class="form-control" value="{{ optional($listing->product)->name ?? $listing->product_id }}" disabled>
+                            <input type="text" class="form-control"
+       value="{{ $product?->product_name ?? $listing->product_id }}" disabled>
                         </div>
                     </div>
                     <div class="form-row cols-1" style="margin-top:16px;">
                         <div class="form-group">
                             <label class="form-label">Warehouse</label>
-                            <input type="text" class="form-control" value="{{ optional($listing->warehouse)->name ?? $listing->warehouse_id }}" disabled>
+                            <input type="text" class="form-control"
+       value="{{ $warehouse?->warehouse_name ?? $listing->warehouse_id }}" disabled>
                         </div>
                     </div>
                 </div>
@@ -170,8 +715,10 @@
             {{-- ── Offer Settings ── --}}
             <div class="section-card">
                 <div class="section-header">
-                    <div class="section-icon icon-orange">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+                    <div class="section-icon icon-blue">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
                     </div>
                     <div>
                         <p class="section-title">Offer Settings</p>
@@ -182,58 +729,114 @@
                     <div class="form-row cols-3">
                         <div class="form-group">
                             <label class="form-label">Sell Type <span class="req">*</span></label>
-                            <select name="sell_type" class="form-select">
-                                @foreach(['sell by pieces'=>'Sell By Pieces Only','sell by containers'=>'Sell By Containers','sell by weight'=>'Sell By Weight'] as $val=>$label)
-                                    <option value="{{ $val }}" {{ $listing->sell_type === $val ? 'selected' : '' }}>{{ $label }}</option>
+                            <select name="sell_type" class="form-select" id="sellTypeSelect">
+                                @foreach(['sell by pieces' => 'Sell By Pieces Only', 'sell by containers' => 'Sell By Containers', 'sell by weight' => 'Sell By Weight'] as $val => $label)
+                                    <option value="{{ $val }}" {{ $listing->sell_type === $val ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Currency <span class="req">*</span></label>
-                            <select name="currency_id" class="form-select">
-                                @foreach(['AED'=>'AED - UAE Dirham','USD'=>'USD - US Dollar','GBP'=>'GBP - British Pound','EUR'=>'EUR - Euro'] as $val=>$label)
-                                    <option value="{{ $val }}" {{ $listing->currency_id === $val ? 'selected' : '' }}>{{ $label }}</option>
+                            <select name="currency_id" class="form-select" id="currencySelect">
+                                @foreach(['AED' => 'AED - UAE Dirham', 'USD' => 'USD - US Dollar', 'GBP' => 'GBP - British Pound', 'EUR' => 'EUR - Euro'] as $val => $label)
+                                    <option value="{{ $val }}" {{ $listing->currency_id === $val ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Promotion</label>
                             <select name="discount_type" class="form-select">
-                                <option value="">No Promotion</option>
-                                <option value="fixed"      {{ $listing->discount_type === 'fixed'      ? 'selected' : '' }}>Fixed Discount</option>
-                                <option value="percentage" {{ $listing->discount_type === 'percentage' ? 'selected' : '' }}>Percentage Discount</option>
+                                <option value="No Promotion" {{ ($listing->discount_type ?? '') === 'No Promotion' ? 'selected' : '' }}>No Promotion</option>
+                                <option value="fixed"        {{ ($listing->discount_type ?? '') === 'fixed'        ? 'selected' : '' }}>Fixed Discount</option>
+                                <option value="percentage"   {{ ($listing->discount_type ?? '') === 'percentage'   ? 'selected' : '' }}>Percentage Discount</option>
                             </select>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- ── Hold this offer ── --}}
-            <div class="hold-card">
-                <div class="hold-body">
-                    <div class="hold-info">
-                        <div class="hold-check">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                {{-- ══ Three Toggle Rows ══ --}}
+                <div class="toggle-section">
+
+                    {{-- 1. Hold this offer --}}
+                    <div class="toggle-row">
+                        <div class="toggle-left">
+                            <div class="toggle-icon" style="background:#D1FAE5; color:#059669;">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="toggle-info-title">Hold this offer</div>
+                                <div class="toggle-info-sub" id="holdSubLabel">
+                                    {{ $listing->is_active ? 'Offer is active and visible to buyers' : 'Offer is on hold and hidden from buyers' }}
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p class="hold-label">Hold this offer</p>
-                            <p class="hold-sublabel">This offer is active and visible to buyers</p>
-                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="is_active" value="1"
+                                   id="toggleIsActive" {{ $listing->is_active ? 'checked' : '' }}>
+                            <span class="toggle-track"></span>
+                            <span class="toggle-thumb"></span>
+                        </label>
                     </div>
-                    <label class="toggle-wrap">
-                        <input type="checkbox" name="is_active" value="1" id="holdToggle"
-                               {{ $listing->is_active ? '' : 'checked' }}
-                               onchange="updateHoldLabel(this)">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
+
+                    {{-- 2. Mark as Sold Off --}}
+                    <div class="toggle-row">
+                        <div class="toggle-left">
+                            <div class="toggle-icon" style="background:#FEE2E2; color:var(--red);">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="toggle-info-title">Mark as Sold Off</div>
+                                <div class="toggle-info-sub">Marks this offer as completely sold out</div>
+                            </div>
+                        </div>
+                        <label class="toggle-switch sold-off-switch">
+                            <input type="checkbox" name="is_sold_off" value="1"
+                                   id="toggleSoldOff" {{ !empty($listing->is_sold_off) ? 'checked' : '' }}>
+                            <span class="toggle-track"></span>
+                            <span class="toggle-thumb"></span>
+                        </label>
+                    </div>
+
+                    {{-- 3. Popular Product --}}
+                    <div class="toggle-row">
+                        <div class="toggle-left">
+                            <div class="toggle-icon" style="background:#FEF3C7; color:#D97706;">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="toggle-info-title">Popular Product</div>
+                                <div class="toggle-info-sub">Highlights this offer as a popular pick</div>
+                            </div>
+                        </div>
+                        <label class="toggle-switch popular-switch">
+                            <input type="checkbox" name="is_popular" value="1"
+                                   id="togglePopular" {{ !empty($listing->is_popular) ? 'checked' : '' }}>
+                            <span class="toggle-track"></span>
+                            <span class="toggle-thumb"></span>
+                        </label>
+                    </div>
+
+                </div>{{-- end toggle-section --}}
             </div>
 
             {{-- ── Inventory & Pricing ── --}}
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-icon icon-green">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="8"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                        </svg>
                     </div>
                     <div style="flex:1;">
                         <p class="section-title">Inventory &amp; Pricing</p>
@@ -241,29 +844,35 @@
                     </div>
                     <div class="inventory-actions">
                         <button type="button" class="btn-sm-outline">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
                             Adjust Stock
                         </button>
                         <button type="button" class="btn-sm-outline">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
                             Set Alert
                         </button>
                     </div>
                 </div>
                 <div class="section-body">
+
                     {{-- Warehouse pill --}}
-                    <div class="warehouse-row">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#6B7280" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5V19a1 1 0 001 1h16a1 1 0 001-1v-8.5M3 10.5L12 4l9 6.5M3 10.5h18"/></svg>
-                        {{ optional($listing->warehouse)->name ?? 'Warehouse' }}
+                    <div class="warehouse-pill">
+                        <svg width="15" height="15" fill="none" stroke="#6B7280" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5V19a1 1 0 001 1h16a1 1 0 001-1v-8.5M3 10.5L12 4l9 6.5M3 10.5h18"/>
+                        </svg>
+                        {{ $warehouse?->warehouse_name ?? $listing->warehouse_id }}
                     </div>
 
-                    {{-- Quantity / Lead Time / Incoterm --}}
                     <div class="form-row cols-3">
                         <div class="form-group">
                             <label class="form-label">Total Quantity <span class="req">*</span></label>
                             <div class="input-suffix">
                                 <input type="number" name="total_quantity" class="form-control"
-                                       value="{{ $listing->total_quantity }}" min="1" id="totalQty">
+                                       value="{{ $listing->total_quantity }}" min="1" id="totalQtyInput">
                                 <span class="suffix-label">pcs</span>
                             </div>
                         </div>
@@ -271,7 +880,7 @@
                             <label class="form-label">Lead Time <span class="req">*</span></label>
                             <div class="input-suffix">
                                 <input type="number" name="lead_time" class="form-control"
-                                       value="{{ $listing->lead_time }}" min="0" id="leadTimeVal">
+                                       value="{{ $listing->lead_time }}" min="0">
                                 <span class="suffix-label">weeks</span>
                             </div>
                         </div>
@@ -279,132 +888,232 @@
                             <label class="form-label">Incoterm <span class="req">*</span></label>
                             <select name="incoterm" class="form-select">
                                 <option value="">Select incoterm</option>
-                                @foreach(['EXW','FCA','FOB','CFR','CIF','DAP','DDP'] as $inco)
-                                    <option value="{{ $inco }}" {{ ($listing->incoterm ?? '') === $inco ? 'selected' : '' }}>{{ $inco }}</option>
+                                @foreach(['EXW' => 'EXW - Ex Works', 'FCA' => 'FCA - Free Carrier', 'FOB' => 'FOB - Free On Board', 'CFR' => 'CFR - Cost and Freight', 'CIF' => 'CIF - Cost Insurance Freight', 'DAP' => 'DAP - Delivered At Place', 'DDP' => 'DDP - Delivered Duty Paid'] as $code => $label)
+                                    <option value="{{ $code }}" {{ ($listing->incoterm ?? '') === $code ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
 
-                    {{-- ── Price Tiers ── --}}
+                    {{-- Price Tiers --}}
                     <div style="margin-top:28px;">
-                        <div class="tier-section-header">
+                        <div class="slots-header">
                             <div>
-                                <div style="font-size:.9rem;font-weight:700;color:var(--pv-text);">Price Tiers</div>
-                                <div style="font-size:.78rem;color:var(--pv-muted);">Set different prices based on order quantity</div>
+                                <div class="slots-label">Price Tiers</div>
+                                <div class="slots-hint">Set different prices based on order quantity</div>
                             </div>
-                            <div style="display:flex;align-items:center;gap:12px;">
-                                <span class="tier-count-badge" id="tierCountBadge">
-                                    + Add Tier &nbsp; <span id="tierFraction">{{ count($listing->slots ?? []) }}/3</span>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="font-size:.75rem; color:var(--muted);">
+                                    + Add Tier &nbsp;<span id="tierFraction">{{ count($listing->slots ?? []) }}/3</span>
                                 </span>
-                                <button type="button" class="btn-add-tier" id="showAddTierBtn"
-                                        onclick="showAddTierForm()">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                <button type="button" class="btn-add-slot" onclick="showSlotForm()">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                    </svg>
                                     Add Tier
                                 </button>
                             </div>
                         </div>
 
-                        {{-- Existing tiers --}}
-                        <div id="tiersContainer">
-                            @foreach($listing->slots ?? [] as $i => $slot)
-                            <div class="tier-row" data-tier-index="{{ $i }}">
-                                <div class="tier-num">{{ $i + 1 }}</div>
-                                <div style="flex:1;margin:0 18px;">
-                                    <div class="tier-range">
-                                        {{ number_format($slot['min_quantity']) }} – {{ number_format($slot['max_quantity']) }} pcs
-                                    </div>
-                                    <div class="tier-type">Fixed range tier</div>
-                                </div>
-                                <div>
-                                    <div class="tier-price">
-                                        {{ $listing->currency_id }} {{ number_format($slot['price'], 2) }}
-                                    </div>
-                                    <div class="tier-price-sub">per pc</div>
-                                </div>
-
-                                {{-- Hidden inputs to submit existing slots --}}
-                                <input type="hidden" name="slots[{{ $i }}][min_quantity]" value="{{ $slot['min_quantity'] }}">
-                                <input type="hidden" name="slots[{{ $i }}][max_quantity]" value="{{ $slot['max_quantity'] }}">
-                                <input type="hidden" name="slots[{{ $i }}][price]"        value="{{ $slot['price'] }}">
-                            </div>
-                            @endforeach
+                        <div class="slot-list-box" id="slotList">
+                            @if(count($listing->slots ?? []) === 0)
+                                <div class="slot-item-empty">No tiers added yet. Click "Add Tier" to create one.</div>
+                            @endif
                         </div>
 
-                        {{-- Add Tier Form (hidden by default) --}}
-                        <div class="new-tier-card" id="addTierForm" style="display:none;">
-                            <div class="new-tier-title">
+                        {{-- Add Slot Form --}}
+                        <div class="slot-form-box" id="slotFormBox" style="display:none;">
+                            <div class="slot-form-title">
                                 New Price Tier
                                 <span class="range-badge">Bounded range</span>
                             </div>
-                            <div class="tier-form-row">
-                                <div>
-                                    <label class="tier-form-label">Min Qty <span style="color:var(--pv-orange)">*</span></label>
-                                    <input type="number" class="form-control" id="newMinQty" placeholder="1" min="0" style="width:90px;">
+                            <div class="slot-form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px;">
+                                <div class="form-group">
+                                    <label class="form-label">Min Qty <span class="req">*</span></label>
+                                    <input type="number" id="slotMinQty" class="form-control" placeholder="e.g. 1" min="0">
                                 </div>
-                                <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding-top:22px;">
-                                    <button type="button" class="btn-range-type">Fixed<br>Max</button>
-                                    <span class="btn-range-more">And<br>More</span>
-                                </div>
-                                <div>
-                                    <label class="tier-form-label">Max Qty <span style="color:var(--pv-orange)">*</span></label>
-                                    <input type="number" class="form-control" id="newMaxQty" placeholder="100" min="1" style="width:110px;">
-                                </div>
-                                <div>
-                                    <label class="tier-form-label">Price / Unit <span style="color:var(--pv-orange)">*</span></label>
+                                <div class="form-group">
+    <label class="form-label">Max Qty</label>
+    <div style="display:flex; gap:8px; align-items:center; height:38px; padding:0 13px; border:1px solid var(--border); border-radius:9px; background:#fff;">
+        <label style="font-size:.8rem; cursor:pointer; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+            <input type="radio" name="maxQtyType" value="specific" id="radioSpecific"> Specific
+        </label>
+        <label style="font-size:.8rem; cursor:pointer; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+            <input type="radio" name="maxQtyType" value="more" id="radioMore" checked> And More
+        </label>
+    </div>
+    <div id="specificMaxWrapper" style="display:none; margin-top:6px;">
+        <input type="number" id="slotMaxQty" class="form-control" placeholder="e.g. 500" min="1">
+    </div>
+</div>
+                                <div class="form-group">
+                                    <label class="form-label">Commission % <span class="req">*</span></label>
                                     <div class="input-suffix">
-                                        <span class="suffix-label" style="border-radius:9px 0 0 9px;border-right:none;">$</span>
-                                        <input type="number" class="form-control" id="newPrice" placeholder="0.00" min="0" step="0.01" style="border-radius:0 9px 9px 0;">
+                                        <input type="number" id="slotCommission" class="form-control"
+                                               placeholder="Auto" step="0.01" min="0"
+                                               style="border-radius:9px 0 0 9px; border-right:none;"
+                                               oninput="recalcTotalPrice()">
+                                        <span class="suffix-label">%</span>
                                     </div>
+                                    <span style="font-size:.7rem; color:var(--muted); margin-top:3px;" id="commissionSourceLabel"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Price / Unit <span class="req">*</span></label>
+                                    <input type="number" id="slotPrice" class="form-control"
+                                           placeholder="0.00" step="0.01" min="0"
+                                           oninput="recalcTotalPrice()">
+                                </div>
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label class="form-label">Total Price / Unit</label>
+                                    <div class="input-suffix">
+                                        <input type="number" id="slotTotalPrice" class="form-control"
+                                               placeholder="Auto-calculated" step="0.01" min="0" readonly
+                                               style="background:#F9FAFB; color:var(--muted); border-radius:9px 0 0 9px; border-right:none;">
+                                        <span class="suffix-label" style="background:#EFF6FF; color:var(--blue); font-weight:700;">= Price + Commission</span>
+                                    </div>
+                                    <span style="font-size:.7rem; color:var(--muted); margin-top:3px;" id="totalPriceBreakdown"></span>
                                 </div>
                             </div>
-                            <div class="tier-form-actions">
-                                <button type="button" class="btn-cancel" onclick="hideAddTierForm()">Cancel</button>
-                                <button type="button" class="btn-add-tier-confirm" onclick="addTier()">Add Tier</button>
+                            <div id="slotError" class="error-msg" style="display:none; margin-top:8px;"></div>
+                            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+                                <button type="button" class="btn-cancel" onclick="cancelSlot()">Cancel</button>
+                                <button type="button" class="btn-save-slot" onclick="saveSlot()">Add Tier</button>
                             </div>
                         </div>
+
+                        <div id="slotInputs"></div>
                     </div>
 
-                    {{-- ── Inventory History ── --}}
+                    {{-- Inventory History --}}
                     <div style="margin-top:32px;">
-                        <div style="font-size:.9rem;font-weight:700;color:var(--pv-text);margin-bottom:4px;">Inventory History</div>
-                        <div style="font-size:.78rem;color:var(--pv-muted);margin-bottom:16px;">Recent stock movements and adjustments</div>
+                        <div style="font-size:.9rem; font-weight:700; color:var(--text); margin-bottom:4px;">Inventory History</div>
+                        <div style="font-size:.78rem; color:var(--muted); margin-bottom:16px;">Recent stock movements and adjustments</div>
                         <div class="inv-history-empty">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="#D1D5DB" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <svg width="30" height="30" fill="none" stroke="#D1D5DB" stroke-width="1.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
                             <div style="margin-top:8px;">No inventory history yet</div>
                         </div>
                     </div>
+
                 </div>
+
+                </div>
+
+            <div style="display:flex; justify-content:flex-end;">
+                <button type="submit" form="editForm" style="padding:12px 28px; background:#1F2937; color:white; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit;">
+                    Update Offer
+                </button>
             </div>
 
         </div>{{-- end .edit-main --}}
 
-        {{-- ════════════════════════════════════
-             SIDEBAR — Offer Summary
-        ════════════════════════════════════ --}}
+        {{-- ══════════════════════════════
+             SIDEBAR
+        ══════════════════════════════ --}}
         <div class="edit-sidebar">
+
+            {{-- ── Product Images card ── --}}
             <div class="summary-card">
                 <div class="summary-header">
-                    <div style="width:30px;height:30px;background:#EFF6FF;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#3B82F6;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <div class="section-icon icon-blue" style="width:30px;height:30px;border-radius:8px;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 15l-5-5L5 21"/>
+                        </svg>
                     </div>
                     <div>
-                        <div style="font-size:.9rem;font-weight:700;color:var(--pv-text);">Offer Summary</div>
-                        <div style="font-size:.75rem;color:var(--pv-muted);">Review before publishing</div>
+                        <div class="summary-header-title">Product Images</div>
+                        <div class="summary-header-sub" id="imgCardSubtitle">
+                            {{ count($listing->images ?? []) }} of 5 uploaded
+                        </div>
+                    </div>
+                </div>
+                <div style="padding:16px 18px;">
+
+                    {{-- Existing images --}}
+                    @if(!empty($listing->images) && count($listing->images) > 0)
+                        <p class="img-section-label">Current Images</p>
+                        <div class="img-grid" id="existingImagesGrid">
+                            @foreach($listing->images as $img)
+                                @if(!empty($img['path']))
+                                <div class="img-grid-item" id="img-wrapper-{{ $loop->index }}">
+                                    <img src="{{ asset('storage/' . $img['path']) }}"
+                                         alt="{{ $img['original_name'] ?? 'image' }}"
+                                         onerror="this.style.display='none'">
+                                    <button type="button"
+                                            class="img-remove-btn"
+                                            onclick="removeExistingImage({{ $loop->index }})"
+                                            title="Remove image">✕</button>
+                                    <input type="hidden"
+                                           name="existing_images[]"
+                                           value="{{ $img['path'] }}"
+                                           id="existing-input-{{ $loop->index }}">
+                                </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endif
+
+                    {{-- New images preview --}}
+                    <p id="newImagesLabel" class="img-section-label" style="display:none; margin-top:12px;">New Images</p>
+                    <div id="newImagesGrid" class="img-grid" style="display:none;"></div>
+
+                    {{-- Upload zone — always visible --}}
+                    <div class="upload-zone" style="margin-top:12px;" onclick="document.getElementById('imgInput').click()">
+                        <div class="upload-icon">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                            </svg>
+                        </div>
+                        <div class="upload-title" id="uploadZoneTitle">Add more images</div>
+                        <div class="upload-sub">JPEG, PNG, WebP · Max 5MB</div>
+                        <input type="file"
+                               id="imgInput"
+                               name="images[]"
+                               multiple
+                               accept="image/*"
+                               style="display:none;"
+                               onchange="previewNewImages(this)">
+                    </div>
+
+                    <p id="imgCountNote" class="img-count-note" style="display:none;"></p>
+
+                    @error('images.*')
+                        <div class="error-msg" style="margin-top:6px;">{{ $message }}</div>
+                    @enderror
+
+                </div>
+            </div>
+
+            {{-- ── Offer Summary card ── --}}
+            <div class="summary-card">
+                <div class="summary-header">
+                    <div class="section-icon icon-blue" style="width:30px;height:30px;border-radius:8px;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="summary-header-title">Offer Summary</div>
+                        <div class="summary-header-sub">Review before updating</div>
                     </div>
                 </div>
                 <div class="summary-body">
                     <div class="summary-row">
                         <span class="summary-key">Product</span>
-                        <span class="summary-val">{{ optional($listing->product)->name ?? 'Talesun Solar Energy…' }}</span>
+                        <span class="summary-val">{{ $product?->product_name ?? $listing->product_id }}</span>
                     </div>
                     <div class="summary-row">
                         <span class="summary-key">Warehouse</span>
-                        <span class="summary-val">{{ optional($listing->warehouse)->name ?? $listing->warehouse_id }}</span>
+                        <span class="summary-val">{{ $warehouse?->warehouse_name ?? $listing->warehouse_id }}</span>
                     </div>
                     <div class="summary-row">
                         <span class="summary-key">Sell Type</span>
-                        <span class="summary-val" id="summSellType">{{ ucwords(str_replace('sell by ','',$listing->sell_type)) }}</span>
+                        <span class="summary-val" id="summSellType">{{ ucwords($listing->sell_type) }}</span>
                     </div>
                     <div class="summary-row">
                         <span class="summary-key">Currency</span>
@@ -416,102 +1125,359 @@
                     </div>
                     <div class="summary-row">
                         <span class="summary-key">Price Tiers</span>
-                        <span class="summary-val" id="summTiers">{{ count($listing->slots ?? []) }} {{ count($listing->slots ?? []) === 1 ? 'tier' : 'tiers' }}</span>
+                        <span class="summary-val" id="summTiers">
+                            {{ count($listing->slots ?? []) }} {{ count($listing->slots ?? []) === 1 ? 'tier' : 'tiers' }}
+                        </span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Images</span>
+                        <span class="summary-val" id="summImages">
+                            {{ count($listing->images ?? []) }} image{{ count($listing->images ?? []) === 1 ? '' : 's' }}
+                        </span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Status</span>
+                        <span class="summary-val" id="summStatus"
+                              style="color:{{ $listing->is_active ? 'var(--green)' : 'var(--muted)' }};">
+                            {{ $listing->is_active ? 'Active' : 'On Hold' }}
+                        </span>
                     </div>
 
-                    <button type="submit" class="btn-update">
+                    {{-- Sidebar update button (submits same form) --}}
+                    <button type="submit" class="btn-update" onclick="handleUpdate(this)">
                         Update Offer
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                        </svg>
                     </button>
                     <p class="update-note">Changes will be reflected immediately</p>
                 </div>
             </div>
+
         </div>
 
     </form>
 </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
-    let tierCount = {{ count($listing->slots ?? []) }};
+const COMMISSIONS = @json($commissionsJson);
+function loadCommissionForCategory() {
+    const categoryId = '{{ (string)$listing->main_category_id }}';
+    const match = COMMISSIONS.find(c => c.category_id === categoryId);
+    const commInput = document.getElementById('slotCommission');
+    const commLabel = document.getElementById('commissionSourceLabel');
+    if (match) {
+        commInput.value       = match.percentage;
+        commLabel.textContent = `Auto-filled from "${match.category_name}"`;
+        commLabel.style.color = 'var(--green)';
+    } else {
+        commInput.value       = '';
+        commLabel.textContent = 'No commission set for this category';
+        commLabel.style.color = 'var(--muted)';
+    }
+    recalcTotalPrice();
+}
 
-    // ── Live summary updates ──────────────────────────────────────
-    document.querySelector('[name="sell_type"]').addEventListener('change', function() {
-        document.getElementById('summSellType').textContent =
-            this.options[this.selectedIndex].text.replace('Sell By ','').replace('Only','').trim();
-    });
-    document.querySelector('[name="currency_id"]').addEventListener('change', function() {
-        document.getElementById('summCurrency').textContent = this.value;
-    });
-    document.getElementById('totalQty').addEventListener('input', function() {
-        document.getElementById('summQty').textContent = Number(this.value).toLocaleString() + ' pcs';
-    });
+function recalcTotalPrice() {
+    const price       = parseFloat(document.getElementById('slotPrice').value);
+    const commission  = parseFloat(document.getElementById('slotCommission').value);
+    const totalEl     = document.getElementById('slotTotalPrice');
+    const breakdownEl = document.getElementById('totalPriceBreakdown');
+    if (!isNaN(price) && !isNaN(commission)) {
+        const commAmt = price * (commission / 100);
+        const total   = price + commAmt;
+        totalEl.value = total.toFixed(2);
+        breakdownEl.textContent = `${price.toFixed(2)} + ${commAmt.toFixed(2)} (${commission}%) = ${total.toFixed(2)}`;
+        breakdownEl.style.color = 'var(--blue)';
+    } else {
+        totalEl.value = '';
+        breakdownEl.textContent = price && !isNaN(price) ? 'Enter commission % to calculate' : '';
+        breakdownEl.style.color = 'var(--muted)';
+    }
+}
 
-    // ── Hold label update ─────────────────────────────────────────
-    function updateHoldLabel(cb) {
-        const sub = cb.closest('.hold-body').querySelector('.hold-sublabel');
-        sub.textContent = cb.checked
-            ? 'This offer is on hold and hidden from buyers'
-            : 'This offer is active and visible to buyers';
+// ── Seed existing slots from PHP ──────────────────────────────
+let slots        = @json($listing->slots ?? []);
+let editingIndex = null;
+
+// Track existing image count for the 5-image cap
+let existingImageCount = {{ count($listing->images ?? []) }};
+
+// Render existing slots immediately on load
+renderSlots();
+
+// ── Live summary ─────────────────────────────────────────────
+document.getElementById('sellTypeSelect').addEventListener('change', function () {
+    document.getElementById('summSellType').textContent =
+        this.options[this.selectedIndex].text;
+});
+
+document.getElementById('currencySelect').addEventListener('change', function () {
+    document.getElementById('summCurrency').textContent = this.value;
+});
+
+document.getElementById('totalQtyInput').addEventListener('input', function () {
+    document.getElementById('summQty').textContent =
+        this.value ? Number(this.value).toLocaleString() + ' pcs' : '—';
+});
+
+// ── Toggle: Hold ──────────────────────────────────────────────
+document.getElementById('toggleIsActive').addEventListener('change', function () {
+    const summStatus = document.getElementById('summStatus');
+    const holdSub    = document.getElementById('holdSubLabel');
+    if (this.checked) {
+        summStatus.textContent = 'Active';
+        summStatus.style.color = 'var(--green)';
+        holdSub.textContent    = 'Offer is active and visible to buyers';
+    } else {
+        summStatus.textContent = 'On Hold';
+        summStatus.style.color = 'var(--muted)';
+        holdSub.textContent    = 'Offer is on hold and hidden from buyers';
+    }
+});
+
+// ── Toggle: Sold Off ──────────────────────────────────────────
+document.getElementById('toggleSoldOff').addEventListener('change', function () {
+    const summStatus = document.getElementById('summStatus');
+    if (this.checked) {
+        document.getElementById('toggleIsActive').checked = false;
+        document.getElementById('togglePopular').checked  = false;
+        document.getElementById('holdSubLabel').textContent = 'Offer is on hold and hidden from buyers';
+        summStatus.textContent = 'Sold Off';
+        summStatus.style.color = 'var(--red)';
+    } else {
+        document.getElementById('toggleIsActive').checked = true;
+        document.getElementById('holdSubLabel').textContent = 'Offer is active and visible to buyers';
+        summStatus.textContent = 'Active';
+        summStatus.style.color = 'var(--green)';
+    }
+});
+
+// ── Toggle: Popular ───────────────────────────────────────────
+document.getElementById('togglePopular').addEventListener('change', function () {
+    if (this.checked) {
+        document.getElementById('toggleSoldOff').checked = false;
+        const summStatus = document.getElementById('summStatus');
+        summStatus.textContent = 'Active';
+        summStatus.style.color = 'var(--green)';
+    }
+});
+
+// ── Max qty radio ─────────────────────────────────────────────
+document.querySelectorAll('input[name="maxQtyType"]').forEach(r => {
+    r.addEventListener('change', function () {
+        document.getElementById('specificMaxWrapper').style.display =
+            this.value === 'specific' ? 'block' : 'none';
+    });
+});
+
+// ── Submit/Update handler ─────────────────────────────────────
+document.getElementById('editForm').addEventListener('submit', function () {
+    const spinner = document.getElementById('updateSpinner');
+    if (spinner) spinner.style.display = 'inline-block';
+    document.querySelectorAll('.btn-update, .btn-update-main').forEach(b => b.disabled = true);
+});
+
+function handleUpdate(btn) {}
+
+// ── Remove existing image ─────────────────────────────────────
+function removeExistingImage(index) {
+    const wrapper = document.getElementById('img-wrapper-' + index);
+    const input   = document.getElementById('existing-input-' + index);
+    if (wrapper) wrapper.remove();
+    if (input)   input.remove();
+
+    existingImageCount = Math.max(0, existingImageCount - 1);
+    updateImageSummary();
+}
+
+// ── Preview newly selected images ─────────────────────────────
+function previewNewImages(input) {
+    const maxAllowed = 5 - existingImageCount;
+    const files      = Array.from(input.files).slice(0, maxAllowed);
+    const grid       = document.getElementById('newImagesGrid');
+    const label      = document.getElementById('newImagesLabel');
+    const countNote  = document.getElementById('imgCountNote');
+    const zoneTitle  = document.getElementById('uploadZoneTitle');
+
+    grid.innerHTML = '';
+
+    if (files.length === 0) {
+        grid.style.display  = 'none';
+        label.style.display = 'none';
+        countNote.style.display = 'none';
+        zoneTitle.textContent = 'Add more images';
+        updateImageSummary(0);
+        return;
     }
 
-    // ── Add Tier UI ───────────────────────────────────────────────
-    function showAddTierForm() {
-        document.getElementById('addTierForm').style.display = 'block';
-        document.getElementById('showAddTierBtn').style.display = 'none';
-    }
+    label.style.display = 'block';
 
-    function hideAddTierForm() {
-        document.getElementById('addTierForm').style.display = 'none';
-        document.getElementById('showAddTierBtn').style.display = 'inline-flex';
-        document.getElementById('newMinQty').value = '';
-        document.getElementById('newMaxQty').value = '';
-        document.getElementById('newPrice').value  = '';
-    }
-
-    function addTier() {
-        const minQ  = parseInt(document.getElementById('newMinQty').value);
-        const maxQ  = parseInt(document.getElementById('newMaxQty').value);
-        const price = parseFloat(document.getElementById('newPrice').value);
-
-        if (isNaN(minQ) || isNaN(maxQ) || isNaN(price)) {
-            alert('Please fill in all tier fields.');
-            return;
-        }
-        if (maxQ <= minQ) {
-            alert('Max Qty must be greater than Min Qty.');
-            return;
-        }
-
-        const idx      = tierCount;
-        const currency = document.querySelector('[name="currency_id"]').value;
-        const container = document.getElementById('tiersContainer');
-
-        // Build display row
-        const row = document.createElement('div');
-        row.className = 'tier-row';
-        row.dataset.tierIndex = idx;
-        row.innerHTML = `
-            <div class="tier-num">${idx + 1}</div>
-            <div style="flex:1;margin:0 18px;">
-                <div class="tier-range">${minQ.toLocaleString()} – ${maxQ.toLocaleString()} pcs</div>
-                <div class="tier-type">Fixed range tier</div>
-            </div>
-            <div>
-                <div class="tier-price">${currency} ${price.toFixed(2)}</div>
-                <div class="tier-price-sub">per pc</div>
-            </div>
-            <input type="hidden" name="slots[${idx}][min_quantity]" value="${minQ}">
-            <input type="hidden" name="slots[${idx}][max_quantity]" value="${maxQ}">
-            <input type="hidden" name="slots[${idx}][price]"        value="${price}">
+    files.forEach(file => {
+        const url = URL.createObjectURL(file);
+        const div = document.createElement('div');
+        div.className = 'img-grid-item';
+        div.innerHTML = `
+            <img src="${url}" alt="new image">
+            <span class="img-new-badge">NEW</span>
         `;
-        container.appendChild(row);
+        grid.appendChild(div);
+    });
 
-        tierCount++;
-        document.getElementById('tierFraction').textContent = tierCount + '/3';
-        document.getElementById('summTiers').textContent    = tierCount + (tierCount === 1 ? ' tier' : ' tiers');
-        hideAddTierForm();
+    const uploadZone = document.querySelector('.upload-zone');
+    grid.parentNode.insertBefore(label, uploadZone);
+    grid.parentNode.insertBefore(grid, uploadZone);
+
+    grid.style.display = 'grid';
+    zoneTitle.textContent = 'Change new images';
+
+    if (maxAllowed < input.files.length) {
+        countNote.textContent  = `Showing ${files.length} of ${input.files.length} selected (max 5 total).`;
+        countNote.style.display = 'block';
+    } else {
+        countNote.style.display = 'none';
     }
+
+    updateImageSummary(files.length);
+}
+
+function updateImageSummary(newCount) {
+    if (newCount === undefined) newCount = 0;
+    const total = existingImageCount + newCount;
+    document.getElementById('summImages').textContent =
+        total + ' image' + (total !== 1 ? 's' : '');
+    document.getElementById('imgCardSubtitle').textContent =
+        total + ' of 5 uploaded';
+}
+
+// ── Slot form ─────────────────────────────────────────────────
+function showSlotForm() {
+    document.getElementById('slotFormBox').style.display = 'block';
+    document.getElementById('slotMinQty').value = '';
+    document.getElementById('slotMaxQty').value = '';
+    document.getElementById('slotPrice').value  = '';
+    document.getElementById('radioMore').checked = true;
+    document.getElementById('specificMaxWrapper').style.display = 'none';
+    document.getElementById('slotError').style.display = 'none';
+    editingIndex = null;
+    loadCommissionForCategory();
+}
+
+function cancelSlot() {
+    document.getElementById('slotFormBox').style.display = 'none';
+    editingIndex = null;
+}
+
+function saveSlot() {
+    const minQty     = parseInt(document.getElementById('slotMinQty').value);
+    const price      = parseFloat(document.getElementById('slotPrice').value);
+    const commission = parseFloat(document.getElementById('slotCommission').value);
+    const totalPrice = parseFloat(document.getElementById('slotTotalPrice').value);
+    const maxType    = document.querySelector('input[name="maxQtyType"]:checked').value;
+    const maxQty     = maxType === 'specific' ? parseInt(document.getElementById('slotMaxQty').value) : null;
+    const errEl      = document.getElementById('slotError');
+
+    if (isNaN(minQty) || minQty < 0) {
+        errEl.textContent = 'Please enter a valid minimum quantity.';
+        errEl.style.display = 'block'; return;
+    }
+    if (isNaN(price) || price < 0) {
+        errEl.textContent = 'Please enter a valid price.';
+        errEl.style.display = 'block'; return;
+    }
+    if (isNaN(commission) || commission < 0) {
+        errEl.textContent = 'Please enter a valid commission percentage.';
+        errEl.style.display = 'block'; return;
+    }
+    if (maxType === 'specific' && (isNaN(maxQty) || maxQty <= minQty)) {
+        errEl.textContent = 'Max quantity must be greater than minimum.';
+        errEl.style.display = 'block'; return;
+    }
+
+    const slot = { min_quantity: minQty, max_quantity: maxQty, price, commission_percentage: commission, total_price: totalPrice };
+    if (editingIndex !== null) slots[editingIndex] = slot;
+    else slots.push(slot);
+
+    renderSlots();
+    cancelSlot();
+}
+
+function editSlot(idx) {
+    const s = slots[idx];
+    showSlotForm();
+    document.getElementById('slotMinQty').value    = s.min_quantity;
+    document.getElementById('slotPrice').value     = s.price;
+    document.getElementById('slotCommission').value = s.commission_percentage ?? '';
+    recalcTotalPrice();
+    if (s.max_quantity !== null && s.max_quantity !== undefined) {
+        document.getElementById('radioSpecific').checked = true;
+        document.getElementById('specificMaxWrapper').style.display = 'block';
+        document.getElementById('slotMaxQty').value = s.max_quantity;
+    } else {
+        document.getElementById('radioMore').checked = true;
+    }
+    editingIndex = idx;
+}
+
+function deleteSlot(idx) {
+    slots.splice(idx, 1);
+    renderSlots();
+}
+
+function renderSlots() {
+    const listEl   = document.getElementById('slotList');
+    const inputsEl = document.getElementById('slotInputs');
+
+    listEl.innerHTML   = '';
+    inputsEl.innerHTML = '';
+
+    if (slots.length === 0) {
+        listEl.innerHTML = '<div class="slot-item-empty">No tiers added yet. Click "Add Tier" to create one.</div>';
+        document.getElementById('summTiers').textContent    = '0 tiers';
+        document.getElementById('tierFraction').textContent = '0/3';
+        return;
+    }
+
+    slots.forEach((slot, i) => {
+        const maxLabel = (slot.max_quantity !== null && slot.max_quantity !== undefined && slot.max_quantity !== '')
+            ? `${Number(slot.max_quantity).toLocaleString()} pcs`
+            : 'And More';
+
+        const row = document.createElement('div');
+        row.className = 'slot-item';
+        row.innerHTML = `
+            <div style="display:flex;align-items:center;flex:1;">
+                <div class="slot-num">${i + 1}</div>
+                <div>
+                    <div style="font-weight:600;font-size:.83rem;">${slot.min_quantity.toLocaleString()} – ${maxLabel}</div>
+                    <div style="font-size:.72rem;color:var(--muted);">Fixed range tier</div>
+                </div>
+            </div>
+            <div style="text-align:right;margin-right:12px;">
+                <div class="slot-price-tag">${Number(slot.price).toFixed(2)} <span style="font-size:.7rem;color:var(--muted);font-weight:400;">+ ${slot.commission_percentage ?? 0}%</span></div>
+                <div class="slot-price-sub">Total: <strong style="color:var(--blue);">${Number(slot.total_price ?? slot.price).toFixed(2)}</strong> / pc</div>
+            </div>
+            <div style="display:flex;gap:4px;">
+                <button type="button" class="btn-icon-sm" onclick="editSlot(${i})" title="Edit">✏️</button>
+                <button type="button" class="btn-icon-sm" onclick="deleteSlot(${i})" title="Delete">🗑️</button>
+            </div>
+        `;
+        listEl.appendChild(row);
+
+        inputsEl.innerHTML += `
+            <input type="hidden" name="slots[${i}][min_quantity]"          value="${slot.min_quantity}">
+            <input type="hidden" name="slots[${i}][max_quantity]"          value="${slot.max_quantity ?? ''}">
+            <input type="hidden" name="slots[${i}][price]"                 value="${slot.price}">
+            <input type="hidden" name="slots[${i}][commission_percentage]" value="${slot.commission_percentage ?? 0}">
+            <input type="hidden" name="slots[${i}][total_price]"           value="${slot.total_price ?? slot.price}">
+        `;
+    });
+
+    const count = slots.length;
+    document.getElementById('summTiers').textContent    = count + (count === 1 ? ' tier' : ' tiers');
+    document.getElementById('tierFraction').textContent = count + '/3';
+}
 </script>
-@endpush
+@endsection

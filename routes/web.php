@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\BidRequestController;
 use App\Http\Controllers\Admin\ProductListingController;
+use App\Http\Controllers\Admin\CommissionController;
 
  
 
@@ -201,6 +202,16 @@ Route::prefix('admin/setup/brands')->name('admin.setup.brands.')->group(function
         Route::delete('/{id}',   [ChargeController::class, 'destroy'])->name('destroy');
     });
 
+    // Commissions
+Route::prefix('setup/commissions')->name('admin.setup.commissions.')->group(function () {
+    Route::get('/',           [App\Http\Controllers\Admin\CommissionController::class, 'index'])->name('index');
+    Route::get('/create',     [App\Http\Controllers\Admin\CommissionController::class, 'create'])->name('create');
+    Route::post('/',          [App\Http\Controllers\Admin\CommissionController::class, 'store'])->name('store');
+    Route::get('/{id}/edit',  [App\Http\Controllers\Admin\CommissionController::class, 'edit'])->name('edit');
+    Route::put('/{id}',       [App\Http\Controllers\Admin\CommissionController::class, 'update'])->name('update');
+    Route::delete('/{id}',    [App\Http\Controllers\Admin\CommissionController::class, 'destroy'])->name('destroy');
+});
+
     // Events
     Route::prefix('admin/knowledge-hub/events')->name('admin.knowledge-hub.events.')->group(function () {
         Route::get('/',            [EventController::class, 'index'])  ->name('index');
@@ -270,6 +281,15 @@ Route::middleware(['auth'])->group(function () {
     });
  
 });
+
+Route::get('/api/subcategories/{mainCategoryId}', [ProductListingController::class, 'getSubCategories']);
+Route::get('/api/products/{subCategoryId}',       [ProductListingController::class, 'getProducts']);
+Route::get('/api/warehouses',                     [ProductListingController::class, 'getWarehouses']);
+    Route::post('product-listings/{id}/approve-payment', [ProductListingController::class, 'approvePayment'])
+     ->name('product_listing.approvePayment');
+
+Route::post('product-listings/{id}/approve-listing', [ProductListingController::class, 'approveListing'])
+     ->name('product_listing.approveListing');
 
 
 

@@ -251,7 +251,7 @@ function renumber() {
 
 <div class="content-panel">
     <form method="POST"
-          action="{{ route('admin.setup.sub-menus.update', $record->id) }}"
+          action="{{ route('admin.setup.sub-menus.update', (string) $record->id) }}"
           enctype="multipart/form-data"
           id="editForm">
         @csrf
@@ -270,7 +270,7 @@ function renumber() {
                     <option value="">Select Category</option>
                     @foreach($mainMenus as $menu)
                         <option value="{{ $menu->id }}"
-                            {{ old('category_id', $record->category_id) == $menu->id ? 'selected' : '' }}>
+                            {{ old('category_id', (string) $record->category_id) == (string) $menu->id ? 'selected' : '' }}>
                             {{ $menu->category_name }}
                         </option>
                     @endforeach
@@ -299,11 +299,11 @@ function renumber() {
         <div class="form-grid-3">
             <div class="form-group">
                 <label class="form-label">Sub Category Icon</label>
-                @if($record->sub_category_icon_image)
-                    <img src="{{ asset('storage/' . $record->sub_category_icon_image) }}"
-                         class="current-icon" alt="current"/>
-                    <span class="form-hint">Leave blank to keep current icon</span>
-                @endif
+                @if(!empty($record->sub_category_icon_image['path']))
+    <img src="{{ asset('storage/' . $record->sub_category_icon_image['path']) }}"
+         class="current-icon" alt="current"/>
+    <span class="form-hint">Leave blank to keep current icon</span>
+@endif
                 <div class="form-file-wrap">
                     <input type="file" name="icon" accept="image/*"/>
                 </div>
@@ -644,9 +644,32 @@ function renumber() {
     </table>
 
     <div class="table-footer">
-        <span>{{ $subMenus->firstItem() ?? 0 }}–{{ $subMenus->lastItem() ?? 0 }} of {{ $subMenus->total() }} entries</span>
-        {{ $subMenus->appends(request()->query())->links() }}
-    </div>
+    <span>{{ $subMenus->firstItem() ?? 0 }}–{{ $subMenus->lastItem() ?? 0 }} of {{ $subMenus->total() }} entries</span>
+
+    @if ($subMenus->hasPages())
+    <nav style="display:flex; align-items:center; gap:4px;">
+        @if ($subMenus->onFirstPage())
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">‹</span>
+        @else
+            <a href="{{ $subMenus->previousPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">‹</a>
+        @endif
+        @foreach ($subMenus->getUrlRange(1, $subMenus->lastPage()) as $page => $url)
+            @if ($page == $subMenus->currentPage())
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--primary-d);background:var(--primary-d);color:white;font-size:13px;font-weight:700;">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $subMenus->lastPage() || abs($page - $subMenus->currentPage()) <= 2)
+                <a href="{{ $url }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">{{ $page }}</a>
+            @elseif ($page == $subMenus->currentPage() - 3 || $page == $subMenus->currentPage() + 3)
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:13px;">…</span>
+            @endif
+        @endforeach
+        @if ($subMenus->hasMorePages())
+            <a href="{{ $subMenus->nextPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">›</a>
+        @else
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">›</span>
+        @endif
+    </nav>
+    @endif
+</div>
 </div>
 
 @endsection

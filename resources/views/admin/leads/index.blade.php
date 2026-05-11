@@ -218,11 +218,11 @@
             </tr>
         </thead>
         <tbody id="leadsTableBody">
-            @forelse($leads as $i => $lead)
+            @forelse($leads as $lead)
             <tr data-id="{{ $lead->id }}">
 
                 {{-- S.No --}}
-                <td><span class="sno">{{ $i + 1 }}</span></td>
+                <td><span class="sno">{{ $leads->firstItem() + $loop->index }}</span></td>
 
                 {{-- Name --}}
                 <td class="name-cell">{{ $lead->name ?? '-' }}</td>
@@ -305,8 +305,34 @@
     </table>
 
     <div class="table-footer">
-        <span id="countLabel">1–{{ count($leads) }} of {{ count($leads) }} entries</span>
-    </div>
+    <span>{{ $leads->firstItem() ?? 0 }}–{{ $leads->lastItem() ?? 0 }} of {{ $leads->total() }} entries</span>
+
+    @if ($leads->hasPages())
+    <nav style="display:flex; align-items:center; gap:4px;">
+        @if ($leads->onFirstPage())
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">‹</span>
+        @else
+            <a href="{{ $leads->previousPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">‹</a>
+        @endif
+
+        @foreach ($leads->getUrlRange(1, $leads->lastPage()) as $page => $url)
+            @if ($page == $leads->currentPage())
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--primary-d);background:var(--primary-d);color:white;font-size:13px;font-weight:700;">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $leads->lastPage() || abs($page - $leads->currentPage()) <= 2)
+                <a href="{{ $url }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">{{ $page }}</a>
+            @elseif ($page == $leads->currentPage() - 3 || $page == $leads->currentPage() + 3)
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:13px;">…</span>
+            @endif
+        @endforeach
+
+        @if ($leads->hasMorePages())
+            <a href="{{ $leads->nextPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">›</a>
+        @else
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">›</span>
+        @endif
+    </nav>
+    @endif
+</div>
 </div>
 
 @endsection

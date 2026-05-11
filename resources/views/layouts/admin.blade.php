@@ -641,8 +641,8 @@
             min-height: 18px; font-weight: 500;
         }
 
-        @yield('styles')
-    </style>
+        </style>
+    @yield('styles')
 </head>
 <body>
 

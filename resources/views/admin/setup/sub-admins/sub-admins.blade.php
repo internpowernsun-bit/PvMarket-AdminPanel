@@ -551,9 +551,32 @@
     </table>
 
     <div class="table-footer">
-        <span>{{ $subAdmins->firstItem() ?? 0 }}–{{ $subAdmins->lastItem() ?? 0 }} of {{ $subAdmins->total() }} entries</span>
-        {{ $subAdmins->appends(request()->query())->links() }}
-    </div>
+    <span>{{ $subAdmins->firstItem() ?? 0 }}–{{ $subAdmins->lastItem() ?? 0 }} of {{ $subAdmins->total() }} entries</span>
+
+    @if ($subAdmins->hasPages())
+    <nav style="display:flex; align-items:center; gap:4px;">
+        @if ($subAdmins->onFirstPage())
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">‹</span>
+        @else
+            <a href="{{ $subAdmins->previousPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">‹</a>
+        @endif
+        @foreach ($subAdmins->getUrlRange(1, $subAdmins->lastPage()) as $page => $url)
+            @if ($page == $subAdmins->currentPage())
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--primary-d);background:var(--primary-d);color:white;font-size:13px;font-weight:700;">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $subAdmins->lastPage() || abs($page - $subAdmins->currentPage()) <= 2)
+                <a href="{{ $url }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">{{ $page }}</a>
+            @elseif ($page == $subAdmins->currentPage() - 3 || $page == $subAdmins->currentPage() + 3)
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:13px;">…</span>
+            @endif
+        @endforeach
+        @if ($subAdmins->hasMorePages())
+            <a href="{{ $subAdmins->nextPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">›</a>
+        @else
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">›</span>
+        @endif
+    </nav>
+    @endif
+</div>
 
 </div>
 

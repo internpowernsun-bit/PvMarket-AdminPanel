@@ -40,7 +40,7 @@ class ProductController extends Controller
         $subMenus  = SubMenu::orderBy('sub_category_name')->get();
 
         if ($subCategoryId) {
-            $options = ProductDetailOption::where('sub_category_id', $subCategoryId)
+            $options = ProductDetailOption::where('sub_category_id', new \MongoDB\BSON\ObjectId($subCategoryId))
                                           ->orderBy('option_name')
                                           ->get();
         } else {
@@ -65,12 +65,25 @@ class ProductController extends Controller
         }
 
         $products = $query->orderBy('created_at', 'desc')
-                          ->paginate($request->get('entries', 10));
+                  ->paginate($request->get('entries', 10));
 
-        return view('admin.products.products', [
-            'mode'     => 'index',
-            'products' => $products,
-        ]);
+// Collect all updated_by ObjectIds and resolve to names in one query
+$updatedByIds = $products->pluck('updated_by')
+                         ->filter()
+                         ->map(fn($id) => new \MongoDB\BSON\ObjectId((string) $id))
+                         ->unique()
+                         ->values()
+                         ->toArray();
+
+$userNames = \App\Models\User::whereIn('_id', $updatedByIds)
+                              ->get(['_id', 'name'])
+                              ->mapWithKeys(fn($u) => [(string) $u->_id => $u->name])
+                              ->toArray();
+return view('admin.products.products', [
+    'mode'      => 'index',
+    'products'  => $products,
+    'userNames' => $userNames,
+]);
     }
 
     // ── Create ────────────────────────────────────────
@@ -100,20 +113,21 @@ class ProductController extends Controller
         $subCategory = SubMenu::find($request->sub_category_id);
 
         $data = [
-            'product_name'          => $request->product_name,
-            'product_description'   => $request->product_description,
-            'category_id'           => $request->category_id,
-            'category_name'     => $category?->category_name,
-            'sub_category_id'       => $request->sub_category_id,
-            'sub_category_name' => $subCategory?->sub_category_name,
-            'brand_id'              => $request->brand_id,
-            'pieces_per_pallet'     => $request->pieces_per_pallet,
-            'pallets_per_container' => $request->pallets_per_container,
-            'is_popular'            => $request->boolean('is_popular'),
-            'real_time_price'       => $request->boolean('real_time_price'),
-            'verification_status'   => Auth::user()->role === 'super_admin' ? 'verified' : 'pending',
-            'updated_by'            => Auth::user()->name,
-        ];
+    'product_name'          => $request->product_name,
+    'product_description'   => $request->product_description,
+    'category_id'           => new \MongoDB\BSON\ObjectId($request->category_id),
+    'category_name'         => $category?->category_name,
+    'sub_category_id'       => new \MongoDB\BSON\ObjectId($request->sub_category_id),
+    'sub_category_name'     => $subCategory?->sub_category_name,
+    'brand_id'              => $request->brand_id ? new \MongoDB\BSON\ObjectId($request->brand_id) : null,
+    'pieces_per_pallet'     => $request->pieces_per_pallet,
+    'pallets_per_container' => $request->pallets_per_container,
+    'is_popular'            => $request->boolean('is_popular'),
+    'real_time_price'       => $request->boolean('real_time_price'),
+    'verification_status'   => Auth::user()->role === 'super_admin' ? 'verified' : 'pending',
+    'created_by'            => new \MongoDB\BSON\ObjectId(Auth::id()),
+    'updated_by'            => new \MongoDB\BSON\ObjectId(Auth::id()),
+];
 
         // Generate SKU using category name
         $data['sku_code'] = $this->generateSku($category?->name ?? 'PRD');
@@ -197,19 +211,19 @@ class ProductController extends Controller
         $subCategory = SubMenu::find($request->sub_category_id);
 
         $data = [
-            'product_name'          => $request->product_name,
-            'product_description'   => $request->product_description,
-            'category_id'           => $request->category_id,
-            'category_name'     => $category?->category_name,
-            'sub_category_id'       => $request->sub_category_id,
-            'sub_category_name' => $subCategory?->sub_category_name,
-            'brand_id'              => $request->brand_id,
-            'pieces_per_pallet'     => $request->pieces_per_pallet,
-            'pallets_per_container' => $request->pallets_per_container,
-            'is_popular'            => $request->boolean('is_popular'),
-            'real_time_price'       => $request->boolean('real_time_price'),
-            'updated_by'            => Auth::user()->name,
-        ];
+    'product_name'          => $request->product_name,
+    'product_description'   => $request->product_description,
+    'category_id'           => new \MongoDB\BSON\ObjectId($request->category_id),
+    'category_name'         => $category?->category_name,
+    'sub_category_id'       => new \MongoDB\BSON\ObjectId($request->sub_category_id),
+    'sub_category_name'     => $subCategory?->sub_category_name,
+    'brand_id'              => $request->brand_id ? new \MongoDB\BSON\ObjectId($request->brand_id) : null,
+    'pieces_per_pallet'     => $request->pieces_per_pallet,
+    'pallets_per_container' => $request->pallets_per_container,
+    'is_popular'            => $request->boolean('is_popular'),
+    'real_time_price'       => $request->boolean('real_time_price'),
+    'updated_by'            => new \MongoDB\BSON\ObjectId(Auth::id()),
+];
 
         if ($request->brand_id) {
             $brand = Brand::find($request->brand_id);
@@ -300,7 +314,7 @@ class ProductController extends Controller
     public function getSubMenusByMainMenu(Request $request)
     {
         $categoryId  = $request->input('main_menu_id');
-        $subMenus = SubMenu::where('category_id', $categoryId)->orderBy('sub_category_name')->get(['_id', 'sub_category_name']);
+        $subMenus = SubMenu::where('category_id', new \MongoDB\BSON\ObjectId($categoryId))->orderBy('sub_category_name')->get(['_id', 'sub_category_name']);
         return response()->json(['subMenus' => $subMenus]);
     }
 

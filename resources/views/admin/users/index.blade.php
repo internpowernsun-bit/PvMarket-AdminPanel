@@ -520,13 +520,13 @@
 
     {{-- Footer --}}
     <div class="table-footer">
-        <span>
-            Showing <strong>{{ $users->firstItem() ?? 0 }}</strong> to
-            <strong>{{ $users->lastItem() ?? 0 }}</strong> of
-            <strong>{{ $users->total() }}</strong> entries
-        </span>
-        {{ $users->appends(request()->query())->links() }}
-    </div>
+    <span>
+        Showing <strong>{{ $users->firstItem() ?? 0 }}</strong> to
+        <strong>{{ $users->lastItem() ?? 0 }}</strong> of
+        <strong>{{ $users->total() }}</strong> entries
+    </span>
+    <x-admin.pagination :paginator="$users" />
+</div>
 
 </div>
 

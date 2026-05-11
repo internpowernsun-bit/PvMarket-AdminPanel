@@ -29,6 +29,7 @@ class Product extends Model
         'datasheet',
         'verification_status',
         'updated_by',
+        'created_by',
     ];
 
     protected $casts = [

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use App\Casts\AsObjectId;
 
 class Offer extends Model
 {
@@ -10,17 +11,19 @@ class Offer extends Model
     protected $collection = 'offers';
 
     protected $fillable = [
-        'unique_id',        // e.g. "00T4Cx"  – auto-generated on create
+        'unique_id',
         'product_id',
-        'product_name',     // denormalised for display
+        'product_name',
         'warehouse_id',
-        'warehouse_name',   // denormalised for display
-        'payment_status',   // 'paid' | 'pending'
-        'is_active',        // boolean – status toggle
+        'warehouse_name',
+        'payment_status',
+        'is_active',
         'updated_by',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'    => 'boolean',
+        'product_id'   => AsObjectId::class,
+        'warehouse_id' => AsObjectId::class,
     ];
 }

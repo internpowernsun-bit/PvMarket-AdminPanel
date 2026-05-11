@@ -100,6 +100,7 @@
 @section('title', 'Offers')
 
 @section('styles')
+<style>
     .content-panel { background:white; border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.04); }
     .table-toolbar { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--border); gap:12px; flex-wrap:wrap; background:#FAFBFD; }
     .search-group { display:flex; align-items:center; gap:8px; }
@@ -216,7 +217,7 @@
     .empty-state p { font-size:14px; font-weight:500; }
     .alert-success { padding:12px 16px; background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; border-radius:8px; font-size:13.5px; font-weight:500; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
     .unique-id { font-family:monospace; font-size:13px; font-weight:600; color:var(--muted); letter-spacing:.5px; }
-
+</style>
 @endsection
 
 @section('content')

@@ -80,18 +80,18 @@ class SubMenuController extends Controller
         }
 
         $data = [
-            'sub_category_name'       => $item['name'],
-            'category_id'             => $request->category_id,
-            'slug'                    => Str::slug($item['name']),
-            'sub_category_icon_image' => $iconData,
-            'category_name'           => MainMenu::find($request->category_id)?->category_name ?? '',
-            'icon_alt_tag'            => $item['alt_tag'] ?? Str::slug($item['name']),
-            'is_hold'                 => false,
-            'stock_value'             => false,
-            'pallet_applicable'       => isset($item['pallet']) ? true : false,
-            'container_applicable'    => isset($item['container']) ? true : false,
-            'created_by'              => (string) auth()->id(),
-        ];
+    'sub_category_name'       => $item['name'],
+    'category_id'             => new \MongoDB\BSON\ObjectId($request->category_id),
+    'slug'                    => Str::slug($item['name']),
+    'sub_category_icon_image' => $iconData,
+    'category_name'           => MainMenu::find($request->category_id)?->category_name ?? '',
+    'icon_alt_tag'            => $item['alt_tag'] ?? Str::slug($item['name']),
+    'is_hold'                 => false,
+    'stock_value'             => false,
+    'pallet_applicable'       => isset($item['pallet']) ? true : false,
+    'container_applicable'    => isset($item['container']) ? true : false,
+    'created_by'              => new \MongoDB\BSON\ObjectId(auth()->id()),
+];
 
         $data = $this->attachTranslations($data, new SubMenu());
         SubMenu::create($data);
@@ -155,15 +155,16 @@ if ($request->hasFile('icon')) {
 }
 
     $data = [
-        'sub_category_name'       => $request->sub_category_name,
-        'category_id'             => $request->category_id,
-        'slug'                    => $request->slug ?: Str::slug($request->sub_category_name),
-        'sub_category_icon_image' => $iconData,
-        'category_name'           => MainMenu::find($request->category_id)?->category_name ?? '',
-        'icon_alt_tag'            => $request->alt_tag ?? Str::slug($request->sub_category_name),
-        'pallet_applicable'       => $request->has('pallet_applicable'),    
-        'container_applicable'    => $request->has('container_applicable'),
-    ];
+    'sub_category_name'       => $request->sub_category_name,
+    'category_id'             => new \MongoDB\BSON\ObjectId($request->category_id),
+    'slug'                    => $request->slug ?: Str::slug($request->sub_category_name),
+    'sub_category_icon_image' => $iconData,
+    'category_name'           => MainMenu::find($request->category_id)?->category_name ?? '',
+    'icon_alt_tag'            => $request->alt_tag ?? Str::slug($request->sub_category_name),
+    'pallet_applicable'       => $request->has('pallet_applicable'),    
+    'container_applicable'    => $request->has('container_applicable'),
+    'updated_by'              => new \MongoDB\BSON\ObjectId(auth()->id()),
+];
 
     $data = $this->attachTranslations($data, $subMenu);
     $subMenu->update($data);

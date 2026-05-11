@@ -156,7 +156,10 @@
             @foreach($units as $unit)
                 <label class="multi-select-item">
                     <input type="checkbox" name="unit_ids[]" value="{{ (string)$unit->id }}"
-    {{ in_array((string)$unit->id, array_map('strval', old('unit_ids', $record->unit_ids ?? []))) ? 'checked' : '' }}
+    {{ in_array((string)$unit->id, collect(old('unit_ids', $record->unit_ids ?? []))->map(function($id) {
+    if (is_array($id) && isset($id['$oid'])) return $id['$oid'];
+    return (string) $id;
+})->toArray()) ? 'checked' : '' }}
                         onchange="updateTriggerText()"/>
                     {{ $unit->unit_name }}
                 </label>
@@ -231,10 +234,9 @@ function handleDetailMainMenuChange(mainMenuId) {
     .then(data => {
         subSelect.innerHTML = '<option value=""> Select Sub Menu </option>';
         data.subMenus.forEach(sm => {
-    const id = sm.id || sm._id;
-    subSelect.innerHTML += `<option value="${id}">${sm.sub_category_name}</option>`; 
+    const id = sm._id?.$oid || sm._id || sm.id;
+    subSelect.innerHTML += `<option value="${id}">${sm.sub_category_name}</option>`;
 });
-
         // Re-select the previously saved sub_menu_id in edit mode (if it matches)
         const savedSubMenuId = '{{ old('sub_category_id', $record->sub_category_id ?? '') }}';
         if (savedSubMenuId) {
@@ -450,9 +452,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     <div class="table-footer">
-        <span>{{ $options->firstItem() ?? 0 }}–{{ $options->lastItem() ?? 0 }} of {{ $options->total() }} entries</span>
-        {{ $options->appends(request()->query())->links() }}
-    </div>
+    <span>{{ $options->firstItem() ?? 0 }}–{{ $options->lastItem() ?? 0 }} of {{ $options->total() }} entries</span>
+    @if ($options->hasPages())
+    <nav style="display:flex; align-items:center; gap:4px;">
+        @if ($options->onFirstPage())
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">‹</span>
+        @else
+            <a href="{{ $options->previousPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">‹</a>
+        @endif
+        @foreach ($options->getUrlRange(1, $options->lastPage()) as $page => $url)
+            @if ($page == $options->currentPage())
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--primary-d);background:var(--primary-d);color:white;font-size:13px;font-weight:700;">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $options->lastPage() || abs($page - $options->currentPage()) <= 2)
+                <a href="{{ $url }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">{{ $page }}</a>
+            @elseif ($page == $options->currentPage() - 3 || $page == $options->currentPage() + 3)
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:13px;">…</span>
+            @endif
+        @endforeach
+        @if ($options->hasMorePages())
+            <a href="{{ $options->nextPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">›</a>
+        @else
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">›</span>
+        @endif
+    </nav>
+    @endif
+</div>
 
 </div>
 

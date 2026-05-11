@@ -72,21 +72,22 @@ class ProductDetailOptionController extends Controller
         // Resolve unit names — works whether unit_ids is empty or not
         $unitNames = [];
         if (!empty($request->unit_ids)) {
-            $unitNames = \App\Models\Unit::whereIn('_id', $request->unit_ids)
-                                          ->pluck('unit_name')
-                                          ->toArray();
+            $unitObjectIds = collect($request->unit_ids)->map(fn($id) => new \MongoDB\BSON\ObjectId($id))->toArray();
+$unitNames = \App\Models\Unit::whereIn('_id', $unitObjectIds)
+                              ->pluck('unit_name')
+                              ->toArray();
         } // ✅ if block closed here
 
         ProductDetailOption::create([
-            'option_name'       => $request->option_name,
-            'data_type'         => $request->data_type,
-            'category_id'       => $request->category_id,
-            'category_name'     => $category?->category_name,
-            'sub_category_id'   => $request->sub_category_id,
-            'sub_category_name' => $subCategory?->sub_category_name,
-            'unit_ids'          => $request->unit_ids ?? [],
-            'unit_names'        => $unitNames,
-        ]);
+    'option_name'       => $request->option_name,
+    'data_type'         => $request->data_type,
+    'category_id'       => $request->category_id ? new \MongoDB\BSON\ObjectId($request->category_id) : null,
+    'category_name'     => $category?->category_name,
+    'sub_category_id'   => $request->sub_category_id ? new \MongoDB\BSON\ObjectId($request->sub_category_id) : null,
+    'sub_category_name' => $subCategory?->sub_category_name,
+    'unit_ids'          => collect($request->unit_ids ?? [])->map(fn($id) => new \MongoDB\BSON\ObjectId($id))->toArray(),
+    'unit_names'        => $unitNames,
+]);
 
         return redirect()->route('admin.products.detail-options.index')
                          ->with('success', 'Product specification created successfully.');
@@ -115,21 +116,22 @@ class ProductDetailOptionController extends Controller
 
         $unitNames = [];
         if (!empty($request->unit_ids)) {
-            $unitNames = \App\Models\Unit::whereIn('_id', $request->unit_ids)
+            $unitObjectIds = collect($request->unit_ids)->map(fn($id) => new \MongoDB\BSON\ObjectId($id))->toArray();
+            $unitNames = \App\Models\Unit::whereIn('_id', $unitObjectIds)
                                           ->pluck('unit_name')
                                           ->toArray();
         } // ✅ if block closed here
 
         $detailOption->update([
-            'option_name'       => $request->option_name,
-            'data_type'         => $request->data_type,
-            'category_id'       => $request->category_id,
-            'category_name'     => $category?->category_name,
-            'sub_category_id'   => $request->sub_category_id,
-            'sub_category_name' => $subCategory?->sub_category_name,
-            'unit_ids'          => $request->unit_ids ?? [],
-            'unit_names'        => $unitNames,
-        ]);
+    'option_name'       => $request->option_name,
+    'data_type'         => $request->data_type,
+    'category_id'       => $request->category_id ? new \MongoDB\BSON\ObjectId($request->category_id) : null,
+    'category_name'     => $category?->category_name,
+    'sub_category_id'   => $request->sub_category_id ? new \MongoDB\BSON\ObjectId($request->sub_category_id) : null,
+    'sub_category_name' => $subCategory?->sub_category_name,
+    'unit_ids'          => collect($request->unit_ids ?? [])->map(fn($id) => new \MongoDB\BSON\ObjectId($id))->toArray(),
+    'unit_names'        => $unitNames,
+]);
 
         return redirect()->route('admin.products.detail-options.index')
                          ->with('success', 'Product specification updated successfully.');

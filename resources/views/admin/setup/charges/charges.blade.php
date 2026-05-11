@@ -248,10 +248,9 @@
     </table>
 
     <div class="table-footer">
-        <span>{{ $charges->firstItem() ?? 0 }}–{{ $charges->lastItem() ?? 0 }} of {{ $charges->total() }} entries</span>
-        {{ $charges->appends(request()->query())->links() }}
-    </div>
-
+    <span>{{ $charges->firstItem() ?? 0 }}–{{ $charges->lastItem() ?? 0 }} of {{ $charges->total() }} entries</span>
+    <x-admin.pagination :paginator="$charges" />
+</div>
 </div>
 
 @endsection

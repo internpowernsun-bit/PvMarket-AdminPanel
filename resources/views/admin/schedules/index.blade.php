@@ -435,14 +435,40 @@
     </table>
 
     {{-- Footer --}}
-    <div class="table-footer">
-        <span>
-            Showing <strong>{{ $schedules->firstItem() ?? 0 }}</strong> to
-            <strong>{{ $schedules->lastItem() ?? 0 }}</strong> of
-            <strong>{{ $schedules->total() }}</strong> entries
-        </span>
-        {{ $schedules->appends(request()->query())->links() }}
-    </div>
+    {{-- Footer --}}
+<div class="table-footer">
+    <span>
+        Showing <strong>{{ $schedules->firstItem() ?? 0 }}</strong> to
+        <strong>{{ $schedules->lastItem() ?? 0 }}</strong> of
+        <strong>{{ $schedules->total() }}</strong> entries
+    </span>
+
+    @if ($schedules->hasPages())
+    <nav style="display:flex; align-items:center; gap:4px;">
+        @if ($schedules->onFirstPage())
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">‹</span>
+        @else
+            <a href="{{ $schedules->previousPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">‹</a>
+        @endif
+
+        @foreach ($schedules->getUrlRange(1, $schedules->lastPage()) as $page => $url)
+            @if ($page == $schedules->currentPage())
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--primary-d);background:var(--primary-d);color:white;font-size:13px;font-weight:700;">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $schedules->lastPage() || abs($page - $schedules->currentPage()) <= 2)
+                <a href="{{ $url }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">{{ $page }}</a>
+            @elseif ($page == $schedules->currentPage() - 3 || $page == $schedules->currentPage() + 3)
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:13px;">…</span>
+            @endif
+        @endforeach
+
+        @if ($schedules->hasMorePages())
+            <a href="{{ $schedules->nextPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">›</a>
+        @else
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">›</span>
+        @endif
+    </nav>
+    @endif
+</div>
 
 </div>
 

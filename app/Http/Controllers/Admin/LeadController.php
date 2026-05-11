@@ -30,9 +30,10 @@ class LeadController extends Controller
             });
         }
 
-        $leads = $query->orderBy('created_at', 'desc')->get();
+        $perPage = (int) $request->get('per_page', 10);
+$leads   = $query->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
 
-        return view('admin.leads.index', compact('leads'));
+return view('admin.leads.index', compact('leads'));
     }
 
     // ── Update lead status ────────────────────────────────────────
@@ -105,11 +106,13 @@ class LeadController extends Controller
         $visits = $query->orderBy('no_of_times', 'desc')->get();
 
         // Load user and product info
-        $userIds    = $visits->pluck('user_id')->filter()->unique()->values()->toArray();
-        $productIds = $visits->pluck('product_id')->filter()->unique()->values()->toArray();
+        $userIds    = $visits->pluck('user_id')->filter()->unique()->values()
+                ->map(fn($id) => new \MongoDB\BSON\ObjectId((string)$id))->toArray();
+$productIds = $visits->pluck('product_id')->filter()->unique()->values()
+                ->map(fn($id) => new \MongoDB\BSON\ObjectId((string)$id))->toArray();
 
-        $users    = User::whereIn('_id', $userIds)->get()->keyBy(fn($u) => (string)$u->_id);
-        $products = Product::whereIn('_id', $productIds)->get()->keyBy(fn($p) => (string)$p->_id);
+$users    = User::whereIn('_id', $userIds)->get()->keyBy(fn($u) => (string)$u->_id);
+$products = Product::whereIn('_id', $productIds)->get()->keyBy(fn($p) => (string)$p->_id);
 
         // Search filter applied after loading
         $search = $request->search;
@@ -128,9 +131,20 @@ class LeadController extends Controller
         }
 
         // Load current visit timer setting
-        $visitTimerSeconds = (int) \App\Models\Setting::getValue('visit_timer_seconds', 30);
+        $perPage     = (int) $request->get('per_page', 10);
+$currentPage = (int) $request->get('page', 1);
+$total       = $visits->count();
+$visits      = new \Illuminate\Pagination\LengthAwarePaginator(
+    $visits->forPage($currentPage, $perPage),
+    $total,
+    $perPage,
+    $currentPage,
+    ['path' => $request->url(), 'query' => $request->query()]
+);
 
-        return view('admin.leads.product-visits', compact('visits', 'visitTimerSeconds'));
+$visitTimerSeconds = (int) \App\Models\Setting::getValue('visit_timer_seconds', 30);
+
+return view('admin.leads.product-visits', compact('visits', 'visitTimerSeconds'));
     }
 
     // ── Delete product visit ──────────────────────────────────────
@@ -154,10 +168,12 @@ class LeadController extends Controller
         }
 
         $visits     = $query->get();
-        $userIds    = $visits->pluck('user_id')->filter()->unique()->toArray();
-        $productIds = $visits->pluck('product_id')->filter()->unique()->toArray();
-        $users      = User::whereIn('_id', $userIds)->get()->keyBy(fn($u) => (string)$u->_id);
-        $products   = Product::whereIn('_id', $productIds)->get()->keyBy(fn($p) => (string)$p->_id);
+        $userIds    = $visits->pluck('user_id')->filter()->unique()
+                ->map(fn($id) => new \MongoDB\BSON\ObjectId((string)$id))->toArray();
+$productIds = $visits->pluck('product_id')->filter()->unique()
+                ->map(fn($id) => new \MongoDB\BSON\ObjectId((string)$id))->toArray();
+$users      = User::whereIn('_id', $userIds)->get()->keyBy(fn($u) => (string)$u->_id);
+$products   = Product::whereIn('_id', $productIds)->get()->keyBy(fn($p) => (string)$p->_id);
 
         $headers = [
             'Content-Type'        => 'text/csv',

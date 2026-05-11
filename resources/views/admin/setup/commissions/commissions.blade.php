@@ -1,55 +1,39 @@
-{{-- views/admin/setup/units/units.blade.php --}}
-{{-- Handles: index | create | edit --}}
-
 @if($mode === 'create')
-@extends('layouts.admin')
 
 {{-- ═══ CREATE MODE ═══ --}}
-@section('title', 'Add Units')
+@extends('layouts.admin')
+@section('title', 'Add Commissions')
 
 @section('styles')
 <style>
     .content-panel { background:white; border:1px solid var(--border); border-radius:12px; padding:28px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
-    .form-table { width:100%; border-collapse:collapse; }
+    .form-table { width:100%; border-collapse:collapse; margin-top:20px; }
     .form-table thead tr { border-bottom:2px solid var(--border); }
     .form-table th { padding:10px 14px; font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; text-align:left; }
-    .form-table td { padding:10px 14px; vertical-align:middle; }
-    .form-table tbody tr { border-bottom:1px solid #F1F5F9; }
-    .form-table tbody tr:last-child { border-bottom:none; }
+    .form-table td { padding:10px 14px; vertical-align:middle; border-bottom:1px solid #F1F5F9; }
+    .form-table tbody tr:last-child td { border-bottom:none; }
     .sno { font-size:13px; font-weight:700; color:var(--muted); width:60px; }
-    .form-row-input { width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; color:var(--text); outline:none; transition:border-color .2s,box-shadow .2s; background:white; }
-    .form-row-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1); }
-    .form-row-input::placeholder { color:#CBD5E1; }
+    .form-row-input, .form-row-select { width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; color:var(--text); outline:none; transition:border-color .2s; background:white; }
+    .form-row-input:focus, .form-row-select:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1); }
+    .form-row-select { cursor:pointer; }
     .btn-add-row { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--primary); color:white; border:none; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:background .15s; }
     .btn-add-row:hover { background:var(--primary-d); }
     .btn-save { display:inline-flex; align-items:center; gap:8px; padding:10px 28px; background:#10B981; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s; }
     .btn-save:hover { background:#059669; }
-    .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 18px;
-    background: var(--text);
-    color: white;
-    border-radius: 8px;
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background .15s;
-    white-space: nowrap;
-    border: 1.5px solid var(--text);
-}
+    .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; white-space:nowrap; border:1.5px solid var(--text); }
+    .btn-back:hover { background:#334155; }
     .btn-remove { background:none; border:none; cursor:pointer; color:#EF4444; padding:6px; border-radius:6px; transition:background .15s; }
     .btn-remove:hover { background:#FEF2F2; }
     .alert-error { padding:12px 16px; background:#FEE2E2; color:#991B1B; border:1px solid #FECACA; border-radius:8px; font-size:13.5px; margin-bottom:20px; }
+    .toolbar-row { display:flex; align-items:center; justify-content:flex-end; margin-bottom:8px; }
 </style>
 @endsection
 
 @section('content')
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Add Units</h1>
-    <a href="{{ route('admin.setup.units.index') }}" class="btn-back">← Back</a>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Add Commissions</h1>
+    <a href="{{ route('admin.setup.commissions.index') }}" class="btn-back">← Back</a>
 </div>
 
 @if($errors->any())
@@ -57,46 +41,42 @@
 @endif
 
 <div class="content-panel">
-
-    <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
-        <button type="button" class="btn-add-row" onclick="addRow()">+ Add More</button>
-    </div>
-
-    <form method="POST" action="{{ route('admin.setup.units.store') }}" id="createForm">
+    <form method="POST" action="{{ route('admin.setup.commissions.store') }}" id="createForm">
         @csrf
+
+        <div class="toolbar-row">
+            <button type="button" class="btn-add-row" onclick="addRow()">+ Add More</button>
+        </div>
 
         <table class="form-table">
             <thead>
                 <tr>
                     <th style="width:60px;">S.No</th>
-                    <th style="min-width:200px;">Unit Name</th>
-                    <th style="min-width:140px;">Unit Code</th>
-                    <th style="min-width:260px;">Description</th>
-                    <th style="width:60px;">Action</th>
+                    <th>Main Category</th>
+                    <th style="width:220px;">Commission (%)</th>
+                    <th style="width:60px;">Actions</th>
                 </tr>
             </thead>
             <tbody id="rowsBody">
                 <tr id="row-1">
                     <td class="sno">1.</td>
                     <td>
-                        <input type="text" name="units[0][unit_name]" class="form-row-input"
-                               placeholder="e.g. Kilogram" required/>
+                        <select name="items[0][category_id]" class="form-row-select" required>
+                            <option value="">Select Category</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->category_name }}</option>
+                            @endforeach
+                        </select>
                     </td>
                     <td>
-                        <input type="text" name="units[0][unit_code]" class="form-row-input"
-                               placeholder="e.g. KG" required
-                               style="text-transform:uppercase;"/>
+                        <input type="number" name="items[0][commission_percentage]"
+                               class="form-row-input" placeholder="e.g. 5.5"
+                               min="0" max="100" step="0.01" required/>
                     </td>
                     <td>
-                        <input type="text" name="units[0][description]" class="form-row-input"
-                               placeholder="Optional description"/>
-                    </td>
-                    <td>
-                        <button type="button" class="btn-remove" onclick="removeRow(this)" title="Remove">
+                        <button type="button" class="btn-remove" onclick="removeRow(this)">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                                <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
                             </svg>
                         </button>
                     </td>
@@ -121,25 +101,32 @@
 
 @section('scripts')
 <script>
+const categoriesOptions = `@foreach($categories as $cat)<option value="{{ $cat->id }}">{{ $cat->category_name }}</option>@endforeach`;
 let rowCount = 1;
 
 function addRow() {
     rowCount++;
-    const idx = rowCount - 1;
+    const idx  = rowCount - 1;
     const body = document.getElementById('rowsBody');
-    const tr = document.createElement('tr');
+    const tr   = document.createElement('tr');
     tr.id = 'row-' + rowCount;
     tr.innerHTML = `
         <td class="sno">${rowCount}.</td>
-        <td><input type="text" name="units[${idx}][unit_name]" class="form-row-input" placeholder="e.g. Kilogram" required/></td>
-        <td><input type="text" name="units[${idx}][unit_code]" class="form-row-input" placeholder="e.g. KG" required style="text-transform:uppercase;"/></td>
-        <td><input type="text" name="units[${idx}][description]" class="form-row-input" placeholder="Optional description"/></td>
         <td>
-            <button type="button" class="btn-remove" onclick="removeRow(this)" title="Remove">
+            <select name="items[${idx}][category_id]" class="form-row-select" required>
+                <option value="">Select Category</option>
+                ${categoriesOptions}
+            </select>
+        </td>
+        <td>
+            <input type="number" name="items[${idx}][commission_percentage]"
+                   class="form-row-input" placeholder="e.g. 5.5"
+                   min="0" max="100" step="0.01" required/>
+        </td>
+        <td>
+            <button type="button" class="btn-remove" onclick="removeRow(this)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                    <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                    <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
                 </svg>
             </button>
         </td>
@@ -157,8 +144,8 @@ function removeRow(btn) {
 function renumber() {
     document.querySelectorAll('#rowsBody tr').forEach((tr, i) => {
         tr.querySelector('.sno').textContent = (i + 1) + '.';
-        tr.querySelectorAll('input').forEach(inp => {
-            inp.name = inp.name.replace(/units\[\d+\]/, `units[${i}]`);
+        tr.querySelectorAll('select, input').forEach(el => {
+            el.name = el.name.replace(/items\[\d+\]/, `items[${i}]`);
         });
     });
 }
@@ -168,39 +155,24 @@ function renumber() {
 
 @elseif($mode === 'edit')
 
-
 {{-- ═══ EDIT MODE ═══ --}}
-@section('title', 'Edit Unit')
+@extends('layouts.admin')
+@section('title', 'Edit Commission')
 
 @section('styles')
 <style>
     .content-panel { background:white; border:1px solid var(--border); border-radius:12px; padding:28px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
-    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px 28px; margin-bottom:20px; }
-    .form-grid-full { margin-bottom:20px; }
-    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
     .form-label { font-size:13px; font-weight:600; color:var(--text); }
-    .form-label span { color:var(--danger); margin-left:2px; }
-    .form-input { width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; color:var(--text); outline:none; transition:border-color .2s,box-shadow .2s; background:white; }
-    .form-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1); }
-    .form-input::placeholder { color:#CBD5E1; }
-    textarea.form-input { resize:vertical; min-height:100px; }
+    .form-label span { color:var(--danger); }
+    .form-input, .form-select { width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; color:var(--text); outline:none; transition:border-color .2s,box-shadow .2s; background:white; }
+    .form-input:focus, .form-select:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(14,165,233,.1); }
+    .form-select { cursor:pointer; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
     .btn-save { display:inline-flex; align-items:center; gap:8px; padding:10px 28px; background:#10B981; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s; }
     .btn-save:hover { background:#059669; }
-    .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 18px;
-    background: var(--text);
-    color: white;
-    border-radius: 8px;
-    font-size: 13.5px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background .15s;
-    white-space: nowrap;
-    border: 1.5px solid var(--text);
-}
+    .btn-back { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:var(--text); color:white; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:background .15s; white-space:nowrap; border:1.5px solid var(--text); }
+    .btn-back:hover { background:#334155; }
     .alert-error { padding:12px 16px; background:#FEE2E2; color:#991B1B; border:1px solid #FECACA; border-radius:8px; font-size:13.5px; margin-bottom:20px; }
 </style>
 @endsection
@@ -208,8 +180,8 @@ function renumber() {
 @section('content')
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Edit Unit</h1>
-    <a href="{{ route('admin.setup.units.index') }}" class="btn-back">← Back</a>
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Edit Commission</h1>
+    <a href="{{ route('admin.setup.commissions.index') }}" class="btn-back">← Back</a>
 </div>
 
 @if($errors->any())
@@ -217,34 +189,30 @@ function renumber() {
 @endif
 
 <div class="content-panel">
-    <form method="POST"
-          action="{{ route('admin.setup.units.update', $record->id) }}">
+    <form method="POST" action="{{ route('admin.setup.commissions.update', $record->id) }}">
         @csrf
         @method('PUT')
 
         <div class="form-grid">
             <div class="form-group">
-                <label class="form-label">Unit Name <span>*</span></label>
-                <input type="text" name="unit_name" class="form-input"
-                       placeholder="e.g. Kilogram"
-                       value="{{ old('unit_name', $record->unit_name) }}" required/>
+                <label class="form-label">Main Category <span>*</span></label>
+                <select name="category_id" class="form-select" required>
+                    <option value="">Select Category</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}"
+                            {{ old('category_id', (string)$record->category_id) == (string)$cat->id ? 'selected' : '' }}>
+                            {{ $cat->category_name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Unit Code <span>*</span></label>
-                <input type="text" name="unit_code" class="form-input"
-                       placeholder="e.g. KG"
-                       value="{{ old('unit_code', $record->unit_code) }}"
-                       style="text-transform:uppercase;"
-                       required/>
-            </div>
-        </div>
-
-        <div class="form-grid-full">
-            <div class="form-group">
-                <label class="form-label">Description</label>
-                <textarea name="description" class="form-input"
-                          placeholder="Optional description">{{ old('description', $record->description) }}</textarea>
+                <label class="form-label">Commission (%) <span>*</span></label>
+                <input type="number" name="commission_percentage" class="form-input"
+                       placeholder="e.g. 5.5"
+                       value="{{ old('commission_percentage', $record->commission_percentage) }}"
+                       min="0" max="100" step="0.01" required/>
             </div>
         </div>
 
@@ -255,7 +223,7 @@ function renumber() {
                     <polyline points="17 8 12 3 7 8"/>
                     <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
-                Save Changes
+                Save
             </button>
         </div>
     </form>
@@ -266,9 +234,9 @@ function renumber() {
 
 @else
 
-
 {{-- ═══ INDEX MODE ═══ --}}
-@section('title', 'Units')
+@extends('layouts.admin')
+@section('title', 'Commissions')
 
 @section('styles')
 <style>
@@ -288,27 +256,18 @@ function renumber() {
     .data-table thead { background:#F0F9FF; }
     .data-table th { padding:11px 16px; text-align:left; font-size:12px; font-weight:700; color:var(--primary-d); text-transform:uppercase; letter-spacing:.5px; border-bottom:2px solid #BAE6FD; white-space:nowrap; }
     .data-table th.center,.data-table td.center { text-align:center; }
-    .data-table td { padding:13px 16px; font-size:13.5px; color:var(--text); border-bottom:1px solid #F1F5F9; vertical-align:middle; }
+    .data-table td { padding:14px 16px; font-size:13.5px; color:var(--text); border-bottom:1px solid #F1F5F9; vertical-align:middle; }
     .data-table tr:last-child td { border-bottom:none; }
     .data-table tbody tr:nth-child(odd) td { background:white; }
     .data-table tbody tr:nth-child(even) td { background:#FAFBFD; }
     .data-table tbody tr:hover td { background:#E0F2FE !important; }
-    .unit-code-badge { display:inline-block; padding:4px 12px; background:var(--primary-l); color:var(--primary-d); border-radius:6px; font-size:12.5px; font-weight:700; font-family:monospace; letter-spacing:.5px; }
-    .description-text { color:var(--muted); font-size:13px; max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
-    .status-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-    .status-badge.active { background:#D1FAE5; color:#065F46; }
-    .status-badge.inactive { background:#F1F5F9; color:#94A3B8; }
-    .status-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block; }
     .action-btns { display:flex; align-items:center; justify-content:center; gap:8px; }
     .action-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1.5px solid transparent; background:none; border-radius:7px; transition:all .15s; text-decoration:none; }
     .action-icon svg { width:15px; height:15px; }
     .action-icon.edit   { color:#D97706; border-color:#FDE68A; background:#FFFBEB; }
-    .action-icon.toggle { color:#059669; border-color:#A7F3D0; background:#ECFDF5; }
-    .action-icon.toggle.off { color:#94A3B8; border-color:#E2E8F0; background:#F8FAFC; }
     .action-icon.delete { color:#DC2626; border-color:#FECACA; background:#FEF2F2; }
     .action-icon:hover { transform:translateY(-2px) scale(1.08); box-shadow:0 3px 8px rgba(0,0,0,.12); }
     .action-icon.edit:hover   { background:#FEF3C7; border-color:#F59E0B; }
-    .action-icon.toggle:hover { background:#D1FAE5; border-color:#10B981; }
     .action-icon.delete:hover { background:#FEE2E2; border-color:#EF4444; }
     .table-footer { padding:12px 20px; font-size:13px; color:var(--muted); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#FAFBFD; }
     .pagination { display:flex; gap:3px; list-style:none; }
@@ -325,8 +284,8 @@ function renumber() {
 @section('content')
 
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Units</h1>
-    <a href="{{ route('admin.setup.units.create') }}"
+    <h1 style="font-size:22px; font-weight:800; color:var(--text);">Commissions</h1>
+    <a href="{{ route('admin.setup.commissions.create') }}"
        style="display:inline-flex; align-items:center; gap:7px; padding:10px 20px;
               background:var(--primary); color:white; border-radius:8px; font-size:14px;
               font-weight:600; text-decoration:none; white-space:nowrap;"
@@ -350,22 +309,22 @@ function renumber() {
 
 <div class="content-panel">
     <div class="table-toolbar">
-        <form method="GET" action="{{ route('admin.setup.units.index') }}" class="search-group">
+        <form method="GET" action="{{ route('admin.setup.commissions.index') }}" class="search-group">
             <label>Search:</label>
             <div class="search-input-wrap">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
                 <input type="text" name="search" value="{{ request('search') }}"
-                       placeholder="Search By Unit Name..." class="search-input"/>
+                       placeholder="Search By Category..." class="search-input"/>
             </div>
         </form>
 
-        <form method="GET" action="{{ route('admin.setup.units.index') }}" class="entries-group">
+        <form method="GET" action="{{ route('admin.setup.commissions.index') }}" class="entries-group">
             Show
             <select name="entries" class="entries-select" onchange="this.form.submit()">
                 @foreach([10,25,50,100] as $n)
-                    <option value="{{ $n }}" {{ request('entries',10) == $n ? 'selected':'' }}>{{ $n }}</option>
+                    <option value="{{ $n }}" {{ request('entries',10) == $n ? 'selected' : '' }}>{{ $n }}</option>
                 @endforeach
             </select>
             entries
@@ -378,69 +337,44 @@ function renumber() {
     <table class="data-table">
         <thead>
             <tr>
-                <th class="center" style="width:70px;">S.No</th>
-                <th>Unit Name</th>
-                <th style="width:140px;">Unit Code</th>
-                <th>Description</th>
-                <th class="center" style="width:110px;">Status</th>
-                <th class="center" style="width:110px;">Action</th>
+                <th class="center" style="width:80px;">S.No</th>
+                <th>Main Category</th>
+                <th>Commission (%)</th>
+                <th class="center" style="width:120px;">Action</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($units as $index => $unit)
+            @forelse($commissions as $index => $commission)
             <tr>
                 <td class="center" style="font-weight:700; color:var(--muted); font-size:13px;">
-                    {{ $units->firstItem() + $index }}
+                    {{ $commissions->firstItem() + $index }}
                 </td>
-                <td style="font-weight:600;">{{ lang($unit, 'unit_name') }}</td>
+                <td style="font-weight:600;">{{ $commission->category_name }}</td>
                 <td>
-                    <span class="unit-code-badge">{{ $unit->unit_code }}</span>
-                </td>
-                <td>
-                    <span class="description-text" title="{{ lang($unit, 'description') }}">
-    {{ lang($unit, 'description') ?: '—' }}
-</span>
-                </td>
-                <td class="center">
-                    <span class="status-badge {{ $unit->is_active ? 'active' : 'inactive' }}">
-                        {{ $unit->is_active ? 'Active' : 'Inactive' }}
+                    <span style="font-weight:700; color:var(--text);">
+                        {{ number_format($commission->commission_percentage, 2) }}
                     </span>
+                    <span style="font-size:11px; color:var(--muted); margin-left:4px;">%</span>
                 </td>
                 <td>
                     <div class="action-btns">
-                        <a href="{{ route('admin.setup.units.edit', $unit->id) }}"
+                        <a href="{{ route('admin.setup.commissions.edit', $commission->id) }}"
                            class="action-icon edit" title="Edit">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                             </svg>
                         </a>
-
-                        <form method="POST"
-                              action="{{ route('admin.setup.units.toggle', $unit->id) }}"
-                              style="display:contents;">
-                            @csrf @method('PATCH')
-                            <button type="submit"
-                                    class="action-icon toggle {{ $unit->is_active ? '' : 'off' }}"
-                                    title="{{ $unit->is_active ? 'Active — click to deactivate' : 'Inactive — click to activate' }}">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="1" y="5" width="22" height="14" rx="7"/>
-                                    <circle cx="{{ $unit->is_active ? '16' : '8' }}" cy="12" r="4"
-                                            fill="currentColor" stroke="none"/>
-                                </svg>
-                            </button>
-                        </form>
-
                         <button class="action-icon delete" title="Delete"
-                            onclick="if(confirm('Delete {{ addslashes($unit->unit_name) }}?')) document.getElementById('del-{{ $unit->id }}').submit();">
+                            onclick="if(confirm('Delete this commission?')) document.getElementById('del-{{ $commission->id }}').submit();">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"/>
                                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
                                 <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
                             </svg>
                         </button>
-                        <form id="del-{{ $unit->id }}" method="POST"
-                              action="{{ route('admin.setup.units.destroy', $unit->id) }}"
+                        <form id="del-{{ $commission->id }}" method="POST"
+                              action="{{ route('admin.setup.commissions.destroy', $commission->id) }}"
                               style="display:none;">
                             @csrf @method('DELETE')
                         </form>
@@ -449,14 +383,13 @@ function renumber() {
             </tr>
             @empty
             <tr>
-                <td colspan="6">
+                <td colspan="4">
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                         </svg>
-                        <p>No units yet. Click <strong>Add +</strong> to create one.</p>
+                        <p>No commissions yet. Click <strong>Add +</strong> to create one.</p>
                     </div>
                 </td>
             </tr>
@@ -465,26 +398,27 @@ function renumber() {
     </table>
 
     <div class="table-footer">
-    <span>{{ $units->firstItem() ?? 0 }}–{{ $units->lastItem() ?? 0 }} of {{ $units->total() }} entries</span>
-
-    @if ($units->hasPages())
+    <span>{{ $commissions->firstItem() ?? 0 }}–{{ $commissions->lastItem() ?? 0 }} of {{ $commissions->total() }} entries</span>
+    @if ($commissions->hasPages())
     <nav style="display:flex; align-items:center; gap:4px;">
-        @if ($units->onFirstPage())
+        @if ($commissions->onFirstPage())
             <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">‹</span>
         @else
-            <a href="{{ $units->previousPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">‹</a>
+            <a href="{{ $commissions->previousPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">‹</a>
         @endif
-        @foreach ($units->getUrlRange(1, $units->lastPage()) as $page => $url)
-            @if ($page == $units->currentPage())
+
+        @foreach ($commissions->getUrlRange(1, $commissions->lastPage()) as $page => $url)
+            @if ($page == $commissions->currentPage())
                 <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--primary-d);background:var(--primary-d);color:white;font-size:13px;font-weight:700;">{{ $page }}</span>
-            @elseif ($page == 1 || $page == $units->lastPage() || abs($page - $units->currentPage()) <= 2)
+            @elseif ($page == 1 || $page == $commissions->lastPage() || abs($page - $commissions->currentPage()) <= 2)
                 <a href="{{ $url }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">{{ $page }}</a>
-            @elseif ($page == $units->currentPage() - 3 || $page == $units->currentPage() + 3)
+            @elseif ($page == $commissions->currentPage() - 3 || $page == $commissions->currentPage() + 3)
                 <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:13px;">…</span>
             @endif
         @endforeach
-        @if ($units->hasMorePages())
-            <a href="{{ $units->nextPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">›</a>
+
+        @if ($commissions->hasMorePages())
+            <a href="{{ $commissions->nextPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">›</a>
         @else
             <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">›</span>
         @endif

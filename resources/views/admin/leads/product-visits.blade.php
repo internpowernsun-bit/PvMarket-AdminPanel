@@ -202,7 +202,7 @@
             </tr>
         </thead>
         <tbody id="visitsTableBody">
-            @forelse($visits as $i => $visit)
+            @forelse($visits as $visit)
             @php
                 $user    = $visit->user_info;
                 $product = $visit->product_info;
@@ -210,7 +210,7 @@
             <tr data-id="{{ $visit->id }}">
 
                 {{-- S.No --}}
-                <td><span style="font-size:13px;font-weight:600;color:var(--muted);">{{ $i + 1 }}</span></td>
+                <td><span style="font-size:13px;font-weight:600;color:var(--muted);">{{ $visits->firstItem() + $loop->index }}</span></td>
 
                 {{-- Name --}}
                 <td class="name-cell">{{ $user?->name ?? '-' }}</td>
@@ -261,8 +261,34 @@
     </table>
 
     <div class="table-footer">
-        <span id="countLabel">1–{{ count($visits) }} of {{ count($visits) }} entries</span>
-    </div>
+    <span>{{ $visits->firstItem() ?? 0 }}–{{ $visits->lastItem() ?? 0 }} of {{ $visits->total() }} entries</span>
+
+    @if ($visits->hasPages())
+    <nav style="display:flex; align-items:center; gap:4px;">
+        @if ($visits->onFirstPage())
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">‹</span>
+        @else
+            <a href="{{ $visits->previousPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">‹</a>
+        @endif
+
+        @foreach ($visits->getUrlRange(1, $visits->lastPage()) as $page => $url)
+            @if ($page == $visits->currentPage())
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--primary-d);background:var(--primary-d);color:white;font-size:13px;font-weight:700;">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $visits->lastPage() || abs($page - $visits->currentPage()) <= 2)
+                <a href="{{ $url }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">{{ $page }}</a>
+            @elseif ($page == $visits->currentPage() - 3 || $page == $visits->currentPage() + 3)
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:13px;">…</span>
+            @endif
+        @endforeach
+
+        @if ($visits->hasMorePages())
+            <a href="{{ $visits->nextPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">›</a>
+        @else
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">›</span>
+        @endif
+    </nav>
+    @endif
+</div>
 </div>
 
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use App\Casts\AsObjectId;
 
 class ProductVisit extends Model
 {
@@ -19,6 +20,9 @@ class ProductVisit extends Model
     ];
 
     protected $casts = [
+        'user_id'     => AsObjectId::class,
+        'product_id'  => AsObjectId::class,
+        'offer_id'    => AsObjectId::class,
         'no_of_times' => 'integer',
         'is_active'   => 'integer',
     ];

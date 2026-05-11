@@ -450,10 +450,10 @@ $total     = (!empty($order->payment_currency_total) && $order->payment_currency
                             <div class="product-img-placeholder">No img</div>
                         @endif
                         @if($product)
-                            <span class="product-code">
-                                {{ strtoupper(substr(md5($product->id), 0, 7)) }}
-                            </span>
-                        @endif
+    <span class="product-code">
+        {{ $product->product_name }}
+    </span>
+@endif
                     </div>
                 </td>
 
@@ -584,10 +584,34 @@ $total     = (!empty($order->payment_currency_total) && $order->payment_currency
 
     {{-- Footer count --}}
     <div class="table-footer">
-        <span id="countLabel">
-            1–{{ count($orders) }} of {{ count($orders) }} entries
-        </span>
-    </div>
+    <span>{{ $orders->firstItem() ?? 0 }}–{{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} entries</span>
+
+    @if ($orders->hasPages())
+    <nav style="display:flex; align-items:center; gap:4px;">
+        @if ($orders->onFirstPage())
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">‹</span>
+        @else
+            <a href="{{ $orders->previousPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">‹</a>
+        @endif
+
+        @foreach ($orders->getUrlRange(1, $orders->lastPage()) as $page => $url)
+            @if ($page == $orders->currentPage())
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--primary-d);background:var(--primary-d);color:white;font-size:13px;font-weight:700;">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $orders->lastPage() || abs($page - $orders->currentPage()) <= 2)
+                <a href="{{ $url }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">{{ $page }}</a>
+            @elseif ($page == $orders->currentPage() - 3 || $page == $orders->currentPage() + 3)
+                <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:13px;">…</span>
+            @endif
+        @endforeach
+
+        @if ($orders->hasMorePages())
+            <a href="{{ $orders->nextPageUrl() }}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--text);text-decoration:none;font-size:16px;font-weight:600;transition:all .15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)';this.style.background='var(--primary-l)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';this.style.background='white';">›</a>
+        @else
+            <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;border:1.5px solid var(--border);background:white;color:#CBD5E1;cursor:not-allowed;font-size:16px;">›</span>
+        @endif
+    </nav>
+    @endif
+</div>
 </div>
 
 @endsection

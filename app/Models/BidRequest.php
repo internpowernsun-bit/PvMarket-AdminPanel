@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use App\Casts\AsObjectId;
 
 class BidRequest extends Model
 {
@@ -10,30 +11,37 @@ class BidRequest extends Model
     protected $collection = 'bid_requests';
 
     protected $fillable = [
-        'unique_id',             // e.g. "Req00035"
-        'selected_pcs_qty',      // integer — quantity selected
-        'quantity_unit',         // e.g. "Pallet", "Container", "Piece"
-        'sell_type',             // 1=normal, 2=offer
-        'purchased_currency',    // e.g. "USD"
-        'bid_price_per_piece',   // string e.g. "2063.45"
+        'unique_id',
+        'selected_pcs_qty',
+        'quantity_unit',
+        'sell_type',
+        'purchased_currency',
+        'bid_price_per_piece',
         'offer_id',
         'order_id',
-        'final_price_per_pcs',   // string — after negotiation
+        'final_price_per_pcs',
         'country_id',
-        'request_type',          // 'bid request' | 'fair request'
-        'lead_time',             // integer — weeks
-        'product_id',            // MongoDB ObjectId string
-        'product_name',          // denormalized
-        'company_id',            // MongoDB ObjectId string
-        'company_name',          // denormalized
+        'request_type',
+        'lead_time',
+        'product_id',
+        'product_name',
+        'company_id',
+        'company_name',
         'created_by',
         'updated_by',
-        'status',                // 0=Pending, 1=Accepted, 2=Rejected, 3=Completed
-        'is_active',             // 1=active, 0=deleted
-        'completed_at',          // timestamp when completed
+        'status',
+        'is_active',
+        'completed_at',
     ];
 
     protected $casts = [
+        'product_id'       => AsObjectId::class,
+        'company_id'       => AsObjectId::class,
+        'offer_id'         => AsObjectId::class,
+        'order_id'         => AsObjectId::class,
+        'country_id'       => AsObjectId::class,
+        'created_by'       => AsObjectId::class,
+        'updated_by'       => AsObjectId::class,
         'selected_pcs_qty' => 'integer',
         'sell_type'        => 'integer',
         'lead_time'        => 'integer',

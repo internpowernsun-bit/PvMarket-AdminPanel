@@ -21,7 +21,8 @@ class ScheduleController extends Controller
         }
 
         $schedules = $query->orderBy('created_at', 'desc')
-                           ->paginate($request->get('entries', 10));
+                   ->paginate(request('entries', 10))
+                   ->appends(request()->query());
 
         return view('admin.schedules.index', compact('schedules'));
     }

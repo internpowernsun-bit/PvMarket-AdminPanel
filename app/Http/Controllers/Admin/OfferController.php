@@ -65,7 +65,7 @@ class OfferController extends Controller
             'product_id'     => $request->product_id,
             'product_name'   => $product->product_name,
             'warehouse_id'   => $request->warehouse_id,
-            'warehouse_name' => $warehouse->name,
+            'warehouse_name' => $warehouse->warehouse_name,
             'payment_status' => 'pending',
             'is_active'      => true,
             'updated_by'     => Auth::user()->name,
@@ -107,7 +107,7 @@ class OfferController extends Controller
             'product_id'     => $request->product_id,
             'product_name'   => $product->product_name,
             'warehouse_id'   => $request->warehouse_id,
-            'warehouse_name' => $warehouse->name,
+            'warehouse_name' => $warehouse->warehouse_name,
             'updated_by'     => Auth::user()->name,
         ]);
 

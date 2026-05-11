@@ -10,56 +10,64 @@ use App\Models\MainMenu;
 use App\Models\SubMenu;
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Models\Commission;
 
 class ProductListingController extends Controller
 {
     // ── Index (My Listings page) ────────────────────────────────────
 
     public function index(Request $request)
-{
-    $query = ProductListing::where('user_id', Auth::id());
+    {
+        $userId = (string) Auth::id();   // ← cast to string to match MongoDB stored value
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('sku_code', 'like', "%{$search}%");
-        });
-    }
+        $query = ProductListing::where('user_id', new \MongoDB\BSON\ObjectId(Auth::id()));
 
-    $filter = $request->get('filter', 'all');
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('sku_code', 'like', "%{$search}%");
+            });
+        }
 
-    // Apply filter tab
-    match ($filter) {
-        'active'   => $query->where('is_active', true),
-        'inactive' => $query->where('is_active', false),
-        'paid'     => $query->where('is_paid', true),
-        'unpaid'   => $query->where('is_paid', false),
-        default    => null,
-    };
+        $filter = $request->get('filter', 'all');
 
-    $warehouseFilter = $request->get('warehouse_id');
-    if ($warehouseFilter) {
-        $query->where('warehouse_id', $warehouseFilter);
-    }
+        match ($filter) {
+            'active'   => $query->where('is_active', true),
+            'inactive' => $query->where('is_active', false),
+            'paid'     => $query->where('is_paid', true),
+            'unpaid'   => $query->where('is_paid', false),
+            default    => null,
+        };
 
-    $listings = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
-
-    // Count unpaid listings for the current user
-    $unpaidCount = ProductListing::where('user_id', Auth::id())
-                                 ->where('is_paid', false)
-                                 ->count();
-
-    // Load warehouses for the dropdown
-    $warehouses = \App\Models\Warehouse::all();
-
-    return view('admin.product_listing.index', compact(
-        'listings',
-        'unpaidCount',
-        'warehouses',
-        'warehouseFilter',
-        'filter',
-    ));
+        $warehouseFilter = $request->get('warehouse_id');
+        if ($warehouseFilter) {
+    $query->where('warehouse_id', new \MongoDB\BSON\ObjectId($warehouseFilter));
 }
+
+        $listings = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+
+        $unpaidCount = ProductListing::where('user_id', new \MongoDB\BSON\ObjectId(Auth::id()))
+                             ->where('is_paid', false)
+                             ->count();
+
+       $warehouses = Warehouse::where('is_active', true)->get();
+
+        $productIds   = $listings->pluck('product_id')->filter()->unique()
+                    ->map(fn($id) => (string)$id)->values();
+$warehouseIds = $listings->pluck('warehouse_id')->filter()->unique()
+                    ->map(fn($id) => (string)$id)->values();
+
+$productsMap   = Product::whereIn('_id', $productIds)->get()
+                    ->keyBy(fn($p) => (string)$p->_id);
+
+$warehousesMap = Warehouse::whereIn('_id', $warehouseIds)->get()
+                    ->keyBy(fn($w) => (string)$w->_id);
+
+return view('admin.product_listing.index', compact(
+    'listings', 'unpaidCount', 'warehouses', 'warehouseFilter', 'filter',
+    'productsMap', 'warehousesMap',
+));
+    }
 
     // ── Create ──────────────────────────────────────────────────────
 
@@ -69,6 +77,7 @@ class ProductListingController extends Controller
     $subCategories  = SubMenu::all();
     $products       = Product::all();
     $warehouses     = Warehouse::all();
+    $commissions    = Commission::all(['category_id', 'category_name', 'commission_percentage']);
 
     $sellTypes     = ['sell by pieces', 'sell by containers', 'sell by weight'];
     $currencies    = ['AED', 'USD', 'GBP', 'EUR'];
@@ -83,10 +92,16 @@ class ProductListingController extends Controller
         'DDP' => 'DDP - Delivered Duty Paid',
     ];
 
-    return view('admin.product_listing.create', compact(
-        'mainCategories', 'subCategories', 'products', 'warehouses',
-        'sellTypes', 'currencies', 'discountTypes', 'incoterms',
-    ));
+    $commissionsJson = $commissions->map(fn($c) => [
+    'category_id'   => (string)$c->category_id,
+    'category_name' => $c->category_name,
+    'percentage'    => $c->commission_percentage,
+])->values();
+
+return view('admin.product_listing.create', compact(
+    'mainCategories', 'subCategories', 'products', 'warehouses',
+    'sellTypes', 'currencies', 'discountTypes', 'incoterms', 'commissions', 'commissionsJson',
+));
 }
 
     // ── Store ───────────────────────────────────────────────────────
@@ -94,35 +109,89 @@ class ProductListingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'product_id'           => 'required|string',
-            'main_category_id'     => 'required|string',
-            'sub_category_id'      => 'required|string',
-            'warehouse_id'         => 'required|string',
-            'sell_type'            => 'required|string',
-            'currency_id'          => 'required|string',
-            'discount_type'        => 'nullable|string',
-            'incoterm'             => 'nullable|string',
-            'total_quantity'       => 'required|integer|min:1',
-            'lead_time'            => 'required|integer|min:0',
-            'is_active'            => 'boolean',
-            'slots'                => 'required|array|min:1',
-            'slots.*.min_quantity' => 'required|integer|min:0',
-            'slots.*.max_quantity' => 'required|integer|min:1',
-            'slots.*.price'        => 'required|numeric|min:0',
-        ]);
+    'product_id'                       => 'required|string',
+    'main_category_id'                 => 'required|string',
+    'sub_category_id'                  => 'required|string',
+    'warehouse_id'                     => 'required|string',
+    'sell_type'                        => 'required|string',
+    'currency_id'                      => 'required|string',
+    'discount_type'                    => 'nullable|string',
+    'incoterm'                         => 'nullable|string',
+    'total_quantity'                   => 'required|integer|min:1',
+    'lead_time'                        => 'required|integer|min:0',
+    'is_active'                        => 'nullable|boolean',
+    'images.*'                         => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+    'slots'                            => 'required|array|min:1',
+    'slots.*.min_quantity'             => 'required|integer|min:0',
+    'slots.*.max_quantity'             => 'nullable|integer|min:1',
+    'slots.*.price'                    => 'required|numeric|min:0',
+    'slots.*.commission_percentage'    => 'nullable|numeric|min:0',  // ← new
+    'slots.*.total_price'              => 'nullable|numeric|min:0',  // ← new
+]);
 
-        $validated['user_id']             = Auth::id();
-        $validated['created_by']          = Auth::id();
+        $validated['product_id']       = new \MongoDB\BSON\ObjectId($validated['product_id']);
+        $validated['main_category_id'] = new \MongoDB\BSON\ObjectId($validated['main_category_id']);
+        $validated['sub_category_id']  = new \MongoDB\BSON\ObjectId($validated['sub_category_id']);
+        $validated['warehouse_id']     = new \MongoDB\BSON\ObjectId($validated['warehouse_id']);
+        $validated['user_id']             = new \MongoDB\BSON\ObjectId(Auth::id());
+        $validated['created_by']          = new \MongoDB\BSON\ObjectId(Auth::id());
         $validated['verification_status'] = 'pending';
         $validated['is_active']           = $request->boolean('is_active', true);
         $validated['is_paid']             = false;
+        $validated['is_sold_off']         = $request->boolean('is_sold_off', false);
+        $validated['is_popular']          = $request->boolean('is_popular', false);
         $validated['sku_code']            = 'PV-' . rand(1000000000, 9999999999) . '-' . rand(1000, 9999);
 
-        ProductListing::create($validated);
+        // Convert max_quantity: empty string → null
+        $slotsAsObjects = [];
+foreach ($validated['slots'] as $slot) {
+    $price      = (float) $slot['price'];
+    $commission = isset($slot['commission_percentage']) && $slot['commission_percentage'] !== ''
+                  ? (float) $slot['commission_percentage']
+                  : 0;
+    $totalPrice = isset($slot['total_price']) && $slot['total_price'] !== ''
+                  ? (float) $slot['total_price']
+                  : round($price + ($price * $commission / 100), 2); // fallback calculation
 
-        return redirect()->route('product_listing.index')
-                         ->with('success', 'Your listing has been created and is pending approval.');
+    $slotsAsObjects[] = (object) [
+        'min_quantity'          => (int) $slot['min_quantity'],
+        'max_quantity'          => (isset($slot['max_quantity']) && $slot['max_quantity'] !== '')
+                                    ? (int) $slot['max_quantity']
+                                    : null,
+        'price'                 => $price,
+        'commission_percentage' => $commission,
+        'total_price'           => $totalPrice,
+    ];
+}
+$validated['slots'] = $slotsAsObjects;
+         $images = [];
+    if ($request->hasFile('images')) {
+        foreach ($request->file('images') as $file) {
+            $timestamp    = time() . '_' . rand(1000, 9999);
+            $originalName = $file->getClientOriginalName();
+            $filename     = $timestamp . '_' . $originalName;
+            $path         = 'uploads/product_listings/' . $filename;
+
+            $file->storeAs('uploads/product_listings', $filename, 'public');
+
+            $images[] = (object) [
+    'size'          => $file->getSize(),
+    'uploaded_at'   => now()->toISOString(),
+    'filename'      => $filename,
+    'original_name' => $originalName,
+    'path'          => $path,
+    'url'           => $path,
+    'mime_type'     => $file->getMimeType(),
+];
+        }
     }
+    $validated['images'] = $images;
+
+    ProductListing::create($validated);
+
+    return redirect()->route('product_listing.index')
+                     ->with('success', 'Your listing has been created and is pending approval.');
+}
 
     // ── Show ────────────────────────────────────────────────────────
 
@@ -135,11 +204,50 @@ class ProductListingController extends Controller
     // ── Edit ────────────────────────────────────────────────────────
 
     public function edit(string $id)
-    {
-        $listing = ProductListing::findOrFail($id);
-        return view('admin.product_listing.edit', compact('listing'));
-    }
+{
+    $listing     = ProductListing::findOrFail($id);
+    $commissions = Commission::all(['category_id', 'category_name', 'commission_percentage']);
 
+    $commissionsJson = $commissions->map(fn($c) => [
+        'category_id'   => (string)$c->category_id,
+        'category_name' => $c->category_name,
+        'percentage'    => $c->commission_percentage,
+    ])->values();
+
+    // ── Resolve names from IDs ──────────────────────────────
+    $mainCatId    = (string)$listing->main_category_id;
+$subCatId     = (string)$listing->sub_category_id;
+$productId    = (string)$listing->product_id;
+$warehouseId  = (string)$listing->warehouse_id;
+$mainCategories = MainMenu::all();
+$subCategories  = SubMenu::all();
+$products       = Product::all();
+$warehouses     = Warehouse::all();
+
+$mainCategory = MainMenu::where('_id', new \MongoDB\BSON\ObjectId($mainCatId))->first();
+$subCategory  = SubMenu::where('_id', new \MongoDB\BSON\ObjectId($subCatId))->first();
+$product      = Product::where('_id', new \MongoDB\BSON\ObjectId($productId))->first();
+$warehouse    = Warehouse::where('_id', new \MongoDB\BSON\ObjectId($warehouseId))->first();
+    $sellTypes     = ['sell by pieces', 'sell by containers', 'sell by weight'];
+    $currencies    = ['AED', 'USD', 'GBP', 'EUR'];
+    $discountTypes = ['No Promotion', 'fixed', 'percentage'];
+    $incoterms     = [
+        'EXW' => 'EXW - Ex Works',
+        'FCA' => 'FCA - Free Carrier',
+        'FOB' => 'FOB - Free On Board',
+        'CFR' => 'CFR - Cost and Freight',
+        'CIF' => 'CIF - Cost Insurance Freight',
+        'DAP' => 'DAP - Delivered At Place',
+        'DDP' => 'DDP - Delivered Duty Paid',
+    ];
+
+    return view('admin.product_listing.edit', compact(
+    'listing', 'sellTypes', 'currencies', 'discountTypes', 'incoterms',
+    'commissions', 'commissionsJson',
+    'mainCategory', 'subCategory', 'product', 'warehouse',
+    'mainCategories', 'subCategories', 'products', 'warehouses',
+));
+}
     // ── Update ──────────────────────────────────────────────────────
 
     public function update(Request $request, string $id)
@@ -147,25 +255,84 @@ class ProductListingController extends Controller
         $listing = ProductListing::findOrFail($id);
 
         $validated = $request->validate([
-            'sell_type'            => 'required|string',
-            'currency_id'          => 'required|string',
-            'discount_type'        => 'nullable|string',
-            'incoterm'             => 'nullable|string',
-            'total_quantity'       => 'required|integer|min:1',
-            'lead_time'            => 'required|integer|min:0',
-            'is_active'            => 'boolean',
-            'slots'                => 'required|array|min:1',
-            'slots.*.min_quantity' => 'required|integer|min:0',
-            'slots.*.max_quantity' => 'required|integer|min:1',
-            'slots.*.price'        => 'required|numeric|min:0',
-        ]);
+    'sell_type'                        => 'required|string',
+    'currency_id'                      => 'required|string',
+    'discount_type'                    => 'nullable|string',
+    'incoterm'                         => 'nullable|string',
+    'total_quantity'                   => 'required|integer|min:1',
+    'lead_time'                        => 'required|integer|min:0',
+    'is_active'                        => 'nullable|boolean',
+    'slots'                            => 'required|array|min:1',
+    'slots.*.min_quantity'             => 'required|integer|min:0',
+    'slots.*.max_quantity'             => 'nullable|integer|min:1',
+    'slots.*.price'                    => 'required|numeric|min:0',
+    'slots.*.commission_percentage'    => 'nullable|numeric|min:0',  // ← new
+    'slots.*.total_price'              => 'nullable|numeric|min:0',  // ← new
+    'main_category_id' => 'required|string',
+'sub_category_id'  => 'required|string',
+'product_id'       => 'required|string',
+'warehouse_id'     => 'required|string',
+    'images.*'                         => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+]);
+        $validated['warehouse_id'] = new \MongoDB\BSON\ObjectId($listing->warehouse_id);
+        $validated['is_active']   = $request->boolean('is_active');
+        $validated['is_sold_off'] = $request->boolean('is_sold_off', false);
+        $validated['is_popular']  = $request->boolean('is_popular', false);
+        $validated['main_category_id'] = new \MongoDB\BSON\ObjectId($request->main_category_id);
+$validated['sub_category_id']  = new \MongoDB\BSON\ObjectId($request->sub_category_id);
+$validated['product_id']       = new \MongoDB\BSON\ObjectId($request->product_id);
+$validated['warehouse_id']     = new \MongoDB\BSON\ObjectId($request->warehouse_id);
 
-        $validated['is_active'] = $request->boolean('is_active');
+        // Convert max_quantity: empty string → null
+        $slotsAsObjects = [];
+foreach ($validated['slots'] as $slot) {
+    $price      = (float) $slot['price'];
+    $commission = isset($slot['commission_percentage']) && $slot['commission_percentage'] !== ''
+                  ? (float) $slot['commission_percentage']
+                  : 0;
+    $totalPrice = isset($slot['total_price']) && $slot['total_price'] !== ''
+                  ? (float) $slot['total_price']
+                  : round($price + ($price * $commission / 100), 2);
+
+    $slotsAsObjects[] = (object) [
+        'min_quantity'          => (int) $slot['min_quantity'],
+        'max_quantity'          => (isset($slot['max_quantity']) && $slot['max_quantity'] !== '')
+                                    ? (int) $slot['max_quantity']
+                                    : null,
+        'price'                 => $price,
+        'commission_percentage' => $commission,
+        'total_price'           => $totalPrice,
+    ];
+}
+$validated['slots'] = $slotsAsObjects;
+
+         $images = $listing->images;
+    if ($request->hasFile('images')) {
+        foreach ($request->file('images') as $file) {
+            $timestamp    = time() . '_' . rand(1000, 9999);
+            $originalName = $file->getClientOriginalName();
+            $filename     = $timestamp . '_' . $originalName;
+            $path         = 'uploads/product_listings/' . $filename;
+
+            $file->storeAs('uploads/product_listings', $filename, 'public');
+
+            $images[] = (object) [
+    'size'          => $file->getSize(),
+    'uploaded_at'   => now()->toISOString(),
+    'filename'      => $filename,
+    'original_name' => $originalName,
+    'path'          => $path,
+    'url'           => $path,
+    'mime_type'     => $file->getMimeType(),
+];
+        }
+    }
+    $validated['images'] = $images;
 
         $listing->update($validated);
 
         return redirect()->route('product_listing.index')
-                         ->with('success', 'Listing updated successfully. Changes are reflected immediately.');
+                         ->with('success', 'Listing updated successfully.');
     }
 
     // ── Destroy ─────────────────────────────────────────────────────
@@ -189,4 +356,51 @@ class ProductListingController extends Controller
         $msg = $listing->is_active ? 'Listing is now active.' : 'Listing is now on hold.';
         return back()->with('success', $msg);
     }
+
+    // ── API: Sub-categories by Main Category ────────────────────
+public function getSubCategories(string $mainCategoryId)
+{
+    $subCategories = SubMenu::where('category_id', new \MongoDB\BSON\ObjectId($mainCategoryId))->get();
+    return response()->json($subCategories);
+}
+
+public function getProducts(string $subCategoryId)
+{
+    try {
+        $products = Product::where('sub_category_id', new \MongoDB\BSON\ObjectId($subCategoryId))
+                           ->get(['_id', 'product_name']);
+        return response()->json($products);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+// ── Approve Payment ─────────────────────────────────────────────
+
+public function approvePayment(string $id)
+{
+    $listing = ProductListing::findOrFail($id);
+    $listing->update(['is_paid' => true]);
+
+    return back()->with('success', 'Payment approved successfully.');
+}
+
+// ── Approve Listing ─────────────────────────────────────────────
+
+public function approveListing(string $id)
+{
+    $listing = ProductListing::findOrFail($id);
+    $listing->update([
+        'verification_status' => 'approved',
+        'is_active'           => true,
+    ]);
+
+    return back()->with('success', 'Listing approved successfully.');
+}
+
+// ── API: All Warehouses ─────────────────────────────────────
+public function getWarehouses()
+{
+    return response()->json(Warehouse::all(['id', 'name']));
+}
 }

@@ -34,9 +34,13 @@ class BidRequestController extends Controller
             $query->where('status', (int)$request->status);
         }
 
-        $bids = $query->orderBy('created_at', 'desc')->get();
+        $perPage = in_array((int)$request->get('per_page', 10), [10, 25, 50, 100])
+    ? (int)$request->get('per_page', 10)
+    : 10;
 
-        $bidsJson = $bids->map(function ($b) {
+$bids = $query->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
+
+        $bidsJson = $bids->getCollection()->map(function ($b) {
     return [
         'id'                  => (string)$b->id,
         'unique_id'           => $b->unique_id ?? ('Req' . str_pad($b->id, 5, '0', STR_PAD_LEFT)),

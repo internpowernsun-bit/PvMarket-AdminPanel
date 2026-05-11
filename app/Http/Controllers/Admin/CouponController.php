@@ -14,7 +14,9 @@ class CouponController extends Controller
         if ($request->filled('search')) {
             $query->where('code', 'like', '%' . $request->search . '%');
         }
-        $coupons = $query->orderBy('created_at', 'desc')->get();
+        $coupons = $query->orderBy('created_at', 'desc')
+                 ->paginate(request('per_page', 12)) 
+                 ->appends(request()->query());
         return view('admin.setup.coupons.coupons', [
             'mode'    => 'index',
             'coupons' => $coupons,

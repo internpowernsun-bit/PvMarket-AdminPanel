@@ -11,59 +11,68 @@ use Illuminate\Http\Request;
 class SalesController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = Order::where('is_active', 1);
+{
+    $query = Order::where('is_active', 1);
 
-        // Filter by seller user if provided (for user sales tab)
-        if ($request->filled('user_id')) {
-            $query->where('seller_id', $request->user_id);
-        }
-
-        // Filter by product
-        if ($request->filled('product_id')) {
-            $query->where('product_id', $request->product_id);
-        }
-
-        // Search by order id
-        if ($request->filled('search')) {
-            $query->where('unique_id', 'like', '%' . $request->search . '%');
-        }
-
-        // Filter by order status
-        if ($request->filled('order_status') && $request->order_status !== '') {
-            $query->where('order_status', (int)$request->order_status);
-        }
-
-        // Filter by payment method
-        if ($request->filled('payment_method') && $request->payment_method !== '') {
-            $query->where('payment_method', (int)$request->payment_method);
-        }
-
-        $orders = $query->orderBy('created_at', 'desc')->get();
-
-        // Load related products for dropdown filter
-        $products = Product::orderBy('product_name')
-                   ->get(['_id', 'product_name']);
-
-        // Load user info if filtering by user
-        $user = null;
-        if ($request->filled('user_id')) {
-            $user = User::find($request->user_id);
-        }
-
-        // Attach product & company info to each order
-        $productIds = $orders->pluck('product_id')->filter()->unique()->values();
-        $products_map = Product::whereIn('_id', $productIds->toArray())
-                               ->get()
-                               ->keyBy(fn($p) => (string)$p->_id);
-
-        $orders = $orders->map(function ($order) use ($products_map) {
-            $order->product_info = $products_map[(string)$order->product_id] ?? null;
-            return $order;
-        });
-
-        return view('admin.sales.index', compact('orders', 'products', 'user'));
+    if ($request->filled('user_id')) {
+        $query->where('seller_id', new \MongoDB\BSON\ObjectId($request->user_id));
     }
+
+    if ($request->filled('product_id')) {
+        $query->where('product_id', new \MongoDB\BSON\ObjectId($request->product_id));
+    }
+
+    if ($request->filled('search')) {
+        $query->where('unique_id', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->filled('order_status') && $request->order_status !== '') {
+        $query->where('order_status', (int)$request->order_status);
+    }
+
+    if ($request->filled('payment_method') && $request->payment_method !== '') {
+        $query->where('payment_method', (int)$request->payment_method);
+    }
+
+    // ── CHANGED: paginate instead of get ──
+    $perPage = (int) $request->input('per_page', 10);
+    $orders  = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+    // Products dropdown
+    $products = Product::orderBy('product_name')->get(['_id', 'product_name']);
+
+    // User info
+    $user = null;
+    if ($request->filled('user_id')) {
+        $user = User::find($request->user_id);
+    }
+
+    // ── CHANGED: map the current page items only, then set them back ──
+    $productIds = collect($orders->items())
+        ->pluck('product_id')
+        ->filter()
+        ->unique()
+        ->values()
+        ->map(fn($id) => new \MongoDB\BSON\ObjectId((string)$id))
+        ->toArray();
+
+    $products_map = Product::whereIn('_id', $productIds)
+        ->get()
+        ->keyBy(fn($p) => (string)$p->_id);
+
+    // Mutate the paginator's items in place
+    $orders->getCollection()->transform(function ($order) use ($products_map) {
+        $product = $products_map[(string)$order->product_id] ?? null;
+        $order->product_info         = $product;
+        $order->product_name_display = $product?->product_name ?? '—';
+        return $order;
+    });
+
+    // ── CHANGED: append all current query params so filters survive page clicks ──
+    $orders->appends($request->query());
+
+    return view('admin.sales.index', compact('orders', 'products', 'user'));
+}
 
     // ── Mark partial payment as verified ─────────────────────────
     public function markPaymentVerified(Request $request, $id)
@@ -81,9 +90,9 @@ class SalesController extends Controller
 
         $order = Order::findOrFail($id);
         $order->update([
-            'order_status' => $request->order_status,
-            'updated_by'   => auth()->id(),
-        ]);
+    'order_status' => $request->order_status,
+    'updated_by'   => auth()->id(),  // mutator handles ObjectId cast automatically
+]);
 
         return response()->json(['success' => true]);
     }
