@@ -17,7 +17,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role_id',
         'phone',      
         'avatar', 
         'is_active',
@@ -33,8 +33,19 @@ class User extends Authenticatable
         'password'      => 'hashed',
     ];
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id', '_id');
+    }
+
     public function isAdmin(): bool
     {
-        return in_array($this->role, ['admin', 'super_admin']);
+        // dd($this->role->slug);
+        return $this->role && in_array($this->role->slug, ['admin', 'super-admin']);
     }
+
+    // public function isAdmin(): bool
+    // {
+    //     return in_array($this->role, ['admin', 'super_admin']);
+    // }
 }
