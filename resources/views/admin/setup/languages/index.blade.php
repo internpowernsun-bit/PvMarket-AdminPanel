@@ -297,7 +297,7 @@
                     <div class="form-group">
                         <label>Quick Pick (ISO)</label>
                         <select class="form-control" id="iso-picker" onchange="fillFromIso(this)">
-                            <option value="">— select a language —</option>
+                            <option value=""> select a language </option>
                             @foreach($isoLanguages as $code => $name)
                                 @if(!isset($available[$code]))
                                     <option value="{{ $code }}" data-name="{{ $name }}">{{ $name }} ({{ $code }})</option>
