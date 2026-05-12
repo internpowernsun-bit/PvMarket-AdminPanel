@@ -847,14 +847,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
-    // ── Sidebar submenus ──
-    document.querySelectorAll('.nav-item.has-children').forEach(item => {
-        item.addEventListener('click', () => {
-            item.classList.toggle('open');
-            const sub = item.nextElementSibling;
-            if (sub && sub.classList.contains('nav-sub')) sub.classList.toggle('open');
-        });
+    // ── Sidebar toggle (for onclick="toggleNav(this)") ──
+window.toggleNav = function (clickedItem) {
+    const subMenu = clickedItem.nextElementSibling;
+    const isOpen = clickedItem.classList.contains('open');
+
+    document.querySelectorAll('.nav-item.has-children.open').forEach(function (item) {
+        if (item !== clickedItem) {
+            item.classList.remove('open');
+            if (item.nextElementSibling && item.nextElementSibling.classList.contains('nav-sub')) {
+                item.nextElementSibling.classList.remove('open');
+            }
+        }
     });
+
+    if (isOpen) {
+        clickedItem.classList.remove('open');
+        if (subMenu && subMenu.classList.contains('nav-sub')) {
+            subMenu.classList.remove('open');
+        }
+    } else {
+        clickedItem.classList.add('open');
+        if (subMenu && subMenu.classList.contains('nav-sub')) {
+            subMenu.classList.add('open');
+        }
+    }
+};
 
     // ── Avatar dropdown ──
     const avatarToggle   = document.getElementById('avatarToggle');

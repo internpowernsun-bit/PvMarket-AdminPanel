@@ -256,33 +256,3 @@
 
 </aside>
 
-{{-- ═══ Sidebar Toggle Script ═══ --}}
-<script>
-    function toggleNav(clickedItem) {
-        const subMenu = clickedItem.nextElementSibling;
-        const isOpen = clickedItem.classList.contains('open');
-
-        // Close all other open menus
-        document.querySelectorAll('.nav-item.has-children.open').forEach(function (item) {
-            if (item !== clickedItem) {
-                item.classList.remove('open');
-                if (item.nextElementSibling && item.nextElementSibling.classList.contains('nav-sub')) {
-                    item.nextElementSibling.classList.remove('open');
-                }
-            }
-        });
-
-        // Toggle the clicked one
-        if (isOpen) {
-            clickedItem.classList.remove('open');
-            if (subMenu && subMenu.classList.contains('nav-sub')) {
-                subMenu.classList.remove('open');
-            }
-        } else {
-            clickedItem.classList.add('open');
-            if (subMenu && subMenu.classList.contains('nav-sub')) {
-                subMenu.classList.add('open');
-            }
-        }
-    }
-</script>
