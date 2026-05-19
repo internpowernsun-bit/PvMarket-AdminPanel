@@ -20,7 +20,9 @@ class ProductListingController extends Controller
     {
         $userId = (string) Auth::id();   // ← cast to string to match MongoDB stored value
 
-        $query = ProductListing::where('user_id', new \MongoDB\BSON\ObjectId(Auth::id()));
+        //$query = ProductListing::where('user_id', new \MongoDB\BSON\ObjectId(Auth::id()));
+
+        $query = ProductListing::query();
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -29,20 +31,37 @@ class ProductListingController extends Controller
             });
         }
 
-        $filter = $request->get('filter', 'all');
-
-        match ($filter) {
-            'active'   => $query->where('is_active', true),
-            'inactive' => $query->where('is_active', false),
-            'paid'     => $query->where('is_paid', true),
-            'unpaid'   => $query->where('is_paid', false),
-            default    => null,
-        };
-
+        
+        $filter        = $request->get('filter', 'all');         
+        $statusFilter  = $request->get('status_filter', 'all'); 
+        $paymentFilter = $request->get('payment_filter', 'all');
         $warehouseFilter = $request->get('warehouse_id');
-        if ($warehouseFilter) {
-    $query->where('warehouse_id', new \MongoDB\BSON\ObjectId($warehouseFilter));
-}
+        // Verification status
+    if ($filter !== 'all') {
+        $query->where('verification_status', $filter);
+    }
+
+    // Active / On Hold
+    if ($statusFilter === 'active') {
+        $query->where('is_active', true);
+    } elseif ($statusFilter === 'on_hold') {
+        $query->where('is_active', false);
+    }
+
+    // Paid / Unpaid
+    if ($paymentFilter === 'paid') {
+        $query->where('is_paid', true);
+    } elseif ($paymentFilter === 'unpaid') {
+        $query->where('is_paid', false);
+    }
+
+    // Warehouse
+    if ($warehouseFilter) {
+        $query->where('warehouse_id', $warehouseFilter);
+    }
+
+    //$listings = $query->latest()->paginate(10)->withQueryString();
+
 
         $listings = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
@@ -63,9 +82,14 @@ $productsMap   = Product::whereIn('_id', $productIds)->get()
 $warehousesMap = Warehouse::whereIn('_id', $warehouseIds)->get()
                     ->keyBy(fn($w) => (string)$w->_id);
 
+$userIds  = $listings->pluck('user_id')->filter()->unique()
+                ->map(fn($id) => (string)$id)->values();
+$usersMap = \App\Models\User::whereIn('_id', $userIds)->get()
+                ->keyBy(fn($u) => (string)$u->_id);
+
 return view('admin.product_listing.index', compact(
-    'listings', 'unpaidCount', 'warehouses', 'warehouseFilter', 'filter',
-    'productsMap', 'warehousesMap',
+    'listings', 'unpaidCount', 'statusFilter', 'paymentFilter','warehouses', 'warehouseFilter', 'filter',
+    'productsMap', 'warehousesMap', 'usersMap',
 ));
     }
 
@@ -241,12 +265,22 @@ $warehouse    = Warehouse::where('_id', new \MongoDB\BSON\ObjectId($warehouseId)
         'DDP' => 'DDP - Delivered Duty Paid',
     ];
 
+    $inventoryHistory = \App\Models\InventoryTransaction::where(
+        'listing_id', new \MongoDB\BSON\ObjectId($id)
+    )
+    ->whereIn('transaction_type', ['initial_stock', 'stock_add', 'stock_reduce'])
+    ->orderBy('created_at', 'desc')
+    ->get();
+
+    $currentStock = \App\Models\InventoryTransaction::currentStock($id);
+
     return view('admin.product_listing.edit', compact(
-    'listing', 'sellTypes', 'currencies', 'discountTypes', 'incoterms',
-    'commissions', 'commissionsJson',
-    'mainCategory', 'subCategory', 'product', 'warehouse',
-    'mainCategories', 'subCategories', 'products', 'warehouses',
-));
+        'listing', 'sellTypes', 'currencies', 'discountTypes', 'incoterms',
+        'commissions', 'commissionsJson',
+        'mainCategory', 'subCategory', 'product', 'warehouse',
+        'mainCategories', 'subCategories', 'products', 'warehouses',
+        'inventoryHistory', 'currentStock',  // ← add these
+    ));
 }
     // ── Update ──────────────────────────────────────────────────────
 

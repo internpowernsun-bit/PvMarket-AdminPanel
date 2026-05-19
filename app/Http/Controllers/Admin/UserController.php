@@ -20,10 +20,7 @@ class UserController extends Controller
             });
         }
 
-        if ($request->filled('user_type')) {
-            $query->where('user_type', $request->user_type);
-        }
-
+        
         $users = $query->orderBy('created_at', 'desc')
                        ->paginate($request->get('entries', 10));
 
@@ -47,10 +44,10 @@ class UserController extends Controller
         ]);
 
         $user->update([
-            'name'   => $request->name,
-            'email'  => $request->email,
-            'mobile' => $request->mobile,
-        ]);
+    'name'   => $request->name,
+    'email'  => $request->email,
+    'mobile' => $request->mobile ?? null,
+]);
 
         return redirect()->route('admin.users.edit', $id)
                          ->with('success', 'Basic details updated.')
@@ -103,9 +100,7 @@ class UserController extends Controller
         });
     }
  
-    if ($request->filled('user_type')) {
-        $query->where('user_type', $request->user_type);
-    }
+    
  
     $users = $query->orderBy('created_at', 'desc')->get();
  
@@ -128,27 +123,21 @@ class UserController extends Controller
  
         // ── Column headers ────────────────────────────────────
         fputcsv($handle, [
-            'S.No',
-            'Name',
-            'Email',
-            'User Type',
-            'Company Type',
-            'Company Verified',
-            'Registered At',
-        ]);
- 
-        // ── Data rows ─────────────────────────────────────────
-        foreach ($users as $i => $user) {
-            fputcsv($handle, [
-                $i + 1,
-                $user->name,
-                $user->email,
-                ucfirst($user->user_type ?? 'buyer'),
-                $user->company_type ?? '',
-                ($user->company_verified ?? false) ? 'Yes' : 'No',
-                optional($user->created_at)->format('Y-m-d H:i'),
-            ]);
-        }
+    'S.No', 'Name', 'Email', 'Mobile', 'Active', 'On Hold', 'Email Verified', 'Registered At',
+]);
+
+foreach ($users as $i => $user) {
+    fputcsv($handle, [
+        $i + 1,
+        $user->name,
+        $user->email,
+        $user->mobile ?? '',
+        ($user->is_active ?? false) ? 'Yes' : 'No',
+        ($user->is_hold ?? false)   ? 'Yes' : 'No',
+        ($user->email_verified ?? false) ? 'Yes' : 'No',
+        optional($user->created_at)->format('Y-m-d H:i'),
+    ]);
+}
  
         fclose($handle);
     };

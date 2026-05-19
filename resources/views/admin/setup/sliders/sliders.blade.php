@@ -1,6 +1,13 @@
 {{-- views/admin/setup/sliders/sliders.blade.php --}}
 {{-- Single file handles: index | create | edit --}}
 
+@php
+    $sliderTypes = [
+        'top'           => 'Top',
+        'advertisement' => 'Advertisement',
+    ];
+@endphp
+
 {{-- ═══════════════════════════════════════
      MODE: INDEX
 ════════════════════════════════════════ --}}
@@ -20,6 +27,7 @@
     <x-slot name="columns">
         <th class="center">Slider Image</th>
         <th>Slider</th>
+        <th class="center">Slider Type</th>
         <th>Redirect Link</th>
         <th class="center" style="width:130px;">Action</th>
     </x-slot>
@@ -62,6 +70,28 @@
             </td>
             {{-- Name --}}
             <td style="font-weight:600;">{{ lang($slider, 'name') }}</td>
+            {{-- Slider Type badge --}}
+<td class="center">
+    @if($slider->slider_type)
+        @php
+            $badgeColors = [
+                'top'           => ['bg'=>'#EFF6FF','color'=>'#1D4ED8','border'=>'#BFDBFE'],
+                'advertisement' => ['bg'=>'#FDF4FF','color'=>'#7E22CE','border'=>'#E9D5FF'],
+            ];
+            $bc = $badgeColors[$slider->slider_type] ?? ['bg'=>'#F1F5F9','color'=>'#475569','border'=>'#E2E8F0'];
+        @endphp
+        <span style="
+            display:inline-flex; align-items:center;
+            padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700;
+            letter-spacing:.4px; text-transform:uppercase;
+            background:{{ $bc['bg'] }}; color:{{ $bc['color'] }}; border:1px solid {{ $bc['border'] }};
+        ">
+            {{ $sliderTypes[$slider->slider_type] ?? ucfirst($slider->slider_type) }}
+        </span>
+    @else
+        <span style="color:#CBD5E1;">—</span>
+    @endif
+</td>
             {{-- Link --}}
             <td>
                 @if($slider->redirect_link)
@@ -110,7 +140,7 @@
         </tr>
         @empty
         <tr>
-            <td colspan="6">
+            <td colspan="7">
                 <div class="empty-state">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -124,7 +154,7 @@
         @endforelse
     </x-slot>
 
-<x-slot name="pagination">
+    <x-slot name="pagination">
         @if ($records->hasPages())
         <nav style="display:flex; align-items:center; gap:4px;">
             @if ($records->onFirstPage())
@@ -156,13 +186,12 @@
 
 @push('scripts')
 <script>
-    {{-- Save drag-and-drop reorder via AJAX --}}
     document.addEventListener('rowsReordered', e => {
         fetch("{{ route('admin.setup.sliders.reorder') }}", {
             method: 'POST',
             headers: {
-                'Content-Type':  'application/json',
-                'X-CSRF-TOKEN':  document.querySelector('meta[name="csrf-token"]').content
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
             body: JSON.stringify({ order: e.detail.ids })
         });
@@ -176,51 +205,69 @@
 ════════════════════════════════════════ --}}
 @elseif($mode === 'create')
 
+
+
+{{-- Slider Type bar — sits OUTSIDE the component, rendered directly in the page --}}
+
+
 <x-admin.table-form-page
     title="Add Sliders"
     :back-route="route('admin.setup.sliders.index')"
     :action="route('admin.setup.sliders.store')"
 >
+
     <x-slot name="columns">
-        <th style="min-width:160px;">Slider Name</th>
-        <th style="min-width:200px;">Slider Image</th>
-        <th style="min-width:160px;">Alt Tag</th>
-        <th style="min-width:200px;">Redirect Link</th>
-    </x-slot>
+    <th style="min-width:160px;">Slider Name</th>
+    <th style="min-width:200px;">Slider Image</th>
+    <th style="min-width:160px;">Alt Tag</th>
+    <th style="min-width:200px;">Redirect Link</th>
+    <th style="min-width:140px;">Slider Type <span style="color:#EF4444;">*</span></th>  {{-- ✅ Added --}}
+</x-slot>
 
     <x-slot name="row">
-        <td>
-            <input
-                type="text"
-                name="sliders[{INDEX}][name]"
-                placeholder="e.g. Jinko Solar"
-                required
-            />
-        </td>
-        <td>
-            <input
-                type="file"
-                name="sliders[{INDEX}][image]"
-                accept="image/*"
-            />
-        </td>
-        <td>
-            <input
-                type="text"
-                name="sliders[{INDEX}][alt_tag]"
-                placeholder="e.g. Jinko"
-            />
-        </td>
-        <td>
-            <input
-                type="url"
-                name="sliders[{INDEX}][redirect_link]"
-                placeholder="https://example.com"
-            />
-        </td>
-    </x-slot>
+    <td>
+        <input type="text" name="sliders[{INDEX}][name]" placeholder="e.g. Jinko Solar" required/>
+    </td>
+    <td>
+        <input type="file" name="sliders[{INDEX}][image]" accept="image/*"/>
+    </td>
+    <td>
+        <input type="text" name="sliders[{INDEX}][alt_tag]" placeholder="e.g. Jinko"/>
+    </td>
+    <td>
+        <input type="url" name="sliders[{INDEX}][redirect_link]" placeholder="https://example.com"/>
+    </td>
+    {{-- ✅ Added: per-row type select instead of hidden input --}}
+    <td>
+        <select name="sliders[{INDEX}][slider_type]" class="slider-type-val" required
+                style="height:36px; padding:0 10px; border-radius:8px; border:1.5px solid var(--border); font-size:13px; font-weight:600; color:var(--text); font-family:inherit; cursor:pointer; outline:none; min-width:130px;">
+            <option value="" disabled selected>Select type</option>
+            <option value="top">Top</option>
+            <option value="advertisement">Advertisement</option>
+        </select>
+    </td>
+</x-slot>
 
 </x-admin.table-form-page>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Guard on submit — check every row has a type selected
+    var form = document.getElementById('tableForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            var missing = Array.from(document.querySelectorAll('.slider-type-val'))
+                               .some(function(el) { return !el.value; });
+            if (missing) {
+                e.preventDefault();
+                alert('Please select a Slider Type for every row before saving.');
+            }
+        });
+    }
+});
+</script>
+@endpush
 
 
 {{-- ═══════════════════════════════════════
@@ -234,6 +281,28 @@
     :action="route('admin.setup.sliders.update', $record->id)"
     method="PUT"
 >
+    {{-- ── Slider Type dropdown — above the form grid ── --}}
+    <div style="display:flex; align-items:center; gap:10px; padding:14px 18px; background:#F8FAFC; border:1.5px solid var(--border); border-radius:10px; margin-bottom:24px;">
+        <label for="slider_type_edit" style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; min-width:90px;">
+            Slider Type <span style="color:#EF4444;">*</span>
+        </label>
+        <select
+            id="slider_type_edit"
+            name="slider_type"
+            required
+            style="height:38px; padding:0 36px 0 12px; border-radius:8px; border:1.5px solid var(--border); font-size:13px; font-weight:600; color:var(--text); background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E&quot;) no-repeat right 10px center; appearance:none; -webkit-appearance:none; cursor:pointer; outline:none; transition:border-color .15s; min-width:180px;"
+            onfocus="this.style.borderColor='var(--primary)'"
+            onblur="this.style.borderColor='var(--border)'"
+        >
+            <option value="" disabled> Select type </option>
+            @foreach($sliderTypes as $value => $label)
+                <option value="{{ $value }}" {{ old('slider_type', $record->slider_type) === $value ? 'selected' : '' }}>
+                    {{ $label }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
     <div class="form-grid">
 
         {{-- Slider Name --}}

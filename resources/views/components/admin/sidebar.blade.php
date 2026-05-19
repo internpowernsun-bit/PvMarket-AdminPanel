@@ -58,6 +58,10 @@
                class="nav-sub-item {{ request()->routeIs('admin.setup.sub-admins.*') ? 'active' : '' }}">
                Sub Admins
             </a>
+            <a href="{{ route('admin.setup.roles.index') }}"
+   class="nav-sub-item {{ request()->routeIs('admin.setup.roles.*') ? 'active' : '' }}">
+   User Roles
+</a>
             <a href="{{ route('admin.setup.countries.index') }}"
                class="nav-sub-item {{ request()->routeIs('admin.setup.countries.*') ? 'active' : '' }}">
                Countries
@@ -212,6 +216,17 @@
         <path d="M9 12h6M9 16h4"/>
     </svg>
     Manage Listings
+</a>
+
+{{-- Inventory — paste this after the "Manage Listings" nav-item --}}
+<a href="{{ route('admin.inventory.index') }}"
+   class="nav-item {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73L13 2.27a2 2 0 0 0-2 0L4 6.27A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <line x1="12" y1="22.08" x2="12" y2="12"/>
+    </svg>
+    Inventory
 </a>
 
 

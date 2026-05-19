@@ -8,6 +8,7 @@ use App\Traits\HasTranslations;
 class Slider extends Model
 {
     use HasTranslations;
+
     protected $connection = 'mongodb';
     protected $collection = 'sliders';
 
@@ -16,6 +17,7 @@ class Slider extends Model
         'image',
         'alt_tag',
         'redirect_link',
+        'slider_type',
         'is_active',
         'sort_order',
     ];

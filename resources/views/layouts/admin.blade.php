@@ -700,7 +700,7 @@
 
                     <div class="avatar-tooltip">
                         <div class="avatar-tooltip-name">{{ Auth::user()->name }}</div>
-                        <div class="avatar-tooltip-role">{{ ucfirst(str_replace('_', ' ', Auth::user()->role ?? 'Admin')) }}</div>
+                        <div class="avatar-tooltip-role">{{ Auth::user()->role?->role ?? 'Admin' }}</div>
                     </div>
 
                     <div class="topbar-dropdown" id="avatarDropdown">
@@ -717,7 +717,7 @@
                             <div class="dropdown-header-info">
                                 <div class="dropdown-header-name">{{ Auth::user()->name }}</div>
                                 <div class="dropdown-header-email">{{ Auth::user()->email }}</div>
-                                <span class="dropdown-header-role">{{ Auth::user()->role ?? 'Admin' }}</span>
+                                <span class="dropdown-header-role">{{ Auth::user()->role?->role ?? 'Admin' }}</span>
                             </div>
                         </div>
 

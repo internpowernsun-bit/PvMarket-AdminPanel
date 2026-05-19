@@ -577,6 +577,96 @@
         .sticky-submit-bar { flex-direction: column; align-items: stretch; }
         .btn-update-main { justify-content: center; }
     }
+    /* ── Modals ── */
+.modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.5); z-index: 1050;
+    align-items: center; justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.modal-box {
+    background: #fff; border-radius: 18px; padding: 26px;
+    width: 100%; max-width: 430px; position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,.2);
+    animation: modalIn .18s ease; margin: 16px;
+}
+@keyframes modalIn {
+    from { opacity:0; transform: translateY(12px) scale(.97); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 30px; height: 30px; border-radius: 50%;
+    border: none; background: #f3f4f6; cursor: pointer;
+    color: var(--muted); font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: #e5e7eb; }
+.modal-title {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 2px;
+}
+.modal-subtitle { font-size: 12px; color: #9ca3af; margin-bottom: 20px; }
+.modal-form-group { margin-bottom: 18px; }
+.modal-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 7px; }
+.modal-qty-input, .modal-reason-input {
+    width: 100%; padding: 11px 13px;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: 14px; color: var(--text); outline: none;
+    transition: border-color .15s; box-sizing: border-box; font-family: inherit;
+}
+.modal-qty-input:focus, .modal-reason-input:focus { border-color: var(--blue); }
+.modal-reason-input { min-height: 85px; resize: vertical; }
+.adjust-tabs {
+    display: flex; margin-bottom: 22px;
+    border-radius: 10px; overflow: hidden; border: 1.5px solid var(--border);
+}
+.adjust-tab {
+    flex: 1; padding: 11px 10px; border: none; background: #fff;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: background .15s, color .15s; font-family: inherit; color: var(--muted);
+}
+.adjust-tab:first-child { border-right: 1.5px solid var(--border); }
+.adjust-tab.active.add    { background: var(--green); color: #fff; }
+.adjust-tab.active.reduce { background: var(--red);   color: #fff; }
+.modal-btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 20px; border-radius: 9px; border: none;
+    background: var(--blue); color: #fff; font-size: 13px;
+    font-weight: 700; cursor: pointer; font-family: inherit; transition: background .12s;
+}
+.modal-btn-primary:hover { background: var(--blue-d); }
+.modal-btn-add    { background: var(--green) !important; }
+.modal-btn-add:hover { background: #15803d !important; }
+.modal-btn-remove { background: var(--red) !important; }
+.modal-btn-remove:hover { background: #b91c1c !important; }
+.modal-btn-cancel {
+    padding: 9px 18px; border-radius: 9px;
+    border: 1.5px solid var(--border); background: #fff;
+    color: #374151; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+}
+.modal-btn-cancel:hover { background: #f9fafb; }
+.modal-btn-danger {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 9px 15px; border-radius: 9px;
+    border: 1.5px solid #fecaca; background: #fff;
+    color: var(--red); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.modal-btn-danger:hover { background: #fef2f2; }
+.inv-toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--text); color: #fff;
+    padding: 12px 20px; border-radius: 11px;
+    font-size: 13px; font-weight: 600;
+    box-shadow: 0 8px 28px rgba(0,0,0,.2); z-index: 9999;
+    transform: translateY(20px); opacity: 0;
+    transition: transform .25s, opacity .25s; pointer-events: none;
+}
+.inv-toast.show    { transform: translateY(0); opacity: 1; }
+.inv-toast.success { background: var(--green); }
+.inv-toast.error   { background: var(--red); }
 </style>
 @endsection
 
@@ -843,18 +933,31 @@
                         <p class="section-subtitle">Set quantity, lead time, and price tiers</p>
                     </div>
                     <div class="inventory-actions">
-                        <button type="button" class="btn-sm-outline">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Adjust Stock
-                        </button>
-                        <button type="button" class="btn-sm-outline">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                            </svg>
-                            Set Alert
-                        </button>
+                        <button type="button" class="btn-sm-outline"
+    data-id="{{ (string)$listing->_id }}"
+    data-sku="{{ $listing->sku_code }}"
+    data-stock="{{ $currentStock }}"
+    data-unit="pieces"
+    onclick="openAdjust(this)">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+    </svg>
+    Adjust Stock
+</button>
+<button type="button" class="btn-sm-outline"
+    data-id="{{ (string)$listing->_id }}"
+    data-sku="{{ $listing->sku_code }}"
+    data-stock="{{ $currentStock }}"
+    data-unit="pieces"
+    data-threshold="{{ $listing->alert_threshold ?? '' }}"
+    data-email="{{ !empty($listing->alert_email_enabled) ? '1' : '0' }}"
+    onclick="openAlert(this)">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    Set Alert
+</button>
                     </div>
                 </div>
                 <div class="section-body">
@@ -987,16 +1090,62 @@
                     </div>
 
                     {{-- Inventory History --}}
-                    <div style="margin-top:32px;">
-                        <div style="font-size:.9rem; font-weight:700; color:var(--text); margin-bottom:4px;">Inventory History</div>
-                        <div style="font-size:.78rem; color:var(--muted); margin-bottom:16px;">Recent stock movements and adjustments</div>
-                        <div class="inv-history-empty">
-                            <svg width="30" height="30" fill="none" stroke="#D1D5DB" stroke-width="1.2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <div style="margin-top:8px;">No inventory history yet</div>
-                        </div>
-                    </div>
+                    {{-- Inventory History --}}
+<div style="margin-top:32px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+        <div style="font-size:.9rem; font-weight:700; color:var(--text);">Inventory History</div>
+        <span style="font-size:.78rem; font-weight:600; background:#EFF6FF; color:var(--blue); padding:3px 10px; border-radius:20px; border:1px solid #BFDBFE;">
+            Current Stock: {{ number_format($currentStock) }} pcs
+        </span>
+    </div>
+    <div style="font-size:.78rem; color:var(--muted); margin-bottom:16px;">Recent stock movements and adjustments</div>
+
+    @if($inventoryHistory->isEmpty())
+        <div class="inv-history-empty">
+            <svg width="30" height="30" fill="none" stroke="#D1D5DB" stroke-width="1.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div style="margin-top:8px;">No inventory history yet</div>
+        </div>
+    @else
+        <div style="border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+            {{-- Table header --}}
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; padding:10px 16px; background:#F9FAFB; border-bottom:1px solid var(--border); font-size:.75rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;">
+                <span>Type</span>
+                <span>Quantity</span>
+                <span>Notes</span>
+                <span>Date</span>
+            </div>
+            {{-- Rows --}}
+            @foreach($inventoryHistory as $tx)
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; padding:11px 16px; border-bottom:1px solid #F9FAFB; font-size:.82rem; align-items:center;">
+                    {{-- Type badge --}}
+                    <span>
+                        @if($tx->transaction_type === 'stock_add' || $tx->transaction_type === 'initial_stock')
+                            <span style="display:inline-flex; align-items:center; gap:4px; background:#D1FAE5; color:#065F46; padding:2px 10px; border-radius:20px; font-size:.72rem; font-weight:600;">
+                                ↑ {{ $tx->transaction_label }}
+                            </span>
+                        @else
+                            <span style="display:inline-flex; align-items:center; gap:4px; background:#FEE2E2; color:#991B1B; padding:2px 10px; border-radius:20px; font-size:.72rem; font-weight:600;">
+                                ↓ {{ $tx->transaction_label }}
+                            </span>
+                        @endif
+                    </span>
+                    {{-- Quantity --}}
+                    <span style="font-weight:700; color:{{ $tx->is_addition ? 'var(--green)' : 'var(--red)' }};">
+                        {{ $tx->is_addition ? '+' : '-' }}{{ number_format($tx->quantity) }}
+                    </span>
+                    {{-- Notes --}}
+                    <span style="color:var(--muted);">{{ $tx->notes ?? '—' }}</span>
+                    {{-- Date --}}
+                    <span style="color:var(--muted); font-size:.75rem;">
+                        {{ \Carbon\Carbon::parse($tx->created_at)->format('d M Y, h:i A') }}
+                    </span>
+                </div>
+            @endforeach
+        </div>
+    @endif
+</div>
 
                 </div>
 
@@ -1157,6 +1306,83 @@
         </div>
 
     </form>
+    {{-- ══ Adjust Stock Modal ══ --}}
+<div class="modal-backdrop" id="adjustModal" onclick="backdropClose('adjustModal',event)">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('adjustModal')">×</button>
+        <div class="modal-title">Adjust Stock</div>
+        <div class="modal-subtitle" id="adjustSku"></div>
+        <div class="adjust-tabs">
+            <button class="adjust-tab active add" id="tabAdd" onclick="switchAdjustTab('add')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Stock
+            </button>
+            <button class="adjust-tab" id="tabReduce" onclick="switchAdjustTab('reduce')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Reduce Stock
+            </button>
+        </div>
+        <div class="modal-form-group">
+            <label class="modal-label">Quantity</label>
+            <input type="number" class="modal-qty-input" id="adjustQty" min="1" placeholder="Enter quantity" oninput="updateAdjustBtn()">
+        </div>
+        <div class="modal-form-group">
+            <label class="modal-label">Reason <span style="color:#9ca3af;font-weight:400;">(optional)</span></label>
+            <textarea class="modal-reason-input" id="adjustReason" placeholder="e.g., Restocked from supplier…"></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+            <button class="modal-btn-cancel" onclick="closeModal('adjustModal')">Cancel</button>
+            <button class="modal-btn-primary modal-btn-add" id="adjustSubmitBtn" onclick="submitAdjust()">+ Add 0</button>
+        </div>
+    </div>
+</div>
+
+{{-- ══ Alert Modal ══ --}}
+<div class="modal-backdrop" id="alertModal" onclick="backdropClose('alertModal',event)">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('alertModal')">×</button>
+        <div class="modal-title">
+            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Stock Alert Settings
+        </div>
+        <div class="modal-subtitle" id="alertSku"></div>
+        <div style="background:#f0fdf4;border-radius:12px;padding:14px 18px;margin-bottom:20px;">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Current Stock</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text);" id="alertCurrentStock"></div>
+        </div>
+        <div class="modal-form-group">
+            <label class="modal-label">Alert Threshold</label>
+            <div style="display:flex;align-items:stretch;">
+                <input type="number" id="alertThreshold" min="0" placeholder="0"
+                       style="flex:1;padding:10px 13px;border:1.5px solid var(--border);border-right:none;border-radius:9px 0 0 9px;font-size:14px;color:var(--text);outline:none;font-family:inherit;">
+                <span id="alertUnit" style="padding:10px 13px;border:1.5px solid var(--border);border-radius:0 9px 9px 0;background:#f9fafb;color:var(--muted);font-size:13px;display:flex;align-items:center;"></span>
+            </div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:5px;">You'll be alerted when stock falls to or below this level</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#f9fafb;border-radius:11px;padding:14px 16px;">
+            <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text);">Email Notifications</div>
+                <div style="font-size:12px;color:#9ca3af;margin-top:2px;">Receive email alerts for low stock</div>
+            </div>
+            <label style="position:relative;width:42px;height:24px;display:inline-block;cursor:pointer;flex-shrink:0;">
+                <input type="checkbox" id="alertEmailToggle" style="display:none;">
+                <span id="alertEmailTrack" style="position:absolute;inset:0;background:#d1d5db;border-radius:12px;transition:background .2s;"></span>
+                <span id="alertEmailThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);"></span>
+            </label>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:22px;">
+            <button class="modal-btn-danger" id="alertRemoveBtn" onclick="removeAlert()" style="display:none;">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+                Remove Alert
+            </button>
+            <button class="modal-btn-cancel" onclick="closeModal('alertModal')">Cancel</button>
+            <button class="modal-btn-primary" onclick="saveAlert()">Save Alert</button>
+        </div>
+    </div>
+</div>
+
+{{-- Toast --}}
+<div class="inv-toast" id="invToast"></div>
 </div>
 @endsection
 
@@ -1478,6 +1704,114 @@ function renderSlots() {
     const count = slots.length;
     document.getElementById('summTiers').textContent    = count + (count === 1 ? ' tier' : ' tiers');
     document.getElementById('tierFraction').textContent = count + '/3';
+}
+// ── Modal state ───────────────────────────────────────────────
+let currentAlertListingId  = null;
+let currentAdjustListingId = null;
+let currentAdjustType      = 'add';
+
+function showToast(msg, type = '') {
+    const t = document.getElementById('invToast');
+    t.textContent = msg;
+    t.className   = 'inv-toast show' + (type ? ' ' + type : '');
+    setTimeout(() => { t.className = 'inv-toast'; }, 3200);
+}
+function closeModal(id)       { document.getElementById(id).classList.remove('open'); }
+function backdropClose(id, e) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+// Alert email toggle visual
+document.getElementById('alertEmailToggle').addEventListener('change', function () {
+    document.getElementById('alertEmailTrack').style.background = this.checked ? 'var(--blue)' : '#d1d5db';
+    document.getElementById('alertEmailThumb').style.transform  = this.checked ? 'translateX(18px)' : 'translateX(0)';
+});
+
+// ── Adjust Modal ──────────────────────────────────────────────
+function openAdjust(el) {
+    currentAdjustListingId = el.dataset.id;
+    currentAdjustType      = 'add';
+    document.getElementById('adjustSku').textContent  = `${el.dataset.sku} — Current stock: ${el.dataset.stock} ${el.dataset.unit}`;
+    document.getElementById('adjustQty').value        = '';
+    document.getElementById('adjustReason').value     = '';
+    switchAdjustTab('add');
+    document.getElementById('adjustModal').classList.add('open');
+}
+function switchAdjustTab(type) {
+    currentAdjustType = type;
+    const addSvg   = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+    const minusSvg = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+    document.getElementById('tabAdd').className    = 'adjust-tab' + (type === 'add'    ? ' active add'    : '');
+    document.getElementById('tabAdd').innerHTML    = addSvg + ' Add Stock';
+    document.getElementById('tabReduce').className = 'adjust-tab' + (type === 'reduce' ? ' active reduce' : '');
+    document.getElementById('tabReduce').innerHTML = minusSvg + ' Reduce Stock';
+    updateAdjustBtn();
+}
+function updateAdjustBtn() {
+    const qty = parseInt(document.getElementById('adjustQty').value) || 0;
+    const btn = document.getElementById('adjustSubmitBtn');
+    if (currentAdjustType === 'add') {
+        btn.textContent = `+ Add ${qty}`;
+        btn.className   = 'modal-btn-primary modal-btn-add';
+    } else {
+        btn.textContent = `− Remove ${qty}`;
+        btn.className   = 'modal-btn-primary modal-btn-remove';
+    }
+}
+function submitAdjust() {
+    const qty = parseInt(document.getElementById('adjustQty').value);
+    if (!qty || qty < 1) { showToast('Enter a valid quantity.', 'error'); return; }
+    fetch(`/admin/inventory/${currentAdjustListingId}/adjust`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+        body: JSON.stringify({ type: currentAdjustType, quantity: qty, notes: document.getElementById('adjustReason').value }),
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) { showToast(`Stock updated. New stock: ${d.new_stock}`, 'success'); closeModal('adjustModal'); }
+        else           { showToast(d.message || 'Error.', 'error'); }
+    })
+    .catch(() => showToast('Network error.', 'error'));
+}
+
+// ── Alert Modal ───────────────────────────────────────────────
+function openAlert(el) {
+    currentAlertListingId = el.dataset.id;
+    const threshold = el.dataset.threshold || null;
+    document.getElementById('alertSku').textContent          = el.dataset.sku;
+    document.getElementById('alertCurrentStock').textContent = `${el.dataset.stock} ${el.dataset.unit}`;
+    document.getElementById('alertUnit').textContent         = el.dataset.unit;
+    document.getElementById('alertThreshold').value          = threshold || '';
+    const emailOn = el.dataset.email === '1';
+    document.getElementById('alertEmailToggle').checked      = emailOn;
+    document.getElementById('alertEmailTrack').style.background = emailOn ? 'var(--blue)' : '#d1d5db';
+    document.getElementById('alertEmailThumb').style.transform  = emailOn ? 'translateX(18px)' : 'translateX(0)';
+    document.getElementById('alertRemoveBtn').style.display  = threshold ? 'inline-flex' : 'none';
+    document.getElementById('alertModal').classList.add('open');
+}
+function saveAlert() {
+    const threshold = document.getElementById('alertThreshold').value;
+    if (threshold === '') { showToast('Please enter a threshold.', 'error'); return; }
+    fetch(`/admin/inventory/${currentAlertListingId}/alert`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+        body: JSON.stringify({ threshold: parseInt(threshold), email_enabled: document.getElementById('alertEmailToggle').checked }),
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) { showToast('Alert saved.', 'success'); closeModal('alertModal'); }
+        else           { showToast(d.message || 'Error saving alert.', 'error'); }
+    })
+    .catch(() => showToast('Network error.', 'error'));
+}
+function removeAlert() {
+    fetch(`/admin/inventory/${currentAlertListingId}/alert`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) { showToast('Alert removed.', 'success'); closeModal('alertModal'); }
+    })
+    .catch(() => showToast('Network error.', 'error'));
 }
 </script>
 @endsection

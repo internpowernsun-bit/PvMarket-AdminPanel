@@ -33,6 +33,8 @@ use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\BidRequestController;
 use App\Http\Controllers\Admin\ProductListingController;
 use App\Http\Controllers\Admin\CommissionController;
+use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\RoleController;
 
  
 
@@ -246,6 +248,15 @@ Route::prefix('setup/commissions')->name('admin.setup.commissions.')->group(func
         Route::delete('/{id}',   [PricePromotionController::class, 'destroy'])->name('destroy');
     });
 
+    Route::middleware(['web', 'auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/inventory',                      [InventoryController::class, 'index'])->name('inventory.index');
+    Route::post('/inventory/{listingId}/adjust',  [InventoryController::class, 'adjustStock'])->name('inventory.adjust');
+    Route::get('/inventory/{listingId}/history',  [InventoryController::class, 'history'])->name('inventory.history');
+    Route::get('/inventory/{listingId}/alert',    [InventoryController::class, 'getAlert'])->name('inventory.alert.get');
+    Route::post('/inventory/{listingId}/alert',   [InventoryController::class, 'saveAlert'])->name('inventory.alert.save');
+    Route::delete('/inventory/{listingId}/alert', [InventoryController::class, 'removeAlert'])->name('inventory.alert.remove');
+    Route::post('/inventory/global-alert',        [InventoryController::class, 'saveGlobalAlert'])->name('inventory.globalAlert');
+});
     // Product Detail Options
 Route::prefix('admin/products/detail-options')->name('admin.products.detail-options.')->group(function () {
     Route::get('/',                        [App\Http\Controllers\Admin\ProductDetailOptionController::class, 'index'])  ->name('index');
@@ -254,6 +265,19 @@ Route::prefix('admin/products/detail-options')->name('admin.products.detail-opti
     Route::get('/{detailOption}/edit',     [App\Http\Controllers\Admin\ProductDetailOptionController::class, 'edit'])   ->name('edit');
     Route::put('/{detailOption}',          [App\Http\Controllers\Admin\ProductDetailOptionController::class, 'update']) ->name('update');
     Route::delete('/{detailOption}',       [App\Http\Controllers\Admin\ProductDetailOptionController::class, 'destroy'])->name('destroy');
+});
+
+
+
+    // ── User Roles ──────────────────────────────────────────
+    Route::prefix('admin/setup/roles')->name('admin.setup.roles.')->group(function () {
+    Route::get('/',              [App\Http\Controllers\Admin\RoleController::class, 'index'])  ->name('index');
+    Route::get('/create',        [App\Http\Controllers\Admin\RoleController::class, 'create']) ->name('create');
+    Route::post('/',             [App\Http\Controllers\Admin\RoleController::class, 'store'])  ->name('store');
+    Route::get('/{id}/edit',     [App\Http\Controllers\Admin\RoleController::class, 'edit'])   ->name('edit');
+    Route::put('/{id}',          [App\Http\Controllers\Admin\RoleController::class, 'update']) ->name('update');
+    Route::patch('/{id}/toggle', [App\Http\Controllers\Admin\RoleController::class, 'toggle']) ->name('toggle');
+    Route::delete('/{id}',       [App\Http\Controllers\Admin\RoleController::class, 'destroy'])->name('destroy');
 });
 
 

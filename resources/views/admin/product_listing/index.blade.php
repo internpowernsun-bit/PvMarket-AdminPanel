@@ -361,6 +361,157 @@
         .header-right { width: 100%; }
         .warehouse-select { width: 100%; min-width: unset; }
     }
+
+    /* ── Search bar ── */
+.search-wrap {
+    position: relative;
+    margin-bottom: 16px;
+}
+.search-wrap > svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+}
+.search-input {
+    width: 100%;
+    padding: 11px 88px 11px 42px; /* ← increased right padding */
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    background: white;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--primary); }
+
+.btn-icon-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    background: white;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, border-color .15s;
+    white-space: nowrap;
+}
+.btn-icon-outline:hover { background: #f3f4f6; }
+
+.view-toggle {
+    display: flex;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    flex-shrink: 0;
+}
+.view-toggle-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    transition: background .15s, color .15s;
+    flex-shrink: 0;
+}
+.view-toggle-btn.active,
+.view-toggle-btn:hover { background: var(--primary); color: white; }
+.view-toggle-btn:first-child { border-right: 1.5px solid var(--border); }
+    /* ── Multi-filter bar ── */
+.filter-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.filter-bar-left  { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.filter-bar-right { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+
+.filter-group { display: flex; flex-direction: column; gap: 6px; }
+
+.filter-group-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+/* ── Grid view ── */
+#listingsWrap.grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+#listingsWrap.grid-view .listing-card {
+    flex-direction: column;
+    margin-bottom: 0;
+}
+#listingsWrap.grid-view .listing-thumb {
+    width: 100%;
+    height: 160px;
+}
+#listingsWrap.grid-view .listing-meta {
+    grid-template-columns: 1fr 1fr;
+}
+/* ── Grid view: lister info stacks vertically ── */
+#listingsWrap.grid-view .lister-info-box {
+    flex-direction: column;
+    gap: 6px;
+}
+#listingsWrap.grid-view {
+    align-items: stretch;  /* add this */
+}
+#listingsWrap.grid-view .listing-card {
+    height: 100%;  /* add this */
+}
+
+.filter-group-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.filter-pill {
+    padding: 5px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1.5px solid var(--border);
+    background: white;
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .2s;
+    font-family: inherit;
+}
+.filter-pill:hover,
+.filter-pill.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+.filter-pill.active-green  { background: #16a34a; color: white; border-color: #16a34a; }
+.filter-pill.active-blue   { background: var(--blue); color: white; border-color: var(--blue); }
 </style>
 @endsection
 
@@ -373,91 +524,172 @@
     @endif
 
     {{-- ── Header ── --}}
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">Manage Listings</h1>
-            <div class="page-subtitle">
-                <div>* Make one time payment to use lifetime.</div>
-                <div>* Per Offer List charge: $5</div>
-                <div>* Unpaid offers: <strong>{{ $unpaidCount }}</strong></div>
-            </div>
-        </div>
-
-        <div class="header-right">
-            {{-- Warehouse filter dropdown --}}
-            <div class="wh-wrap">
-                <span class="wh-label">
-                    Filter by Warehouse
-                    @if($warehouseFilter)
-                        <button type="button"
-                                class="wh-clear-btn"
-                                id="whClearBtn"
-                                style="display:inline-flex;"
-                                onclick="clearWarehouseFilter()">
-                            &nbsp;✕ Clear
-                        </button>
-                    @endif
-                </span>
-
-                {{-- The form wraps just the select; filter tab links carry warehouse_id via JS --}}
-                <form method="GET" action="{{ route('product_listing.index') }}" id="warehouseForm">
-                    <input type="hidden" name="filter" value="{{ $filter }}" id="warehouseFormFilter">
-                    <select name="warehouse_id"
-                            class="warehouse-select"
-                            id="warehouseSelect"
-                            onchange="applyWarehouseFilter(this)">
-                        <option value="">All Warehouses</option>
-                        @foreach($warehouses as $wh)
-                            <option value="{{ $wh->id }}"
-                                {{ $warehouseFilter == $wh->id ? 'selected' : '' }}>
-                                {{ $wh->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </form>
-
-                @if($warehouseFilter)
-                    @php $selectedWh = $warehouses->firstWhere('id', $warehouseFilter); @endphp
-                    @if($selectedWh)
-                        <span style="font-size:11px; color:var(--primary); font-weight:600;">
-                            📦 Showing: {{ $selectedWh->name }}
-                        </span>
-                    @endif
-                @endif
-            </div>
-
-            {{-- Add button --}}
-            <a href="{{ route('product_listing.create') }}" class="btn-add">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                Add +
-            </a>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Manage Listings</h1>
+        <div class="page-subtitle">
+            <div>* Make one time payment to use lifetime.</div>
+            <div>* Per Offer List charge: $5</div>
+            <div>* Unpaid offers: <strong>{{ $unpaidCount }}</strong></div>
         </div>
     </div>
 
-    {{-- ── Filter Tabs ── --}}
-    {{-- Tabs preserve the current warehouse filter via query string --}}
-    <div class="filter-tabs">
-        @foreach(['all' => 'All', 'active' => 'Active', 'inactive' => 'InActive', 'paid' => 'Paid', 'unpaid' => 'Unpaid'] as $key => $label)
+    <div class="header-right">
+        {{-- Warehouse filter dropdown --}}
+        <div class="wh-wrap">
+            <span class="wh-label">
+                Filter by Warehouse
+                @if($warehouseFilter)
+                    <button type="button" class="wh-clear-btn" id="whClearBtn"
+                            style="display:inline-flex;" onclick="clearWarehouseFilter()">
+                        &nbsp;✕ Clear
+                    </button>
+                @endif
+            </span>
+            <form method="GET" action="{{ route('product_listing.index') }}" id="warehouseForm">
+                <input type="hidden" name="filter" value="{{ $filter }}" id="warehouseFormFilter">
+                <select name="warehouse_id" class="warehouse-select" id="warehouseSelect"
+                        onchange="applyWarehouseFilter(this)">
+                    <option value="">All Warehouses</option>
+                    @foreach($warehouses as $wh)
+                        <option value="{{ $wh->id }}" {{ $warehouseFilter == $wh->id ? 'selected' : '' }}>
+                            {{ $wh->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+            @if($warehouseFilter)
+                @php $selectedWh = $warehouses->firstWhere('id', $warehouseFilter); @endphp
+                @if($selectedWh)
+                    <span style="font-size:11px; color:var(--primary); font-weight:600;">
+                        📦 Showing: {{ $selectedWh->name }}
+                    </span>
+                @endif
+            @endif
+        </div>
+
+        {{-- Refresh --}}
+        <a href="{{ route('product_listing.index') }}" class="btn-icon-outline">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            Refresh
+        </a>
+
+        
+
+        {{-- Add button --}}
+        <a href="{{ route('product_listing.create') }}" class="btn-add">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            New Listing
+        </a>
+    </div>
+</div>
+
+{{-- ── Search bar + view toggle ── --}}
+<form method="GET" action="{{ route('product_listing.index') }}" id="searchForm">
+    @foreach(request()->except('search') as $key => $val)
+        <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+    @endforeach
+    <div class="search-wrap">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text"
+               name="search"
+               class="search-input"
+               placeholder="Search by product name, SKU..."
+               value="{{ request('search') }}"
+               oninput="debounceSearch(this.form)">
+
+        {{-- View toggle inside search bar (right side) --}}
+        <div class="view-toggle" style="position:absolute; right:6px; top:50%; transform:translateY(-50%); height:36px;">
+            <button type="button" class="view-toggle-btn active" id="btnList" onclick="setView('list')" title="List view">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+                    <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+                    <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+            </button>
+            <button type="button" class="view-toggle-btn" id="btnGrid" onclick="setView('grid')" title="Grid view">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</form>
+
+{{-- ── Filter bar ── --}}
+<div class="filter-bar">
+
+    {{-- LEFT: Verification Status --}}
+    <div class="filter-bar-left">
+        <span class="filter-group-label" style="margin-right:4px;">Verification Status</span>
+        @foreach(['all' => 'All', 'pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected'] as $key => $label)
             <a href="{{ route('product_listing.index', array_merge(
-                    $warehouseFilter ? ['warehouse_id' => $warehouseFilter] : [],
+                    request()->only(['warehouse_id', 'status_filter', 'payment_filter', 'search']),
                     ['filter' => $key]
                 )) }}"
-               class="filter-tab {{ $filter === $key ? 'active' : '' }}">
+               class="filter-pill {{ $filter === $key ? 'active' : '' }}">
                 {{ $label }}
             </a>
         @endforeach
     </div>
 
+    {{-- RIGHT: Status + Payment --}}
+    <div class="filter-bar-right">
+
+        {{-- Status --}}
+        <div class="filter-group">
+            <span class="filter-group-label">Status</span>
+            <div class="filter-group-pills">
+                @foreach(['all' => 'All', 'active' => 'Active', 'on_hold' => 'On Hold'] as $key => $label)
+                    <a href="{{ route('product_listing.index', array_merge(
+                            request()->only(['warehouse_id', 'filter', 'payment_filter', 'search']),
+                            ['status_filter' => $key]
+                        )) }}"
+                       class="filter-pill {{ ($statusFilter ?? 'all') === $key ? 'active' : '' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Payment --}}
+        <div class="filter-group">
+            <span class="filter-group-label">Payment</span>
+            <div class="filter-group-pills">
+                @foreach(['all' => 'All', 'paid' => 'Paid', 'unpaid' => 'Unpaid'] as $key => $label)
+                    <a href="{{ route('product_listing.index', array_merge(
+                            request()->only(['warehouse_id', 'filter', 'status_filter', 'search']),
+                            ['payment_filter' => $key]
+                        )) }}"
+                       class="filter-pill {{ ($paymentFilter ?? 'all') === $key ? 'active' : '' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+    </div>
+</div>
+
     {{-- ── Listings ── --}}
+    <div id="listingsWrap">
     @forelse($listings as $listing)
         @php
     $productId   = is_object($listing->product_id) ? $listing->product_id->__toString() : (string)$listing->product_id;
-$warehouseId = is_object($listing->warehouse_id) ? $listing->warehouse_id->__toString() : (string)$listing->warehouse_id;
-$product     = $productsMap[$productId] ?? null;
-$warehouse   = $warehousesMap[$warehouseId] ?? null;
-    $slots     = $listing->slots ?? [];
+    $warehouseId = is_object($listing->warehouse_id) ? $listing->warehouse_id->__toString() : (string)$listing->warehouse_id;
+    $listingUserId = is_object($listing->user_id) ? $listing->user_id->__toString() : (string)$listing->user_id;
+    $product     = $productsMap[$productId] ?? null;
+    $warehouse   = $warehousesMap[$warehouseId] ?? null;
+    $lister      = $usersMap[$listingUserId] ?? null;
+    $slots       = $listing->slots ?? [];
 @endphp
 
         <div class="listing-card" id="card-{{ $listing->id }}">
@@ -485,6 +717,35 @@ src="{{ $firstImage && !empty($firstImage['path']) ? asset('storage/' . $firstIm
                     <div>
                         <h5 class="listing-name">{{ $product?->product_name ?? $product?->name ?? $listing->product_id }}</h5>
                         <div class="listing-sku">SKU: {{ $listing->sku_code }}</div>
+                        @if($lister)
+                        <div class="lister-info-box" style="display:flex; align-items:center; gap:16px; margin-top:8px; padding:8px 12px; background:#EFF6FF; border-radius:8px; border:1px solid #BFDBFE; transition: background .2s, border-color .2s, box-shadow .2s; flex-wrap:wrap;" 
+     onmouseover="this.style.background='#DBEAFE'; this.style.borderColor='#93C5FD'; this.style.boxShadow='0 2px 8px rgba(59,130,246,0.12)'" 
+     onmouseout="this.style.background='#EFF6FF'; this.style.borderColor='#BFDBFE'; this.style.boxShadow='none'">
+                            <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:#374151;">
+                                <svg width="13" height="13" fill="none" stroke="#6B7280" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                <span style="font-weight:600; color:#111827;">{{ $lister->name }}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:#6B7280;">
+                                <svg width="13" height="13" fill="none" stroke="#6B7280" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                                {{ $lister->email }}
+                            </div>
+                            @if($lister->mobile)
+                            <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:#6B7280;">
+                                <svg width="13" height="13" fill="none" stroke="#6B7280" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                                    <line x1="12" y1="18" x2="12.01" y2="18"/>
+                                </svg>
+                                {{ $lister->mobile }}
+                            </div>
+                            @endif
+                        </div>
+                        @endif
 
                         {{-- Tags --}}
                         <div class="listing-tags">
@@ -656,10 +917,12 @@ Min {{ number_format($minQty) }}
             </a>
         </div>
     @endforelse
+    </div>
 
+    
     {{-- Pagination --}}
-    <div class="pagination-wrap">
-        {{ $listings->links() }}
+    <div class="pagination-wrap" style="display:flex; justify-content:flex-end;">
+        <x-admin.pagination :paginator="$listings" />
     </div>
 
 </div>
@@ -667,6 +930,38 @@ Min {{ number_format($minQty) }}
 
 @section('scripts')
 <script>
+
+    // ── Search debounce ───────────────────────────────────────────
+let searchTimer;
+function debounceSearch(form) {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => form.submit(), 500);
+}
+
+// ── Grid / List view toggle ───────────────────────────────────
+function setView(type) {
+    const listingsWrap = document.getElementById('listingsWrap');
+    const btnList = document.getElementById('btnList');
+    const btnGrid = document.getElementById('btnGrid');
+
+    if (type === 'grid') {
+        listingsWrap.classList.add('grid-view');
+        btnGrid.classList.add('active');
+        btnList.classList.remove('active');
+        localStorage.setItem('listingView', 'grid');
+    } else {
+        listingsWrap.classList.remove('grid-view');
+        btnList.classList.add('active');
+        btnGrid.classList.remove('active');
+        localStorage.setItem('listingView', 'list');
+    }
+}
+
+// Restore saved view on load
+document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('listingView');
+    if (saved === 'grid') setView('grid');
+});
 // ── Slot toggle ───────────────────────────────────────────────
 function toggleSlots(id) {
     const el    = document.getElementById('slots-' + id);

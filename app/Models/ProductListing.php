@@ -140,4 +140,5 @@ public function getSlotsAttribute($value)
         return [];
     })->filter(fn($s) => !empty($s))->values()->toArray();
 }
+
 }

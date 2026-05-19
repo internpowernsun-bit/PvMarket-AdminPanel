@@ -240,10 +240,11 @@
 <div class="content-panel">
 
     <div class="add-more-wrap">
-        <button type="button" class="btn-add-more" id="addMoreBtn">
-            + Add More
-        </button>
-    </div>
+    {{ $toolbar ?? '' }}
+    <button type="button" class="btn-add-more" id="addMoreBtn">
+        + Add More
+    </button>
+</div>
 
     <form method="POST" action="{{ $action }}" enctype="multipart/form-data" id="tableForm">
         @csrf

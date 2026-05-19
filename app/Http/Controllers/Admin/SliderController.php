@@ -10,42 +10,49 @@ use App\Services\TranslationService;
 class SliderController extends ResourceController
 {
     public function __construct(protected TranslationService $translator) {}
-    protected string $model   = Slider::class;
-    protected string $view    = 'admin.setup.sliders.sliders';
-    protected string $route   = 'admin.setup.sliders';
+
+    protected string $model = Slider::class;
+    protected string $view  = 'admin.setup.sliders.sliders';
+    protected string $route = 'admin.setup.sliders';
 
     protected array $rules = [
         'name'          => 'required|string|max:255',
         'alt_tag'       => 'nullable|string|max:255',
         'redirect_link' => 'nullable|url',
         'image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        'slider_type'   => 'required|string|in:top,advertisement',
     ];
 
-    protected array $fields = ['name', 'alt_tag', 'redirect_link'];
+    protected array $fields = ['name', 'alt_tag', 'redirect_link', 'slider_type'];
 
     public function store(Request $request)
     {
         $request->validate([
-            'sliders'                 => 'required|array|min:1',
-            'sliders.*.name'          => 'required|string|max:255',
-            'sliders.*.redirect_link' => 'nullable|url',
-            'sliders.*.alt_tag'       => 'nullable|string|max:255',
-            'sliders.*.image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-        ]);
+    'sliders'                 => 'required|array|min:1',
+    'sliders.*.name'          => 'required|string|max:255',
+    'sliders.*.slider_type'   => 'required|string|in:top,bottom,side,popup',
+    'sliders.*.redirect_link' => 'nullable|url',
+    'sliders.*.alt_tag'       => 'nullable|string|max:255',
+    'sliders.*.image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+]);
 
-        $sortStart = Slider::count();
+        $sortStart   = Slider::count();
+        $sliderType  = $request->input('slider_type');
 
         foreach ($request->sliders as $i => $data) {
             $row = [
                 'name'          => $data['name'],
-                'alt_tag'       => $data['alt_tag'] ?? null,
+                'alt_tag'       => $data['alt_tag']       ?? null,
                 'redirect_link' => $data['redirect_link'] ?? null,
+                'slider_type'   => $data['slider_type'] ?? null,            
                 'is_active'     => true,
                 'sort_order'    => $sortStart + $i + 1,
             ];
+
             if ($request->hasFile("sliders.{$i}.image")) {
                 $row['image'] = $request->file("sliders.{$i}.image")->store('sliders', 'public');
             }
+
             $row = $this->attachTranslations($row, new Slider());
             Slider::create($row);
         }
@@ -57,16 +64,23 @@ class SliderController extends ResourceController
     public function update(Request $request, $id)
     {
         $slider = Slider::findOrFail($id);
-        $request->validate($this->rules);
 
-        $data = $request->only(['name', 'alt_tag', 'redirect_link']);
+        $request->validate([
+            'name'          => 'required|string|max:255',
+            'alt_tag'       => 'nullable|string|max:255',
+            'redirect_link' => 'nullable|url',
+            'image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'slider_type'   => 'required|string|in:top,advertisement',
+        ]);
+
+        $data = $request->only(['name', 'alt_tag', 'redirect_link', 'slider_type']);
 
         if ($request->hasFile('image')) {
             if ($slider->image) Storage::disk('public')->delete($slider->image);
             $data['image'] = $request->file('image')->store('sliders', 'public');
         }
-        $data = $this->attachTranslations($data, $slider);
 
+        $data = $this->attachTranslations($data, $slider);
         $slider->update($data);
 
         return redirect()->route('admin.setup.sliders.index')
@@ -98,27 +112,27 @@ class SliderController extends ResourceController
     }
 
     private function attachTranslations(array $data, $modelInstance): array
-{
-    $languages    = array_keys(config('languages.available'));
-    $translatable = $modelInstance->translatable ?? [];
+    {
+        $languages    = array_keys(config('languages.available'));
+        $translatable = $modelInstance->translatable ?? [];
 
-    foreach ($languages as $locale) {
-        if ($locale === 'en') continue;
+        foreach ($languages as $locale) {
+            if ($locale === 'en') continue;
 
-        $translated = [];
-        foreach ($translatable as $field) {
-            if (!empty($data[$field])) {
-                $translated[$field] = $this->translator->translateText(
-                    $data[$field], $locale, 'en'
-                );
+            $translated = [];
+            foreach ($translatable as $field) {
+                if (!empty($data[$field])) {
+                    $translated[$field] = $this->translator->translateText(
+                        $data[$field], $locale, 'en'
+                    );
+                }
+            }
+
+            if (!empty($translated)) {
+                $data[$locale] = $translated;
             }
         }
 
-        if (!empty($translated)) {
-            $data[$locale] = $translated;
-        }
+        return $data;
     }
-
-    return $data;
-}
 }
